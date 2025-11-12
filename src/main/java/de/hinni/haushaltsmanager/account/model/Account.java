@@ -1,10 +1,8 @@
 package de.hinni.haushaltsmanager.account.model;
 
-import de.hinni.haushaltsmanager.BaseEntity;
-import de.hinni.haushaltsmanager.shared.SupportedCurrencies;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import de.hinni.haushaltsmanager.shared.BaseEntity;
+import de.hinni.haushaltsmanager.shared.SupportedCurrency;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,11 +11,10 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Account extends BaseEntity {
-    @Id
-    @GeneratedValue
-    private Long id;
-    private String name;
-    private SupportedCurrencies curreny;
-    private BigDecimal balance;
+    protected String name;
+    @Enumerated(EnumType.STRING)
+    protected SupportedCurrency currency;
+    protected BigDecimal balance;
 }
