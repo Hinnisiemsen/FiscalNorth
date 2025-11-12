@@ -1,0 +1,81 @@
+@startuml
+' Abstract base entity for audit fields
+abstract class BaseEntity {
+  + id : Long <<PK>>
+  + createdAt : LocalDateTime
+  + updatedAt : LocalDateTime
+}
+
+' User base with possibility for future role extension
+class User extends BaseEntity {
+  + username : String
+  + email : String
+  + passwordHash : String
+  + role : String
+}
+
+' Polymorphic Account for future account types
+abstract class Account extends BaseEntity {
+  + name : String
+  + currency : String
+  + balance : BigDecimal
+}
+class BankAccount extends Account {
+  + bankName : String
+  + iban : String
+  + bic : String
+  + accountType : String
+}
+class CryptoAccount extends Account {
+  + walletAddress : String
+  + provider : String
+}
+
+User "1" o-- "*" Account : owns >
+
+' General transaction entity
+abstract class Transaction extends BaseEntity {
+  + amount : BigDecimal
+  + description : String
+  + transactionDate : LocalDate
+  + type : String
+}
+class PaymentTransaction extends Transaction {
+  + tags : String
+  + categoryId : Long <<FK>>
+  + contractId : Long <<FK>>
+}
+class TransferTransaction extends Transaction {
+  + fromAccountId : Long <<FK>>
+  + toAccountId : Long <<FK>>
+}
+
+Account "1" o-- "*" Transaction : includes >
+
+class Category extends BaseEntity {
+  + name : String
+  + type : String
+}
+Category "1" o-- "*" PaymentTransaction : categorizes >
+Category "1" o-- "*" Category : parent >
+
+class Contract extends BaseEntity {
+  + name : String
+  + startDate : LocalDate
+  + endDate : LocalDate
+  + amount : BigDecimal
+  + interval : String
+  + autoDetected : Boolean
+}
+Contract "1" o-- "*" PaymentTransaction : causes >
+
+class Budget extends BaseEntity {
+  + name : String
+  + limit : BigDecimal
+  + startDate : LocalDate
+  + endDate : LocalDate
+}
+Category "1" o-- "*" Budget : assigned >
+User "1" o-- "*" Budget : has >
+
+@enduml
