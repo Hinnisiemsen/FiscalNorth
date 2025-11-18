@@ -11,8 +11,8 @@
     <groupId>de.hinni</groupId>
     <artifactId>fiscalnorth</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>haushaltsmanager</name>
-    <description>haushaltsmanager</description>
+    <name>fiscalnorth</name>
+    <description>fiscalnorth</description>
     <url/>
     <licenses>
         <license/>
