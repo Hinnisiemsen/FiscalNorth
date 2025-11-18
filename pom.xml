@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>de.hinni</groupId>
-    <artifactId>haushaltsmanager</artifactId>
+    <artifactId>fiscalnorth</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>haushaltsmanager</name>
     <description>haushaltsmanager</description>
