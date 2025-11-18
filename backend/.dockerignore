@@ -1,0 +1,7 @@
+target/
+.git/
+.idea/
+.vscode/
+*.md
+mvnw.cmd
+compose.yaml
