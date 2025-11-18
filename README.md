@@ -1,4 +1,4 @@
-# 🏠 Haushaltsmanager (FiscalNorth)
+# 🏠 FiscalNorth
 
 Ein modernes, auf Spring Boot basierendes Backend zur Verwaltung persönlicher Finanzen. Diese Anwendung ermöglicht das Management von Bankkonten, Budgets, Verträgen und Transaktionen und integriert moderne KI-Funktionen zur Datenverarbeitung.
 
