@@ -5,11 +5,11 @@ import de.fiscalnorth.category.model.Category;
 import de.fiscalnorth.category.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/category")
@@ -32,7 +32,13 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable @Valid Long id) {
+    public ResponseEntity<Category> getCategoryById(@PathVariable @Valid @NonNull Long id) {
         return ResponseEntity.ok(categoryService.getCategory(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCategory(@PathVariable @Valid @NonNull Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 }

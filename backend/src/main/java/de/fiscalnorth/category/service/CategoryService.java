@@ -7,10 +7,10 @@ import de.fiscalnorth.shared.RessourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +34,12 @@ public class CategoryService {
         return repository.findAll();
     }
 
-    public Category getCategory(Long id) {
+    public Category getCategory(@NonNull Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new RessourceNotFoundException("Category doesn't exist in datasource!", "id", id));
+    }
+
+    public void deleteCategory(Long id) {
+        repository.deleteById(id);
     }
 }
