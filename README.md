@@ -1,106 +1,140 @@
 # 🏠 FiscalNorth
 
-Ein modernes, auf Spring Boot basierendes Backend zur Verwaltung persönlicher Finanzen. Diese Anwendung ermöglicht das Management von Bankkonten, Budgets, Verträgen und Transaktionen und integriert moderne KI-Funktionen zur Datenverarbeitung.
+Ein modernes Finanz-Management-System bestehend aus einem Spring-Boot-Backend und einer Angular-Frontend-Anwendung. Die App ermöglicht das Management von Bankkonten, Budgets, Verträgen und Transaktionen – inklusive Bank-Sync über Berlin Group XS2A (PSD2) und KI-gestützte Analysefunktionen.
+
+## 📦 Projektstruktur
+
+```
+fiscalNorth/
+├── backend/          # Spring Boot API (Java 21)
+├── frontend/         # Angular 20 SPA
+├── xs2a-client/      # OpenAPI-generierter Berlin Group XS2A Client (finAPI)
+└── compose.yaml      # Docker Compose (PostgreSQL, RabbitMQ, Backend, Frontend)
+```
 
 ## 🚀 Features
 
-Die Anwendung ist nach einer **Package-by-Feature** Architektur strukturiert und bietet folgende Kernfunktionalitäten:
+### Kernfunktionen
+* **Kontenverwaltung** – Girokonto, Sparkonto, Festgeld (DepositAccount), Krypto, Bargeld, Depot, PayPal
+* **Transaktionsmanagement** – Ausgaben, Einnahmen, Umbuchungen, Kategorisierung, Split-Buchungen
+* **Vertragsmanagement** – Wiederkehrende Zahlungen mit verschiedenen Intervallen
+* **Budgetierung** – Ausgabenlimits pro Zeitraum inkl. Nutzungsanzeige
+* **Kategorien** – Eigene Kategorien für Transaktionen
 
-* **Kontenverwaltung (`/account`)**:
-    * Unterstützung verschiedener Kontotypen: Girokonto, Sparkonto, Krypto, Bargeld, Depot, PayPal, u.v.m.
-    * Validierung von IBAN und BIC (ISO-Standard) beim Erstellen von Bankkonten.
-    * Spezielle Logik für Festgeldkonten (`DepositAccount`) mit Zins- und Laufzeitverwaltung.
-* **Transaktionsmanagement (`/transaction`)**:
-    * Erfassung von Ausgaben, Einnahmen und Umbuchungen.
-    * Kategorisierung und Tagging von Zahlungen.
-    * Unterstützung für Split-Buchungen und Währungen (EUR, USD).
-* **Vertragsmanagement (`/contract`)**:
-    * Verwaltung wiederkehrender Zahlungen mit verschiedenen Intervallen (Täglich bis Jährlich).
-    * Flag für automatisch erkannte Verträge (`autoDetected`).
-* **Budgetierung (`/budget`)**:
-    * Festlegen von Ausgabenlimits für bestimmte Zeiträume.
-* **AI Integration 🤖**:
-    * Integration von **Spring AI** (Mistral AI) zur intelligenten Analyse.
-    * PDF-Dokumentenanalyse (`spring-ai-pdf-document-reader`).
+### Erweiterte Funktionen
+* **Bank-Sync (XS2A)** – PSD2-konforme Anbindung an Banken über finAPI Sandbox
+* **CSV-Import** – Transaktionen aus CSV-Dateien importieren
+* **Insights** – Monatliche Trends und Ausgaben nach Kategorien
+* **KI-Integration** – Spring AI (Mistral) für Vertragsanalyse und Dokumentenverarbeitung
 
 ## 🛠 Tech Stack
 
-Das Projekt nutzt moderne Java- und Spring-Technologien (Java 21 & Spring Boot 3.5.x Snapshot):
-
-* **Core:** Java 21, Spring Boot 3.5.7
-* **Datenbank & Persistenz:** Spring Data JPA, Hibernate.
-* **API:** Spring WebFlux (Reactive), Spring Data REST.
-* **Messaging:** RabbitMQ, Apache Kafka.
-* **AI:** Spring AI (Mistral AI Model).
-* **Infrastruktur:** Docker Compose (für RabbitMQ & Kafka).
-* **Tools:** Lombok, Maven.
+| Komponente | Technologien |
+|------------|--------------|
+| **Backend** | Java 21, Spring Boot 3.3.5, Spring Data JPA, Spring Security |
+| **API** | Spring WebFlux (Reactive), Spring Data REST |
+| **Datenbank** | PostgreSQL (Produktion), H2 (lokale Entwicklung) |
+| **Messaging** | RabbitMQ, Apache Kafka |
+| **AI** | Spring AI (Mistral AI), PDF-Dokumentenanalyse |
+| **Frontend** | Angular 20, TypeScript |
+| **XS2A** | Berlin Group NextGenPSD2 Framework (finAPI Client) |
 
 ## ⚙️ Voraussetzungen
 
 * Java 21 SDK
-* Docker & Docker Compose (für die Infrastruktur-Dienste)
+* Node.js & npm (für Frontend-Entwicklung)
+* Docker & Docker Compose
 
 ## 🏃‍♂️ Starten der Anwendung
 
-### 1. Repository klonen
-```bash
-    git clone https://github.com/Hinnisiemsen/FiscalNorth
-    cd FiscalNorth
-```
-
-### 2. Infrastruktur starten
-Das Projekt beinhaltet eine `compose.yaml` für benötigte Dienste (z.B. RabbitMQ). Starte diese zuerst:
+### Option 1: Vollständiger Stack mit Docker Compose
 
 ```bash
-  docker-compose up -d
+git clone https://github.com/Hinnisiemsen/FiscalNorth
+cd FiscalNorth
+
+docker compose up -d
 ```
 
-Hinweis: RabbitMQ läuft standardmäßig auf Port 5672 (User: myuser, Pass: secret).
+| Service | URL |
+|---------|-----|
+| Backend API | http://localhost:8080 |
+| Frontend | http://localhost:3000 |
+| H2 Console (bei H2-Modus) | http://localhost:8080/h2-console |
 
-### 3. Anwendung bauen und starten
+### Option 2: Lokale Entwicklung
 
-Nutze den Maven Wrapper, um die Anwendung ohne installiertes Maven zu starten:
-
-Windows:
+**1. Infrastruktur starten (PostgreSQL, RabbitMQ):**
 ```bash
-    ./mvnw.cmd spring-boot:run
+docker compose up -d postgres rabbitmq
 ```
-Mac/Linux:
+
+**2. Backend starten:**
 ```bash
-    ./mvnw spring-boot:run
+# Im Projektroot (baut xs2a-client + backend)
+./backend/mvnw -f pom.xml -pl backend spring-boot:run
 ```
 
-Die API ist anschließend unter http://localhost:8080 erreichbar.
+**3. Frontend starten:**
+```bash
+cd frontend
+npm install
+ng serve
+```
 
-## 📚 API Dokumentation
+Frontend: http://localhost:4200
 
-Das Projekt nutzt Standard REST-Controller. Hier sind einige wichtige Endpunkte:
+**Hinweis:** In der lokalen Entwicklung verwendet das Backend standardmäßig H2 (Speicher-DB). Für PostgreSQL `spring.docker.compose.enabled=true` setzen oder die Datenquelle manuell konfigurieren.
 
-* Bankkonten:
-  * `GET /api/account/bank` - Alle Konten abrufen
-  * `POST /api/account/bank` - Neues Konto erstellen (benötigt IBAN/BIC Validierung)
-* Transaktionen:
+## 📚 API Übersicht
 
-  * `GET /api/transaction/payment` - Zahlungen abrufen
-  * `GET /api/transaction/transfer` - Umbuchungen abrufen
-
-* User:
-  * `GET /api/user` - Benutzerverwaltung
+| Bereich | Endpunkte |
+|---------|-----------|
+| **Bankkonten** | `GET/POST /api/account/bank`, `GET /api/account/bank/{id}` |
+| **Festgeld** | `GET/POST /api/account/deposit`, `GET/DELETE /api/account/deposit/{id}` |
+| **Transaktionen** | `GET/POST /api/transaction/payment`, `GET /api/transaction/transfer` |
+| **CSV-Import** | `POST /api/transaction/import/csv` |
+| **Insights** | `GET /api/transaction/insights` |
+| **Verträge** | `GET/POST /api/contract`, `POST /api/contract/analyze` |
+| **Budgets** | `GET/POST /api/budget`, `GET /api/budget/with-usage` |
+| **Kategorien** | `GET/POST/DELETE /api/category` |
+| **Bank-Sync** | `GET /api/bank-sync/status`, `POST /api/bank-sync/consent`, `POST /api/bank-sync/sync` |
+| **User** | `GET/POST /api/user` |
 
 ## 🧪 Testen
 
-Das Projekt nutzt Testcontainers für Integrationstests, um eine echte Umgebung (Kafka, RabbitMQ) zu simulieren.
-
 ```bash
-    ./mvnw test
+./backend/mvnw -f pom.xml test
 ```
 
-Die Tests nutzen eine spezielle TestcontainersConfiguration, die automatisch Container für Kafka und RabbitMQ hochfährt.
+Integrationstests nutzen Testcontainers (Kafka, RabbitMQ, PostgreSQL).
+
+## 🔄 CI/CD (GitHub Actions)
+
+| Workflow | Trigger | Beschreibung |
+|----------|---------|--------------|
+| **CI** | Push/PR auf main/master | Backend: Maven build + Tests. Frontend: npm build + Karma Tests |
+| **Docker Build** | Push/PR, Release | Baut Backend- und Frontend-Images, push zu ghcr.io bei Push/Release |
+| **Lint** | PR (nur bei Änderungen in frontend/) | Prettier-Check für TypeScript, HTML, CSS |
+
 ## 📝 Konfiguration
 
-Die Hauptkonfiguration befindet sich in `src/main/resources/application.properties`.
-Wichtige Standard-Einstellungen:
+| Datei | Beschreibung |
+|-------|--------------|
+| `backend/src/main/resources/application.properties` | Hauptkonfiguration |
+| `compose.yaml` | Docker-Services und Umgebungsvariablen |
 
-* `spring.jackson.mapper.accept-case-insensitive-enums=true` (Erlaubt "checking" statt "CHECKING" im JSON).
+### Wichtige Einstellungen
+* `spring.jackson.mapper.accept-case-insensitive-enums=true` – Flexiblere Enum-Deserialisierung
+* `app.xs2a.enabled` – Bank-Sync aktivieren/deaktivieren
+* `app.xs2a.base-url` – finAPI XS2A Endpoint (z.B. Sandbox)
+* `SPRING_AI_MISTRAL_API_KEY` – Mistral AI API-Key (für Docker)
 
-**Entwickler**: Hinni Siemsen
+## 📖 Weitere Dokumentation
+
+* [xs2a-client/README.md](xs2a-client/README.md) – Berlin Group XS2A API Client
+* [frontend/README.md](frontend/README.md) – Angular-Projekt
+
+---
+
+**Entwickler:** Hinni Siemsen
