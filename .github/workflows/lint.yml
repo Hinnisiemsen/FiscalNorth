@@ -1,0 +1,31 @@
+name: Lint
+
+on:
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/lint.yml'
+
+jobs:
+  prettier:
+    name: Prettier (Frontend)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Prettier
+        run: npm install --save-dev prettier
+
+      - name: Check formatting
+        run: npx prettier --check "src/**/*.{ts,html,css,json}"
