@@ -53,14 +53,15 @@ fiscalNorth/
 git clone https://github.com/Hinnisiemsen/FiscalNorth
 cd FiscalNorth
 
-docker compose up -d
+# Optional: copy .env.example to .env and set GEMINI_API_KEY (and OAuth vars if needed)
+docker compose up -d --build
 ```
 
 | Service | URL |
 |---------|-----|
-| Backend API | http://localhost:8080 |
-| Frontend | http://localhost:3000 |
-| H2 Console (bei H2-Modus) | http://localhost:8080/h2-console |
+| Frontend (SPA + API proxy) | http://localhost:3000 |
+| Backend API (direct) | http://localhost:8080 |
+| H2 Console (nur bei lokaler H2-Entwicklung) | http://localhost:8080/h2-console |
 
 ### Option 2: Lokale Entwicklung
 
@@ -128,7 +129,8 @@ Integrationstests nutzen Testcontainers (Kafka, RabbitMQ, PostgreSQL).
 * `spring.jackson.mapper.accept-case-insensitive-enums=true` – Flexiblere Enum-Deserialisierung
 * `app.xs2a.enabled` – Bank-Sync aktivieren/deaktivieren
 * `app.xs2a.base-url` – finAPI XS2A Endpoint (z.B. Sandbox)
-* `SPRING_AI_MISTRAL_API_KEY` – Mistral AI API-Key (für Docker)
+* `GEMINI_API_KEY` – Google Gemini API-Key (Compose: via `.env` oder Host-Umgebung)
+* `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` – OAuth für Docker-Stack (Redirect: `http://localhost:8080/login/oauth2/code/google`)
 
 ## 📖 Weitere Dokumentation
 
