@@ -27,7 +27,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
     menuItems = [
         { label: 'Dashboard', path: '/', icon: 'dashboard' },
-        { label: 'Assistant', path: '/assistant', icon: 'smart_toy' },
+        { label: 'Fiscal North', path: '/assistant', icon: 'auto_awesome' },
         { label: 'Transactions', path: '/transactions', icon: 'receipt_long' },
         { label: 'Import', path: '/transactions/import', icon: 'upload' },
         { label: 'Contracts', path: '/contracts', icon: 'description' },

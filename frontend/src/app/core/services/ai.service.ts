@@ -13,6 +13,7 @@ export interface ProposedAction {
 export interface ChatResponse {
     reply: string;
     proposedActions: ProposedAction[];
+    followUpRecommendations: string[];
     conversationId: string;
 }
 

@@ -12,6 +12,13 @@ interface ChatMessage {
     role: 'user' | 'assistant';
     text: string;
     actions?: ProposedAction[];
+    followUps?: string[];
+}
+
+interface MessageBlock {
+    type: 'paragraph' | 'list';
+    text?: string;
+    items?: string[];
 }
 
 @Component({
@@ -22,6 +29,12 @@ interface ChatMessage {
     styleUrl: './assistant.component.css',
 })
 export class AssistantComponent implements OnInit {
+    readonly welcomeFollowUps = [
+        'Wie viel habe ich diesen Monat für Lebensmittel ausgegeben?',
+        'Lege ein Budget für Transport an.',
+        'Wo gebe ich am meisten aus?',
+    ];
+
     messages: ChatMessage[] = [];
     inputText = '';
     conversationId = '';
@@ -46,7 +59,7 @@ export class AssistantComponent implements OnInit {
             },
             error: () => {
                 this.aiAvailable = false;
-                this.setupHint = 'Could not reach the assistant service.';
+                this.setupHint = 'Fiscal North ist gerade nicht erreichbar. Bitte später erneut versuchen.';
             },
         });
     }
@@ -54,6 +67,24 @@ export class AssistantComponent implements OnInit {
     send(): void {
         const text = this.inputText.trim();
         if (!text || this.loading) return;
+        this.sendMessage(text);
+    }
+
+    askFollowUp(question: string): void {
+        const text = question.trim();
+        if (!text || this.loading) return;
+        this.sendMessage(text);
+    }
+
+    showFollowUps(msgIndex: number): boolean {
+        if (this.loading || msgIndex !== this.messages.length - 1) {
+            return false;
+        }
+        const msg = this.messages[msgIndex];
+        return msg.role === 'assistant' && (msg.followUps?.length ?? 0) > 0;
+    }
+
+    private sendMessage(text: string): void {
         this.messages.push({ role: 'user', text });
         this.inputText = '';
         this.loading = true;
@@ -64,13 +95,14 @@ export class AssistantComponent implements OnInit {
                     role: 'assistant',
                     text: res.reply,
                     actions: res.proposedActions,
+                    followUps: res.followUpRecommendations ?? [],
                 });
                 this.loading = false;
             },
             error: (err) => {
                 const msg =
                     err?.error?.message ||
-                    'Assistant unavailable. Set GEMINI_API_KEY on the backend.';
+                    'Fiscal North konnte gerade nicht antworten. Bitte versuche es erneut.';
                 this.messages.push({ role: 'assistant', text: msg });
                 this.loading = false;
             },
@@ -103,8 +135,8 @@ export class AssistantComponent implements OnInit {
                         categoryId: p['categoryId'] ? Number(p['categoryId']) : null,
                     })
                     .subscribe({
-                        next: () => done('Budget created.'),
-                        error: () => done('Failed to create budget.', true),
+                        next: () => done('Budget wurde in Fiscal North angelegt.'),
+                        error: () => done('Budget konnte nicht angelegt werden.', true),
                     });
                 break;
             case 'CREATE_CATEGORY':
@@ -114,8 +146,8 @@ export class AssistantComponent implements OnInit {
                         transactionType: String(p['transactionType']),
                     })
                     .subscribe({
-                        next: () => done('Category created.'),
-                        error: () => done('Failed to create category.', true),
+                        next: () => done('Kategorie wurde in Fiscal North angelegt.'),
+                        error: () => done('Kategorie konnte nicht angelegt werden.', true),
                     });
                 break;
             case 'CREATE_TRANSACTION':
@@ -130,8 +162,8 @@ export class AssistantComponent implements OnInit {
                         tags: null,
                     })
                     .subscribe({
-                        next: () => done('Transaction created.'),
-                        error: () => done('Failed to create transaction.', true),
+                        next: () => done('Buchung wurde in Fiscal North erfasst.'),
+                        error: () => done('Buchung konnte nicht erfasst werden.', true),
                     });
                 break;
         }
@@ -147,5 +179,44 @@ export class AssistantComponent implements OnInit {
 
     isActionBusy(msgIndex: number, actionIndex: number): boolean {
         return this.actionBusyIndex === msgIndex * 100 + actionIndex;
+    }
+
+    formatMessage(text: string): MessageBlock[] {
+        if (!text?.trim()) {
+            return [{ type: 'paragraph', text: '' }];
+        }
+        const blocks: MessageBlock[] = [];
+        const sections = text.split(/\n\n+/);
+        for (const section of sections) {
+            const trimmed = section.trim();
+            if (!trimmed) continue;
+            const lines = trimmed.split('\n').map((l) => l.trim()).filter(Boolean);
+            const isListLine = (l: string) => /^[-•*]\s+/.test(l) || /^\d+\.\s+/.test(l);
+            const toListItem = (l: string) => l.replace(/^[-•*]\s+/, '').replace(/^\d+\.\s+/, '');
+
+            if (lines.every(isListLine)) {
+                blocks.push({ type: 'list', items: lines.map(toListItem) });
+                continue;
+            }
+
+            let listBuffer: string[] = [];
+            const flushList = () => {
+                if (listBuffer.length) {
+                    blocks.push({ type: 'list', items: [...listBuffer] });
+                    listBuffer = [];
+                }
+            };
+
+            for (const line of lines) {
+                if (isListLine(line)) {
+                    listBuffer.push(toListItem(line));
+                } else {
+                    flushList();
+                    blocks.push({ type: 'paragraph', text: line });
+                }
+            }
+            flushList();
+        }
+        return blocks.length ? blocks : [{ type: 'paragraph', text: text.trim() }];
     }
 }

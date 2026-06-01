@@ -1,0 +1,33 @@
+<div class="action-proposal-card card-glass">
+  <div class="action-header">
+    <span class="material-symbols-outlined action-icon">{{ actionIcon() }}</span>
+    <div>
+      <span class="action-kind">{{ actionTitle() }}</span>
+      <p class="action-summary">{{ action().summary }}</p>
+    </div>
+  </div>
+
+  @if (detailRows().length) {
+    <dl class="action-details">
+      @for (row of detailRows(); track row.label) {
+        <div class="detail-row">
+          <dt>{{ row.label }}</dt>
+          <dd>{{ row.value }}</dd>
+        </div>
+      }
+    </dl>
+  }
+
+  <p class="action-hint">Nur nach deiner Bestätigung wird etwas in Fiscal North gespeichert.</p>
+
+  <div class="action-buttons">
+    <button type="button" class="btn btn-secondary" (click)="dismiss.emit()">Ablehnen</button>
+    <button type="button" class="btn btn-primary" (click)="confirm.emit()" [disabled]="busy()">
+      {{ busy() ? 'Wird angelegt…' : 'Übernehmen' }}
+    </button>
+  </div>
+
+  @if (result()) {
+    <p class="action-result" [class.error]="resultError()">{{ result() }}</p>
+  }
+</div>
