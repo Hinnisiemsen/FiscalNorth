@@ -1,0 +1,35 @@
+<div class="page-content-inner">
+  <app-page-header heading="New Budget" />
+
+  <div class="form-container card-glass">
+    <form [formGroup]="budgetForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input id="name" type="text" formControlName="name" placeholder="e.g. Groceries, Entertainment">
+      </div>
+      <div class="form-group">
+        <label for="limit">Limit (€)</label>
+        <input id="limit" type="number" formControlName="limit" placeholder="0.00">
+      </div>
+      <div class="form-group">
+        <label for="categoryId">Category (optional)</label>
+        <select id="categoryId" formControlName="categoryId">
+          <option [ngValue]="null">— None —</option>
+          <option *ngFor="let cat of expenseCategories" [ngValue]="cat.id">{{ cat.name }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="startDate">Start Date</label>
+        <input id="startDate" type="date" formControlName="startDate">
+      </div>
+      <div class="form-group">
+        <label for="endDate">End Date</label>
+        <input id="endDate" type="date" formControlName="endDate">
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="budgetForm.invalid">Save Budget</button>
+      </div>
+    </form>
+  </div>
+</div>

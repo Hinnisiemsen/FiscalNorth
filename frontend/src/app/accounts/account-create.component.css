@@ -1,0 +1,13 @@
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.checkbox-group input[type='checkbox'] {
+  width: auto;
+  min-height: auto;
+}

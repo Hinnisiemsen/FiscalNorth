@@ -1,0 +1,23 @@
+<div class="page-content-inner">
+  <app-page-header heading="New Category" />
+
+  <div class="form-container card-glass">
+    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input id="name" type="text" formControlName="name" placeholder="e.g. Groceries, Salary">
+      </div>
+      <div class="form-group">
+        <label for="type">Type</label>
+        <select id="type" formControlName="transactionType">
+          <option value="Expense">Expense</option>
+          <option value="Income">Income</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="categoryForm.invalid">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

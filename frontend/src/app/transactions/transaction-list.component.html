@@ -1,0 +1,30 @@
+<div class="page-content-inner">
+  <app-page-header heading="Transactions">
+    <a routerLink="/transactions/import" class="btn btn-secondary">Import CSV</a>
+    <a routerLink="/transactions/new" class="btn btn-primary">Add Transaction</a>
+  </app-page-header>
+
+  <div class="list-card" *ngFor="let tx of transactions">
+    <div class="list-card-icon">
+      <span class="material-symbols-outlined">receipt</span>
+    </div>
+    <div class="list-card-body">
+      <div class="list-card-title">{{ tx.description }}</div>
+      <div class="list-card-meta">
+        {{ tx.transactionDate | date:'mediumDate' }}
+        <span *ngIf="tx.category"> · {{ tx.category.name }}</span>
+      </div>
+    </div>
+    <div
+      class="list-card-amount"
+      [class.negative]="tx.transactionType === 'Expense'"
+      [class.positive]="tx.transactionType === 'Income'"
+    >
+      {{ tx.transactionType === 'Expense' ? '−' : '+' }}{{ tx.amount | currency:'EUR' }}
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="transactions.length === 0">
+    <p>No transactions found.</p>
+  </div>
+</div>

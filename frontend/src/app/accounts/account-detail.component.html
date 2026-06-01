@@ -1,0 +1,42 @@
+<div class="page-content-inner">
+  @if (loading) {
+    <app-skeleton height="2rem" />
+    <app-skeleton height="120px" />
+  } @else if (!account) {
+    <p class="empty-state">Account not found.</p>
+    <a routerLink="/accounts" class="btn btn-secondary">Back to accounts</a>
+  } @else {
+    <app-page-header [heading]="account.name">
+      <a routerLink="/accounts" class="btn btn-ghost">Back</a>
+    </app-page-header>
+
+    <div class="detail-hero card-glass">
+      <span class="label">Balance</span>
+      <div class="balance">
+        {{ account.balance | currency: getCurrencyCode(account.currency):'symbol':'1.2-2' }}
+      </div>
+      <p class="meta">{{ getCurrencyCode(account.currency) }} · {{ account.interestRate }}% · {{ account.term }}</p>
+    </div>
+
+    <section class="section">
+      <h3>Recent activity</h3>
+      <p class="hint">All accounts share the same transaction list until account linking is added.</p>
+      @for (tx of recentTransactions; track tx.id) {
+        <div class="list-card">
+          <div class="list-card-body">
+            <div class="list-card-title">{{ tx.description }}</div>
+            <div class="list-card-meta">{{ tx.transactionDate | date:'mediumDate' }}</div>
+          </div>
+          <div
+            class="list-card-amount"
+            [class.negative]="tx.transactionType === 'Expense'"
+            [class.positive]="tx.transactionType === 'Income'"
+          >
+            {{ tx.transactionType === 'Expense' ? '−' : '+' }}{{ tx.amount | currency:'EUR' }}
+          </div>
+        </div>
+      }
+      <a routerLink="/transactions" class="btn btn-secondary">All transactions</a>
+    </section>
+  }
+</div>

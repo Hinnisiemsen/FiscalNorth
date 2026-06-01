@@ -1,0 +1,62 @@
+<div class="page-content-inner">
+  <app-page-header heading="Import Transactions">
+    <a routerLink="/transactions" class="btn btn-secondary">Back to Transactions</a>
+  </app-page-header>
+
+  <div class="import-layout">
+    <div class="card-glass import-form">
+      <h2 class="section-title">CSV Import</h2>
+      <p class="hint">Import transactions from your bank's CSV export. Supports Sparkasse and ING-DiBa formats.</p>
+
+      <div class="form-group">
+        <label for="preset">Bank / Format</label>
+        <select id="preset" [(ngModel)]="selectedPreset" (ngModelChange)="result = null; error = null">
+          <option *ngFor="let p of presets" [ngValue]="p.value">{{ p.label }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="csv-file">CSV File</label>
+        <div class="upload-zone">
+          <input type="file" id="csv-file" accept=".csv" (change)="onFileSelected($event)">
+          <span class="file-name" *ngIf="selectedFile">{{ selectedFile.name }}</span>
+          <span class="file-hint" *ngIf="!selectedFile">Choose a CSV file</span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" (click)="importCsv()" [disabled]="!selectedFile || isImporting">
+          {{ isImporting ? 'Importing...' : 'Import' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="reset()" [disabled]="isImporting">Clear</button>
+      </div>
+
+      <div class="error-message" *ngIf="error">{{ error }}</div>
+    </div>
+
+    <div class="card-glass import-result" *ngIf="result">
+      <h2 class="section-title">Import Result</h2>
+      <div class="result-stats">
+        <div class="stat-card">
+          <span class="stat-value success">{{ result.imported }}</span>
+          <span class="stat-label">Imported</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ result.skippedDuplicates }}</span>
+          <span class="stat-label">Skipped (duplicates)</span>
+        </div>
+        <div class="stat-card" *ngIf="result.parseErrors > 0">
+          <span class="stat-value danger">{{ result.parseErrors }}</span>
+          <span class="stat-label">Parse errors</span>
+        </div>
+      </div>
+      <div class="error-list" *ngIf="result.errorMessages?.length">
+        <h3>Errors</h3>
+        <ul>
+          <li *ngFor="let msg of result.errorMessages">{{ msg }}</li>
+        </ul>
+      </div>
+      <a routerLink="/transactions" class="btn btn-primary" *ngIf="result.imported > 0">View Transactions</a>
+    </div>
+  </div>
+</div>
