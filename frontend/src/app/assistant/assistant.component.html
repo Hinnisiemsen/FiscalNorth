@@ -1,0 +1,60 @@
+<div class="assistant page-content-inner">
+  <app-page-header heading="Assistant" />
+
+  @if (setupHint && !aiAvailable) {
+    <div class="setup-hint card-glass">
+      <span class="material-symbols-outlined">info</span>
+      <p>{{ setupHint }}</p>
+    </div>
+  }
+
+  <div class="chat-area">
+    @if (messages.length === 0 && !loading) {
+      <div class="chat-welcome">
+        <span class="spark" aria-hidden="true"></span>
+        <h2>Hi, how can I help with your finances?</h2>
+        <p>Ask about spending, budgets, or let me suggest actions you can confirm.</p>
+      </div>
+    }
+
+    @for (msg of messages; track $index; let mi = $index) {
+      <div class="message-row" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+        <div class="message-bubble" [class.user-bubble]="msg.role === 'user'">
+          {{ msg.text }}
+        </div>
+        @if (msg.actions?.length) {
+          @for (action of msg.actions; track $index; let ai = $index) {
+            <app-action-card
+              [action]="action"
+              [busy]="isActionBusy(mi, ai)"
+              [result]="actionResult(mi, ai)"
+              [resultError]="actionResultError(mi, ai)"
+              (confirm)="confirmAction(mi, ai, action)"
+              (dismiss)="actionResults.delete(mi * 100 + ai)"
+            />
+          }
+        }
+      </div>
+    }
+
+    @if (loading) {
+      <div class="typing-indicator">
+        <span></span><span></span><span></span>
+      </div>
+    }
+  </div>
+
+  <div class="chat-input-bar">
+    <input
+      type="text"
+      class="chat-input"
+      [(ngModel)]="inputText"
+      (keydown)="onKeydown($event)"
+      placeholder="Ask Gemini..."
+      [disabled]="loading"
+    />
+    <button type="button" class="send-btn" (click)="send()" [disabled]="loading || !inputText.trim()">
+      <span class="material-symbols-outlined">send</span>
+    </button>
+  </div>
+</div>

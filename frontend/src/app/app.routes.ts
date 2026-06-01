@@ -13,7 +13,8 @@ import { AccountCreateComponent } from './accounts/account-create.component';
 import { CategoryListComponent } from './categories/category-list.component';
 import { CategoryCreateComponent } from './categories/category-create.component';
 import { BankSyncComponent } from './bank-sync/bank-sync.component';
-import { BankSyncCallbackComponent } from './bank-sync/bank-sync-callback.component';
+import { BankSyncCallbackComponent }
+import { AssistantComponent } from './assistant/assistant.component'; from './bank-sync/bank-sync-callback.component';
 
 export const routes: Routes = [
     {
@@ -34,6 +35,7 @@ export const routes: Routes = [
             { path: 'bank-sync/callback', component: BankSyncCallbackComponent, data: { title: 'Bank Sync' } },
             { path: 'categories', component: CategoryListComponent, data: { title: 'Categories' } },
             { path: 'categories/new', component: CategoryCreateComponent, data: { title: 'New Category' } },
+            { path: 'assistant', component: AssistantComponent, data: { title: 'Assistant' } },
         ]
     }
 ];
