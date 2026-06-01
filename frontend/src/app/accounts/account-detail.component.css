@@ -1,0 +1,38 @@
+.detail-hero {
+  text-align: center;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-hero .label {
+  font-size: 0.8125rem;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.detail-hero .balance {
+  font-size: 2.5rem;
+  font-weight: 500;
+  margin: 0.5rem 0;
+}
+
+.detail-hero .meta {
+  color: var(--color-text-light);
+  font-size: 0.875rem;
+}
+
+.section h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-light);
+  margin-bottom: 1rem;
+}
+
+.section .btn {
+  margin-top: 1rem;
+}
