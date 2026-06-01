@@ -1,0 +1,25 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'categories.title' | translate">
+    <a routerLink="/categories/new" class="btn btn-primary">{{ 'categories.add' | translate }}</a>
+  </app-page-header>
+
+  <div class="list-card" *ngFor="let cat of categories">
+    <div class="list-card-body">
+      <div class="list-card-title">{{ cat.name }}</div>
+      <span
+        class="type-badge"
+        [class.expense]="cat.transactionType === 'Expense'"
+        [class.income]="cat.transactionType === 'Income'"
+      >
+        {{ typeLabel(cat.transactionType) }}
+      </span>
+    </div>
+    <button class="btn-danger" type="button" (click)="deleteCategory(cat.id)">
+      {{ 'common.delete' | translate }}
+    </button>
+  </div>
+
+  <div class="empty-state" *ngIf="categories.length === 0">
+    <p>{{ 'categories.empty' | translate }}</p>
+  </div>
+</div>

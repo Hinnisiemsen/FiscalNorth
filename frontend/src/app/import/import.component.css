@@ -1,0 +1,76 @@
+.import-layout {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .import-layout {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin: 0 0 0.5rem;
+}
+
+.hint {
+  color: var(--color-text-light);
+  font-size: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.file-name,
+.file-hint {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-secondary);
+}
+
+.result-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.stat-card {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.stat-value.success {
+  color: var(--color-success);
+}
+
+.stat-value.danger {
+  color: var(--color-danger);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+}
+
+.error-list {
+  margin: 1rem 0;
+  font-size: 0.875rem;
+}
+
+.error-list ul {
+  padding-left: 1.25rem;
+  color: var(--color-danger);
+}
+
+.import-result .btn {
+  margin-top: 1rem;
+}

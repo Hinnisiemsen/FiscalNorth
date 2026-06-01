@@ -2,6 +2,7 @@ package de.fiscalnorth.account.model;
 
 import de.fiscalnorth.shared.BaseEntity;
 import de.fiscalnorth.shared.SupportedCurrency;
+import de.fiscalnorth.user.model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,4 +18,8 @@ public abstract class Account extends BaseEntity {
     @Enumerated(EnumType.STRING)
     protected SupportedCurrency currency;
     protected BigDecimal balance;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    protected User owner;
 }

@@ -1,0 +1,76 @@
+<div class="login-page">
+  <div class="ambient-gradient" aria-hidden="true"></div>
+  <div class="login-card card-glass">
+    <div class="login-header">
+      <span class="spark spark-lg" aria-hidden="true"></span>
+      <h1>{{ 'auth.title' | translate }}</h1>
+      <p>{{ 'auth.subtitle' | translate }}</p>
+    </div>
+
+    <div class="mode-tabs">
+      <button type="button" [class.active]="mode === 'login'" (click)="setMode('login')">
+        {{ 'auth.signIn' | translate }}
+      </button>
+      <button type="button" [class.active]="mode === 'register'" (click)="setMode('register')">
+        {{ 'auth.createAccount' | translate }}
+      </button>
+    </div>
+
+    @if (errorMessage) {
+      <p class="error-banner" role="alert">{{ errorMessage }}</p>
+    }
+
+    @if (mode === 'login') {
+      <form [formGroup]="loginForm" (ngSubmit)="submitLogin()" class="auth-form">
+        <div class="form-group">
+          <label for="login-email">{{ 'auth.email' | translate }}</label>
+          <input id="login-email" type="email" formControlName="email" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="login-password">{{ 'auth.password' | translate }}</label>
+          <input
+            id="login-password"
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+        </div>
+        <button type="submit" class="btn-primary" [disabled]="loading || loginForm.invalid">
+          {{ 'auth.signIn' | translate }}
+        </button>
+      </form>
+    } @else {
+      <form [formGroup]="registerForm" (ngSubmit)="submitRegister()" class="auth-form">
+        <div class="form-group">
+          <label for="register-name">{{ 'auth.displayName' | translate }}</label>
+          <input id="register-name" type="text" formControlName="userName" autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="register-email">{{ 'auth.email' | translate }}</label>
+          <input id="register-email" type="email" formControlName="email" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="register-password">{{ 'auth.password' | translate }}</label>
+          <input
+            id="register-password"
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+          />
+        </div>
+        <button type="submit" class="btn-primary" [disabled]="loading || registerForm.invalid">
+          {{ 'auth.createAccount' | translate }}
+        </button>
+      </form>
+    }
+
+    <div class="divider">
+      <span>{{ 'auth.or' | translate }}</span>
+    </div>
+
+    <button type="button" class="btn-google" (click)="continueWithGoogle()">
+      <span class="material-symbols-outlined">login</span>
+      {{ 'auth.continueGoogle' | translate }}
+    </button>
+  </div>
+</div>

@@ -1,0 +1,79 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'auth.accountSettings' | translate" />
+
+  <div class="settings-grid">
+    <section class="card-glass settings-card">
+      <h2>{{ 'auth.profileSection' | translate }}</h2>
+      @if (user?.avatarUrl) {
+        <img [src]="user!.avatarUrl!" [alt]="user!.userName" class="profile-avatar" />
+      }
+      <p class="readonly-field">
+        <strong>{{ 'auth.email' | translate }}:</strong> {{ user?.email }}
+      </p>
+      <p class="readonly-field">
+        <strong>{{ 'auth.signInMethod' | translate }}:</strong>
+        {{ user?.authProvider ?? 'LOCAL' }}
+      </p>
+
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="settings-form">
+        <div class="form-group">
+          <label for="userName">{{ 'auth.displayName' | translate }}</label>
+          <input id="userName" type="text" formControlName="userName" />
+        </div>
+        <div class="form-group">
+          <label for="locale">{{ 'auth.locale' | translate }}</label>
+          <select id="locale" formControlName="locale">
+            <option value="en">English</option>
+            <option value="de">Deutsch</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
+          </select>
+        </div>
+        @if (profileMessage) {
+          <p class="success-text">{{ profileMessage }}</p>
+        }
+        @if (profileError) {
+          <p class="error-text">{{ profileError }}</p>
+        }
+        <button type="submit" class="btn-primary" [disabled]="profileForm.invalid">
+          {{ 'auth.saveProfile' | translate }}
+        </button>
+      </form>
+    </section>
+
+    @if (canChangePassword) {
+      <section class="card-glass settings-card">
+        <h2>{{ 'auth.securitySection' | translate }}</h2>
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="settings-form">
+          <div class="form-group">
+            <label for="currentPassword">{{ 'auth.currentPassword' | translate }}</label>
+            <input
+              id="currentPassword"
+              type="password"
+              formControlName="currentPassword"
+              autocomplete="current-password"
+            />
+          </div>
+          <div class="form-group">
+            <label for="newPassword">{{ 'auth.newPassword' | translate }}</label>
+            <input
+              id="newPassword"
+              type="password"
+              formControlName="newPassword"
+              autocomplete="new-password"
+            />
+          </div>
+          @if (passwordMessage) {
+            <p class="success-text">{{ passwordMessage }}</p>
+          }
+          @if (passwordError) {
+            <p class="error-text">{{ passwordError }}</p>
+          }
+          <button type="submit" class="btn-primary" [disabled]="passwordForm.invalid">
+            {{ 'auth.changePassword' | translate }}
+          </button>
+        </form>
+      </section>
+    }
+  </div>
+</div>

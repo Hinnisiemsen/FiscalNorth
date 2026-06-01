@@ -1,0 +1,34 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'budgets.title' | translate">
+    <a routerLink="/budgets/new" class="btn btn-primary">{{ 'budgets.add' | translate }}</a>
+  </app-page-header>
+
+  <div class="budget-grid">
+    <div class="budget-card card-glass" *ngFor="let budget of budgets">
+      <div class="budget-header">
+        <h3>{{ budget.name }}</h3>
+        <span class="budget-limit">{{ budget.limit | currency: 'EUR' }}</span>
+      </div>
+      <p class="budget-category" *ngIf="budget.categoryName">{{ budget.categoryName }}</p>
+      <div class="progress-track">
+        <div
+          class="progress-fill"
+          [ngClass]="getProgressBarClass(budget)"
+          [style.width.%]="getProgressPercent(budget)"
+        ></div>
+      </div>
+      <div class="budget-footer">
+        <span
+          >{{ budget.spent | currency: 'EUR' }} / {{ budget.limit | currency: 'EUR' }} ({{
+            getProgressPercent(budget) | number: '1.0-1'
+          }}%)</span
+        >
+        <span>{{ budget.endDate | date: 'MMM y' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="budgets.length === 0">
+    <p>{{ 'budgets.empty' | translate }}</p>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'categories.newTitle' | translate" />
+
+  <div class="form-container card-glass">
+    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">{{ 'categories.name' | translate }}</label>
+        <input id="name" type="text" formControlName="name" placeholder="e.g. Groceries, Salary" />
+      </div>
+      <div class="form-group">
+        <label for="type">{{ 'categories.type' | translate }}</label>
+        <select id="type" formControlName="transactionType">
+          <option value="Expense">{{ 'categories.expense' | translate }}</option>
+          <option value="Income">{{ 'categories.income' | translate }}</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">
+          {{ 'categories.cancel' | translate }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="categoryForm.invalid">
+          {{ 'categories.save' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

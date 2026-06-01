@@ -1,0 +1,40 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'contracts.newTitle' | translate" />
+
+  <div class="form-container card-glass">
+    <form [formGroup]="contractForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">{{ 'contracts.name' | translate }}</label>
+        <input id="name" type="text" formControlName="name" placeholder="e.g. Rent, Gym" />
+      </div>
+      <div class="form-group">
+        <label for="amount">{{ 'contracts.amount' | translate }}</label>
+        <input id="amount" type="number" formControlName="amount" placeholder="0.00" />
+      </div>
+      <div class="form-group">
+        <label for="interval">{{ 'contracts.interval' | translate }}</label>
+        <select id="interval" formControlName="contractInterval">
+          <option value="MONTHLY">{{ 'contracts.monthly' | translate }}</option>
+          <option value="QUARTERLY">{{ 'contracts.quarterly' | translate }}</option>
+          <option value="YEARLY">{{ 'contracts.yearly' | translate }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="startDate">{{ 'contracts.startDate' | translate }}</label>
+        <input id="startDate" type="date" formControlName="startDate" />
+      </div>
+      <div class="form-group">
+        <label for="endDate">{{ 'contracts.endDateOptional' | translate }}</label>
+        <input id="endDate" type="date" formControlName="endDate" />
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">
+          {{ 'contracts.cancel' | translate }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="contractForm.invalid">
+          {{ 'contracts.save' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

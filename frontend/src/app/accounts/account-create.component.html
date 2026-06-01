@@ -1,0 +1,69 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'accounts.newTitle' | translate" />
+
+  <div class="form-container card-glass">
+    <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">{{ 'accounts.accountName' | translate }}</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="e.g. Main Account, Savings"
+        />
+      </div>
+      <div class="form-group">
+        <label for="currency">{{ 'accounts.currency' | translate }}</label>
+        <select id="currency" formControlName="currency">
+          <option value="EURO">EUR</option>
+          <option value="USD">USD</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="balance">{{ 'accounts.currentBalance' | translate }}</label>
+        <input
+          id="balance"
+          type="number"
+          formControlName="balance"
+          placeholder="0.00"
+          step="0.01"
+        />
+      </div>
+      <div class="form-group">
+        <label for="interestRate">{{ 'accounts.interestRate' | translate }}</label>
+        <input
+          id="interestRate"
+          type="number"
+          formControlName="interestRate"
+          placeholder="0"
+          step="0.1"
+        />
+      </div>
+      <div class="form-group">
+        <label for="term">{{ 'accounts.term' | translate }}</label>
+        <select id="term" formControlName="term">
+          <option value="Flexible">Flexible</option>
+          <option value="1 Month">1 Month</option>
+          <option value="3 Months">3 Months</option>
+          <option value="6 Months">6 Months</option>
+          <option value="12 Months">12 Months</option>
+          <option value="24 Months">24 Months</option>
+        </select>
+      </div>
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" formControlName="renewable" />
+          {{ 'accounts.renewable' | translate }}
+        </label>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">
+          {{ 'accounts.cancel' | translate }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="accountForm.invalid">
+          {{ 'accounts.save' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

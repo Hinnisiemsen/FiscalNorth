@@ -3,24 +3,34 @@ import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 
 export interface Budget {
-    id: number;
-    name: string;
-    limit: number;
-    startDate: string;
-    endDate: string;
+  id: number;
+  name: string;
+  limit: number;
+  startDate: string;
+  endDate: string;
+}
+
+export interface BudgetWithUsage extends Budget {
+  spent: number;
+  categoryId?: number;
+  categoryName?: string;
 }
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root',
 })
 export class BudgetService {
-    constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService) {}
 
-    getBudgets(): Observable<Budget[]> {
-        return this.apiService.get<Budget[]>('/budget');
-    }
+  getBudgets(): Observable<Budget[]> {
+    return this.apiService.get<Budget[]>('/budget');
+  }
 
-    createBudget(budget: any): Observable<Budget> {
-        return this.apiService.post<Budget>('/budget', budget);
-    }
+  getBudgetsWithUsage(): Observable<BudgetWithUsage[]> {
+    return this.apiService.get<BudgetWithUsage[]>('/budget/with-usage');
+  }
+
+  createBudget(budget: any): Observable<Budget> {
+    return this.apiService.post<Budget>('/budget', budget);
+  }
 }

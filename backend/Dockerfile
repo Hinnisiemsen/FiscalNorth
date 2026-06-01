@@ -5,10 +5,17 @@ WORKDIR /app
 # Copy Maven wrapper and configuration first to cache dependencies
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
+COPY lib/ lib/
 
 # Ensure the wrapper is executable and download dependencies
 # (This step is cached if pom.xml doesn't change)
 RUN chmod +x mvnw
+RUN ./mvnw -B install:install-file \
+    -Dfile=lib/openapi-java-client-1.3.14_2025-01-24.jar \
+    -DgroupId=org.openapitools \
+    -DartifactId=openapi-java-client \
+    -Dversion=1.3.14_2025-01-24 \
+    -Dpackaging=jar
 RUN ./mvnw dependency:go-offline
 
 # Copy source code and build the JAR

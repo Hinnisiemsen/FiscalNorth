@@ -1,0 +1,77 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'import.pageTitle' | translate">
+    <a routerLink="/transactions" class="btn btn-secondary">{{ 'import.back' | translate }}</a>
+  </app-page-header>
+
+  <div class="import-layout">
+    <div class="card-glass import-form">
+      <h2 class="section-title">{{ 'import.title' | translate }}</h2>
+      <p class="hint">{{ 'import.hint' | translate }}</p>
+
+      <div class="form-group">
+        <label for="preset">{{ 'import.bankFormat' | translate }}</label>
+        <select
+          id="preset"
+          [(ngModel)]="selectedPreset"
+          (ngModelChange)="result = null; error = null"
+        >
+          <option *ngFor="let p of presets" [ngValue]="p.value">
+            {{ presetLabel(p.labelKey) }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="csv-file">{{ 'import.file' | translate }}</label>
+        <div class="upload-zone">
+          <input type="file" id="csv-file" accept=".csv" (change)="onFileSelected($event)" />
+          <span class="file-name" *ngIf="selectedFile">{{ selectedFile.name }}</span>
+          <span class="file-hint" *ngIf="!selectedFile">{{ 'import.chooseFile' | translate }}</span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="importCsv()"
+          [disabled]="!selectedFile || isImporting"
+        >
+          {{ isImporting ? ('import.importing' | translate) : ('import.importBtn' | translate) }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="reset()" [disabled]="isImporting">
+          {{ 'import.clear' | translate }}
+        </button>
+      </div>
+
+      <div class="error-message" *ngIf="error">{{ error }}</div>
+    </div>
+
+    <div class="card-glass import-result" *ngIf="result">
+      <h2 class="section-title">{{ 'import.resultTitle' | translate }}</h2>
+      <div class="result-stats">
+        <div class="stat-card">
+          <span class="stat-value success">{{ result.imported }}</span>
+          <span class="stat-label">{{ 'import.importedLabel' | translate }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ result.skippedDuplicates }}</span>
+          <span class="stat-label">{{ 'import.skippedLabel' | translate }}</span>
+        </div>
+        <div class="stat-card" *ngIf="result.parseErrors > 0">
+          <span class="stat-value danger">{{ result.parseErrors }}</span>
+          <span class="stat-label">{{ 'import.parseErrorsLabel' | translate }}</span>
+        </div>
+      </div>
+      <div class="error-list" *ngIf="result.errorMessages?.length">
+        <h3>{{ 'import.errorsTitle' | translate }}</h3>
+        <ul>
+          <li *ngFor="let msg of result.errorMessages">{{ msg }}</li>
+        </ul>
+      </div>
+      <a routerLink="/transactions" class="btn btn-primary" *ngIf="result.imported > 0">{{
+        'import.viewTransactions' | translate
+      }}</a>
+    </div>
+  </div>
+</div>

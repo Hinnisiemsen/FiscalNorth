@@ -1,0 +1,4 @@
+Auftragskonto;Buchungstag;Valutadatum;Buchungstext;Verwendungszweck;Beguenstigter/Zahlungspflichtiger;Betrag;Waehrung
+DE1234567890;01.11.2024;01.11.2024;LASTSCHRIFT;REWE;REWE;-50,00;EUR
+DE1234567890;15.11.2024;15.11.2024;LASTSCHRIFT;Netflix;Netflix;-15,00;EUR
+DE1234567890;25.11.2024;25.11.2024;GUTSCHRIFT;Gehalt November;Arbeitgeber GmbH;3500,00;EUR

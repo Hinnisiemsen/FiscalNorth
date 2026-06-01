@@ -1,0 +1,95 @@
+.action-proposal-card {
+  margin-top: 0.5rem;
+  max-width: 100%;
+  padding: 1rem 1.25rem;
+}
+
+.action-header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.action-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: 1.25rem;
+}
+
+.action-kind {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-accent);
+  margin-bottom: 0.25rem;
+}
+
+.action-summary {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.action-details {
+  margin: 0 0 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-control);
+  border: 1px solid var(--color-border);
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: minmax(100px, 38%) 1fr;
+  gap: 0.25rem 0.75rem;
+  padding: 0.35rem 0;
+  font-size: 0.875rem;
+}
+
+.detail-row:not(:last-child) {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.detail-row dt {
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.detail-row dd {
+  margin: 0;
+  color: var(--color-primary);
+}
+
+.action-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-light);
+  margin: 0 0 0.75rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.action-result {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-success);
+}
+
+.action-result.error {
+  color: var(--color-danger);
+}

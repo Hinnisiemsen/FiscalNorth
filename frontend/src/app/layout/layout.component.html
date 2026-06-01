@@ -1,0 +1,85 @@
+<div class="layout-container" [class.drawer-open]="drawerOpen">
+  <div class="ambient-gradient" aria-hidden="true"></div>
+
+  <!-- Desktop icon rail -->
+  <aside class="icon-rail" [attr.aria-label]="'layout.mainNav' | translate">
+    <a routerLink="/" class="rail-logo" [title]="'layout.brand' | translate">
+      <span class="spark" aria-hidden="true"></span>
+    </a>
+    <nav class="rail-nav">
+      <a
+        *ngFor="let item of menuItems"
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+        [title]="item.labelKey | translate"
+        class="rail-link"
+      >
+        <span class="material-symbols-outlined">{{ item.icon }}</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Mobile drawer -->
+  <div class="drawer-backdrop" *ngIf="drawerOpen" (click)="closeDrawer()" aria-hidden="true"></div>
+  <aside
+    class="nav-drawer"
+    [class.open]="drawerOpen"
+    [attr.aria-label]="'layout.navMenu' | translate"
+    [attr.aria-hidden]="!drawerOpen"
+  >
+    <div class="drawer-header">
+      <span class="spark spark-lg" aria-hidden="true"></span>
+      <h2>{{ 'layout.brand' | translate }}</h2>
+    </div>
+    <nav class="drawer-nav">
+      <a
+        *ngFor="let item of menuItems"
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+        class="drawer-link"
+        (click)="onNavClick()"
+      >
+        <span class="material-symbols-outlined">{{ item.icon }}</span>
+        {{ item.labelKey | translate }}
+      </a>
+    </nav>
+    <div class="drawer-account">
+      <app-user-menu />
+    </div>
+  </aside>
+
+  <main class="main-column">
+    <header class="topbar">
+      <button
+        type="button"
+        class="menu-btn"
+        (click)="toggleDrawer()"
+        [attr.aria-expanded]="drawerOpen"
+        [attr.aria-label]="'layout.openMenu' | translate"
+      >
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <h1 class="topbar-title">{{ pageTitle }}</h1>
+      <app-language-switcher />
+      <a
+        routerLink="/notifications"
+        class="notification-bell"
+        [title]="'layout.notificationsTitle' | translate"
+      >
+        <span class="material-symbols-outlined">notifications</span>
+        @if (unreadNotifications > 0) {
+          <span class="notification-badge">{{
+            unreadNotifications > 9 ? '9+' : unreadNotifications
+          }}</span>
+        }
+      </a>
+      <app-user-menu />
+    </header>
+
+    <div class="page-content">
+      <router-outlet />
+    </div>
+  </main>
+</div>

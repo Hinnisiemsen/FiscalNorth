@@ -1,0 +1,24 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'accounts.title' | translate">
+    <a routerLink="/accounts/new" class="btn btn-primary">{{ 'accounts.add' | translate }}</a>
+  </app-page-header>
+
+  <div class="list-card" *ngFor="let account of accounts">
+    <div class="list-card-icon">
+      <span class="material-symbols-outlined">account_balance</span>
+    </div>
+    <div class="list-card-body">
+      <div class="list-card-title">{{ account.name }}</div>
+      <div class="list-card-meta">
+        {{ getCurrencyCode(account.currency) }} · {{ account.interestRate }}%
+      </div>
+    </div>
+    <div class="list-card-amount">
+      {{ account.balance | currency: getCurrencyCode(account.currency) : 'symbol' : '1.2-2' }}
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="accounts.length === 0">
+    <p>{{ 'accounts.empty' | translate }}</p>
+  </div>
+</div>

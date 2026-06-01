@@ -1,0 +1,26 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'contracts.title' | translate">
+    <button class="btn btn-secondary" (click)="analyzeContracts()" [disabled]="isAnalyzing">
+      {{ isAnalyzing ? ('contracts.analyzing' | translate) : ('contracts.analyze' | translate) }}
+    </button>
+    <a routerLink="/contracts/new" class="btn btn-primary">{{ 'contracts.add' | translate }}</a>
+  </app-page-header>
+
+  <div class="list-card" *ngFor="let contract of contracts">
+    <div class="list-card-icon">
+      <span class="material-symbols-outlined">description</span>
+    </div>
+    <div class="list-card-body">
+      <div class="list-card-title">{{ contract.name }}</div>
+      <div class="list-card-meta">{{ intervalLabel(contract.contractInterval) }}</div>
+    </div>
+    <span class="chip" *ngIf="contract.autoDetected">{{
+      'contracts.autoDetected' | translate
+    }}</span>
+    <div class="list-card-amount">{{ contract.amount | currency: 'EUR' }}</div>
+  </div>
+
+  <div class="empty-state" *ngIf="contracts.length === 0">
+    <p>{{ 'contracts.empty' | translate }}</p>
+  </div>
+</div>

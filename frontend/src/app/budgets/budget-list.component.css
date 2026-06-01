@@ -1,0 +1,37 @@
+.budget-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.budget-card h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.budget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.budget-limit {
+  font-weight: 500;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.budget-category {
+  font-size: 0.8125rem;
+  color: var(--color-text-light);
+  margin: 0.25rem 0 0;
+}
+
+.budget-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: var(--color-text-light);
+}

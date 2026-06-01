@@ -1,5 +1,6 @@
 package de.fiscalnorth.budget.controller;
 
+import de.fiscalnorth.budget.dto.BudgetWithUsage;
 import de.fiscalnorth.budget.dto.CreateBudgetRequest;
 import de.fiscalnorth.budget.model.Budget;
 import de.fiscalnorth.budget.service.BudgetService;
@@ -7,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -22,6 +23,11 @@ public class BudgetController {
     @GetMapping
     public ResponseEntity<List<Budget>> getAllBudgets() {
         return ResponseEntity.ok(budgetService.getAllBudgets());
+    }
+
+    @GetMapping("/with-usage")
+    public ResponseEntity<List<BudgetWithUsage>> getBudgetsWithUsage() {
+        return ResponseEntity.ok(budgetService.getBudgetsWithUsage());
     }
 
     @GetMapping("/{id}")
