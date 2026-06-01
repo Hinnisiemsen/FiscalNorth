@@ -11,5 +11,6 @@ public record CreateBudgetRequest(
                 @NotBlank String name,
                 @NotNull @Positive BigDecimal limit,
                 @NotNull LocalDate startDate,
-                @NotNull LocalDate endDate) {
+                @NotNull LocalDate endDate,
+                Long categoryId) {
 }
