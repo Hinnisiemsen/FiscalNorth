@@ -13,9 +13,11 @@
     <div class="detail-hero card-glass">
       <span class="label">{{ 'accounts.detailBalance' | translate }}</span>
       <div class="balance">
-        {{ account.balance | currency: getCurrencyCode(account.currency):'symbol':'1.2-2' }}
+        {{ account.balance | currency: getCurrencyCode(account.currency) : 'symbol' : '1.2-2' }}
       </div>
-      <p class="meta">{{ getCurrencyCode(account.currency) }} · {{ account.interestRate }}% · {{ account.term }}</p>
+      <p class="meta">
+        {{ getCurrencyCode(account.currency) }} · {{ account.interestRate }}% · {{ account.term }}
+      </p>
     </div>
 
     <section class="section">
@@ -25,18 +27,20 @@
         <div class="list-card">
           <div class="list-card-body">
             <div class="list-card-title">{{ tx.description }}</div>
-            <div class="list-card-meta">{{ tx.transactionDate | date:'mediumDate' }}</div>
+            <div class="list-card-meta">{{ tx.transactionDate | date: 'mediumDate' }}</div>
           </div>
           <div
             class="list-card-amount"
             [class.negative]="tx.transactionType === 'Expense'"
             [class.positive]="tx.transactionType === 'Income'"
           >
-            {{ tx.transactionType === 'Expense' ? '−' : '+' }}{{ tx.amount | currency:'EUR' }}
+            {{ tx.transactionType === 'Expense' ? '−' : '+' }}{{ tx.amount | currency: 'EUR' }}
           </div>
         </div>
       }
-      <a routerLink="/transactions" class="btn btn-secondary">{{ 'accounts.allTransactions' | translate }}</a>
+      <a routerLink="/transactions" class="btn btn-secondary">{{
+        'accounts.allTransactions' | translate
+      }}</a>
     </section>
   }
 </div>

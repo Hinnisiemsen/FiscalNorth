@@ -17,14 +17,20 @@
         <p class="welcome-follow-label">{{ 'assistant.examplesLabel' | translate }}</p>
         <div class="follow-up-chips">
           @for (key of welcomeFollowUpKeys; track key) {
-            <button type="button" class="follow-up-chip" (click)="askWelcomeExample(key)">{{ key | translate }}</button>
+            <button type="button" class="follow-up-chip" (click)="askWelcomeExample(key)">
+              {{ key | translate }}
+            </button>
           }
         </div>
       </div>
     }
 
     @for (msg of messages; track $index; let mi = $index) {
-      <div class="message-row" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+      <div
+        class="message-row"
+        [class.user]="msg.role === 'user'"
+        [class.assistant]="msg.role === 'assistant'"
+      >
         @if (msg.role === 'assistant') {
           <div class="message-meta">
             <span class="spark spark-xs" aria-hidden="true"></span>
@@ -49,7 +55,9 @@
             <p class="follow-up-label">{{ 'assistant.followUpLabel' | translate }}</p>
             <div class="follow-up-chips">
               @for (q of msg.followUps; track q) {
-                <button type="button" class="follow-up-chip" (click)="askFollowUp(q)">{{ q }}</button>
+                <button type="button" class="follow-up-chip" (click)="askFollowUp(q)">
+                  {{ q }}
+                </button>
               }
             </div>
           </div>
@@ -75,9 +83,7 @@
     @if (loading) {
       <div class="typing-row">
         <span class="spark spark-xs" aria-hidden="true"></span>
-        <div class="typing-indicator">
-          <span></span><span></span><span></span>
-        </div>
+        <div class="typing-indicator"><span></span><span></span><span></span></div>
         <span class="typing-label">{{ 'assistant.typing' | translate }}</span>
       </div>
     }

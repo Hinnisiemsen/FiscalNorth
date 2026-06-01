@@ -10,19 +10,19 @@ import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
   standalone: true,
   imports: [CommonModule, RouterLink, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './account-list.component.html',
-  styleUrl: './account-list.component.css'
+  styleUrl: './account-list.component.css',
 })
 export class AccountListComponent implements OnInit {
   accounts: DepositAccount[] = [];
 
-  constructor(private accountService: AccountService) { }
+  constructor(private accountService: AccountService) {}
 
   ngOnInit() {
     this.loadAccounts();
   }
 
   loadAccounts() {
-    this.accountService.getDepositAccounts().subscribe(data => {
+    this.accountService.getDepositAccounts().subscribe((data) => {
       this.accounts = data;
     });
   }

@@ -21,7 +21,9 @@
   <p class="action-hint">{{ 'assistant.confirmHint' | translate }}</p>
 
   <div class="action-buttons">
-    <button type="button" class="btn btn-secondary" (click)="dismiss.emit()">{{ 'assistant.reject' | translate }}</button>
+    <button type="button" class="btn btn-secondary" (click)="dismiss.emit()">
+      {{ 'assistant.reject' | translate }}
+    </button>
     <button type="button" class="btn btn-primary" (click)="confirm.emit()" [disabled]="busy()">
       {{ busy() ? ('assistant.confirmBusy' | translate) : ('assistant.confirm' | translate) }}
     </button>

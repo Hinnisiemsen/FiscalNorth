@@ -27,7 +27,10 @@ describe('AiService', () => {
 
     const req = httpMock.expectOne('/api/assistant/status');
     expect(req.request.method).toBe('GET');
-    req.flush({ available: true, message: 'Fiscal North ist bereit, deine Fragen zu beantworten.' });
+    req.flush({
+      available: true,
+      message: 'Fiscal North ist bereit, deine Fragen zu beantworten.',
+    });
   });
 
   it('chat should post message to assistant chat endpoint', () => {
@@ -38,7 +41,10 @@ describe('AiService', () => {
 
     const req = httpMock.expectOne('/api/assistant/chat');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ message: 'Wie viel habe ich ausgegeben?', conversationId: undefined });
+    expect(req.request.body).toEqual({
+      message: 'Wie viel habe ich ausgegeben?',
+      conversationId: undefined,
+    });
     req.flush({
       reply: 'Antwort',
       proposedActions: [],

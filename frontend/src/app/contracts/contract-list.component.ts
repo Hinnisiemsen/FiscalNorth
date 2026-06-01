@@ -11,7 +11,7 @@ import { LanguageService } from '../core/i18n/language.service';
   standalone: true,
   imports: [CommonModule, RouterLink, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './contract-list.component.html',
-  styleUrl: './contract-list.component.css'
+  styleUrl: './contract-list.component.css',
 })
 export class ContractListComponent implements OnInit {
   private readonly lang = inject(LanguageService);
@@ -19,14 +19,14 @@ export class ContractListComponent implements OnInit {
   contracts: Contract[] = [];
   isAnalyzing = false;
 
-  constructor(private contractService: ContractService) { }
+  constructor(private contractService: ContractService) {}
 
   ngOnInit() {
     this.loadContracts();
   }
 
   loadContracts() {
-    this.contractService.getContracts().subscribe(data => {
+    this.contractService.getContracts().subscribe((data) => {
       this.contracts = data;
     });
   }
@@ -55,7 +55,7 @@ export class ContractListComponent implements OnInit {
       error: (err) => {
         console.error('Analysis failed', err);
         this.isAnalyzing = false;
-      }
+      },
     });
   }
 }

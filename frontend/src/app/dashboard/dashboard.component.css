@@ -177,7 +177,9 @@
   backdrop-filter: blur(var(--blur-glass));
   cursor: pointer;
   text-align: left;
-  transition: border-color var(--transition-fast), background var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .panel-toggle:hover {

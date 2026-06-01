@@ -11,7 +11,7 @@ import { LanguageService } from '../core/i18n/language.service';
   standalone: true,
   imports: [CommonModule, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './bank-sync.component.html',
-  styleUrl: './bank-sync.component.css'
+  styleUrl: './bank-sync.component.css',
 })
 export class BankSyncComponent implements OnInit {
   private readonly lang = inject(LanguageService);
@@ -25,36 +25,36 @@ export class BankSyncComponent implements OnInit {
   constructor(
     private bankSyncService: BankSyncService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {}
 
-    ngOnInit() {
-        this.loadStatus();
-        this.loadConsents();
+  ngOnInit() {
+    this.loadStatus();
+    this.loadConsents();
 
-        this.route.queryParams.subscribe(params => {
-            const err = params['error'];
-            if (err === 'callback_failed') {
-                this.error = this.lang.instant('bankSync.callbackFailed');
-            } else if (err) {
-                this.error = err;
-            }
-        });
-    }
+    this.route.queryParams.subscribe((params) => {
+      const err = params['error'];
+      if (err === 'callback_failed') {
+        this.error = this.lang.instant('bankSync.callbackFailed');
+      } else if (err) {
+        this.error = err;
+      }
+    });
+  }
 
   loadStatus() {
-    this.bankSyncService.getStatus().subscribe(s => {
+    this.bankSyncService.getStatus().subscribe((s) => {
       this.status = s;
     });
   }
 
   loadConsents() {
-    this.bankSyncService.getConsents().subscribe(c => {
-      this.consents = c.map(x => ({
+    this.bankSyncService.getConsents().subscribe((c) => {
+      this.consents = c.map((x) => ({
         id: x.id,
         consentId: x.consentId,
         status: x.status,
-        validUntil: x.validUntil || ''
+        validUntil: x.validUntil || '',
       }));
     });
   }
@@ -63,7 +63,7 @@ export class BankSyncComponent implements OnInit {
     this.loading = true;
     this.error = '';
     this.bankSyncService.createConsent().subscribe({
-      next: res => {
+      next: (res) => {
         this.loading = false;
         if (res.redirectUrl) {
           window.location.href = res.redirectUrl;
@@ -71,21 +71,22 @@ export class BankSyncComponent implements OnInit {
           this.error = res.message || this.lang.instant('bankSync.noRedirect');
         }
       },
-      error: err => {
+      error: (err) => {
         this.loading = false;
-        this.error = err.error?.message || err.message || this.lang.instant('bankSync.consentFailed');
-      }
+        this.error =
+          err.error?.message || err.message || this.lang.instant('bankSync.consentFailed');
+      },
     });
   }
 
   handleCallback(consentId: string) {
     this.bankSyncService.handleCallback(consentId).subscribe({
-      next: res => {
+      next: (res) => {
         this.router.navigateByUrl(res.redirectTo || '/accounts');
       },
       error: () => {
         this.router.navigate(['/bank-sync'], { queryParams: { error: 'callback_failed' } });
-      }
+      },
     });
   }
 
@@ -93,7 +94,7 @@ export class BankSyncComponent implements OnInit {
     this.loading = true;
     this.error = '';
     this.bankSyncService.sync(consentId).subscribe({
-      next: res => {
+      next: (res) => {
         this.loading = false;
         if (res.success) {
           this.loadConsents();
@@ -102,10 +103,10 @@ export class BankSyncComponent implements OnInit {
           this.error = res.message;
         }
       },
-      error: err => {
+      error: (err) => {
         this.loading = false;
         this.error = err.error?.message || err.message || this.lang.instant('bankSync.syncFailed');
-      }
+      },
     });
   }
 }

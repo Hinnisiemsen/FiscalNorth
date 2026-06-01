@@ -7,7 +7,9 @@
       @if (user?.avatarUrl) {
         <img [src]="user!.avatarUrl!" [alt]="user!.userName" class="profile-avatar" />
       }
-      <p class="readonly-field"><strong>{{ 'auth.email' | translate }}:</strong> {{ user?.email }}</p>
+      <p class="readonly-field">
+        <strong>{{ 'auth.email' | translate }}:</strong> {{ user?.email }}
+      </p>
       <p class="readonly-field">
         <strong>{{ 'auth.signInMethod' | translate }}:</strong>
         {{ user?.authProvider ?? 'LOCAL' }}
@@ -45,11 +47,21 @@
         <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="settings-form">
           <div class="form-group">
             <label for="currentPassword">{{ 'auth.currentPassword' | translate }}</label>
-            <input id="currentPassword" type="password" formControlName="currentPassword" autocomplete="current-password" />
+            <input
+              id="currentPassword"
+              type="password"
+              formControlName="currentPassword"
+              autocomplete="current-password"
+            />
           </div>
           <div class="form-group">
             <label for="newPassword">{{ 'auth.newPassword' | translate }}</label>
-            <input id="newPassword" type="password" formControlName="newPassword" autocomplete="new-password" />
+            <input
+              id="newPassword"
+              type="password"
+              formControlName="newPassword"
+              autocomplete="new-password"
+            />
           </div>
           @if (passwordMessage) {
             <p class="success-text">{{ passwordMessage }}</p>

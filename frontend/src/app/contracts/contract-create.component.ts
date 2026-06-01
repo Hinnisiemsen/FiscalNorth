@@ -11,7 +11,7 @@ import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './contract-create.component.html',
-  styleUrl: './contract-create.component.css'
+  styleUrl: './contract-create.component.css',
 })
 export class ContractCreateComponent {
   contractForm: FormGroup;
@@ -19,15 +19,18 @@ export class ContractCreateComponent {
   constructor(
     private fb: FormBuilder,
     private contractService: ContractService,
-    private router: Router
+    private router: Router,
   ) {
     this.contractForm = this.fb.group({
       name: ['', Validators.required],
       amount: ['', [Validators.required, Validators.min(0.01)]],
       contractInterval: ['MONTHLY', Validators.required],
       startDate: [new Date().toISOString().split('T')[0], Validators.required],
-      endDate: [new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0], Validators.required],
-      autoDetected: [false]
+      endDate: [
+        new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+        Validators.required,
+      ],
+      autoDetected: [false],
     });
   }
 
@@ -35,7 +38,7 @@ export class ContractCreateComponent {
     if (this.contractForm.valid) {
       this.contractService.createContract(this.contractForm.value).subscribe({
         next: () => this.router.navigate(['/contracts']),
-        error: (err) => console.error('Failed to create contract', err)
+        error: (err) => console.error('Failed to create contract', err),
       });
     }
   }

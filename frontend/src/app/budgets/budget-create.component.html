@@ -5,11 +5,16 @@
     <form [formGroup]="budgetForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="name">{{ 'budgets.name' | translate }}</label>
-        <input id="name" type="text" formControlName="name" placeholder="e.g. Groceries, Entertainment">
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="e.g. Groceries, Entertainment"
+        />
       </div>
       <div class="form-group">
         <label for="limit">{{ 'budgets.limit' | translate }}</label>
-        <input id="limit" type="number" formControlName="limit" placeholder="0.00">
+        <input id="limit" type="number" formControlName="limit" placeholder="0.00" />
       </div>
       <div class="form-group">
         <label for="categoryId">{{ 'budgets.categoryOptional' | translate }}</label>
@@ -20,15 +25,19 @@
       </div>
       <div class="form-group">
         <label for="startDate">{{ 'budgets.startDate' | translate }}</label>
-        <input id="startDate" type="date" formControlName="startDate">
+        <input id="startDate" type="date" formControlName="startDate" />
       </div>
       <div class="form-group">
         <label for="endDate">{{ 'budgets.endDate' | translate }}</label>
-        <input id="endDate" type="date" formControlName="endDate">
+        <input id="endDate" type="date" formControlName="endDate" />
       </div>
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" (click)="cancel()">{{ 'budgets.cancel' | translate }}</button>
-        <button type="submit" class="btn btn-primary" [disabled]="budgetForm.invalid">{{ 'budgets.save' | translate }}</button>
+        <button type="button" class="btn btn-secondary" (click)="cancel()">
+          {{ 'budgets.cancel' | translate }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="budgetForm.invalid">
+          {{ 'budgets.save' | translate }}
+        </button>
       </div>
     </form>
   </div>

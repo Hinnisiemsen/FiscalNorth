@@ -1,280 +1,379 @@
-<div class="dashboard page-content-inner">
-  <header class="dash-header">
-    <div>
-      <h1>{{ greeting }}</h1>
-      <p class="dash-period">{{ 'dashboard.overviewPeriod' | translate: { period: periodLabel } }}</p>
-    </div>
-    <a routerLink="/assistant" class="header-assistant-link">
-      <span class="material-symbols-outlined">auto_awesome</span>
-      <span class="hide-mobile">{{ 'dashboard.openChat' | translate }}</span>
-    </a>
-  </header>
-
-  @if (loading) {
-    <p class="loading-hint">{{ 'dashboard.loading' | translate }}</p>
-  } @else {
-    <section class="overview-strip card-glass" aria-label="KPIs">
-      <div class="overview-item" [class.highlight-negative]="currentTotals.net < 0">
-        <span class="overview-label">{{ 'dashboard.balanceMonth' | translate }}</span>
-        <span class="overview-value">{{ currentTotals.net | currency: 'EUR' }}</span>
-        <span class="overview-hint">{{ periodLabel }}</span>
-      </div>
-      <div class="overview-item">
-        <span class="overview-label">{{ 'dashboard.expenses' | translate }}</span>
-        <span class="overview-value">{{ currentTotals.expenses | currency: 'EUR' }}</span>
-        @if (expenseTrendLabel) {
-          <span class="overview-hint">{{ expenseTrendLabel }}</span>
-        }
-      </div>
-      <div class="overview-item">
-        <span class="overview-label">{{ 'dashboard.income' | translate }}</span>
-        <span class="overview-value">{{ currentTotals.income | currency: 'EUR' }}</span>
-        <span class="overview-hint">{{ periodLabel }}</span>
-      </div>
-      <div class="overview-item">
-        <span class="overview-label">{{ 'dashboard.accountBalance' | translate }}</span>
-        <span class="overview-value">{{ totalBalance | currency: 'EUR' }}</span>
-        <span class="overview-hint">{{ 'dashboard.allAccounts' | translate }}</span>
-      </div>
-    </section>
-
-    <div class="dash-layout">
-      <div class="dash-primary">
-        <app-fiscal-north-ask-bar
-          variant="hero"
-          [placeholder]="generalAsk.placeholder"
-          [suggestions]="generalAsk.suggestions"
-          [showAnalysisChip]="true"
-        />
-
-        <section class="hero-compact card-glass">
-          <span class="hero-label">{{ 'dashboard.availableAfterFixed' | translate }}</span>
-          <div class="hero-value" [class.negative]="disposableIncome < 0">
-            {{ disposableIncome | currency: 'EUR' }}
-          </div>
-          @if (heroConclusion) {
-            <p class="hero-teaser">{{ heroConclusion }}</p>
-          }
-        </section>
-      </div>
-
-      <div class="dash-panels">
-        <div class="panels-grid">
-          <div class="panel-wrap">
-            <button
-              type="button"
-              class="panel-toggle card-glass"
-              (click)="toggle('fazit')"
-              [attr.aria-expanded]="isExpanded('fazit')"
-            >
-              <span class="material-symbols-outlined panel-icon">lightbulb</span>
-              <span class="panel-text">
-                <span class="panel-title">{{ 'dashboard.panelFazit' | translate }}</span>
-                <span class="panel-teaser">{{ fazitTeaser() }}</span>
-              </span>
-              <span class="material-symbols-outlined chevron" [class.open]="isExpanded('fazit')">expand_more</span>
-            </button>
-            @if (isExpanded('fazit')) {
-              <div class="panel-body">
-                <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'fazit' }" />
-                @for (c of conclusions; track c.id) {
-                  <article class="conclusion-item" [class]="conclusionClass(c.severity)">
-                    <strong>{{ c.title }}</strong>
-                    <p>{{ c.text }}</p>
-                  </article>
-                }
-              </div>
-            }
-          </div>
-
-          <div class="panel-wrap">
-            <button
-              type="button"
-              class="panel-toggle card-glass"
-              (click)="toggle('monat')"
-              [attr.aria-expanded]="isExpanded('monat')"
-            >
-              <span class="material-symbols-outlined panel-icon">calendar_month</span>
-              <span class="panel-text">
-                <span class="panel-title">{{ 'dashboard.panelMonth' | translate }}</span>
-                <span class="panel-teaser">{{ monatTeaser() }}</span>
-              </span>
-              <span class="material-symbols-outlined chevron" [class.open]="isExpanded('monat')">expand_more</span>
-            </button>
-            @if (isExpanded('monat')) {
-              <div class="panel-body">
-                <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'monat' }" />
-                <dl class="detail-list">
-                  <div><dt>{{ 'dashboard.fixedCostsMonth' | translate }}</dt><dd>{{ fixedCosts | currency: 'EUR' }}</dd></div>
-                  <div><dt>{{ 'dashboard.available' | translate }}</dt><dd>{{ disposableIncome | currency: 'EUR' }}</dd></div>
-                </dl>
-                <div class="kpi-mini-grid">
-                  @for (kpi of kpis; track kpi.label) {
-                    <div class="kpi-mini">
-                      <span class="kpi-mini-label">{{ kpi.label }}</span>
-                      @if (isCurrencyKpi(kpi)) {
-                        <span class="kpi-mini-value">{{ kpi.value | currency: 'EUR' }}</span>
-                      } @else {
-                        <span class="kpi-mini-value">{{ formatKpiValue(kpi) }}</span>
-                      }
-                      @if (kpi.trend) {
-                        <span class="kpi-mini-trend" [class]="trendClass(kpi)">{{ kpi.trend.label }}</span>
-                      }
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-          </div>
-
-          @if (categoryBreakdown.length > 0) {
-            <div class="panel-wrap">
-              <button
-                type="button"
-                class="panel-toggle card-glass"
-                (click)="toggle('kategorien')"
-                [attr.aria-expanded]="isExpanded('kategorien')"
-              >
-                <span class="material-symbols-outlined panel-icon">pie_chart</span>
-                <span class="panel-text">
-                  <span class="panel-title">{{ 'dashboard.panelCategories' | translate }}</span>
-                  <span class="panel-teaser">{{ kategorienTeaser() }}</span>
-                </span>
-                <span class="material-symbols-outlined chevron" [class.open]="isExpanded('kategorien')">expand_more</span>
-              </button>
-              @if (isExpanded('kategorien')) {
-                <div class="panel-body">
-                  <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'kategorien' }" />
-                  @for (c of categoryBreakdown; track c.categoryName) {
-                    <div class="category-bar">
-                      <span class="cat-name">{{ c.categoryName }}</span>
-                      <div class="bar-track">
-                        <div class="bar-fill" [style.width.%]="getBarWidth(c.sharePercent)"></div>
-                      </div>
-                      <span class="cat-meta">{{ c.sharePercent | number: '1.0-0' }} % · {{ c.amount | currency: 'EUR' }}</span>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          }
-
-          @if (uniqueMonths.length > 1) {
-            <div class="panel-wrap">
-              <button
-                type="button"
-                class="panel-toggle card-glass"
-                (click)="toggle('verlauf')"
-                [attr.aria-expanded]="isExpanded('verlauf')"
-              >
-                <span class="material-symbols-outlined panel-icon">show_chart</span>
-                <span class="panel-text">
-                  <span class="panel-title">{{ 'dashboard.panelTrend' | translate }}</span>
-                  <span class="panel-teaser">{{ verlaufTeaser() }}</span>
-                </span>
-                <span class="material-symbols-outlined chevron" [class.open]="isExpanded('verlauf')">expand_more</span>
-              </button>
-              @if (isExpanded('verlauf')) {
-                <div class="panel-body">
-                  <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'verlauf' }" />
-                  @for (m of uniqueMonths; track m.year + '-' + m.month) {
-                    <div class="trend-row" [class.current]="m.year === currentYear && m.month === currentMonth">
-                      <span>{{ getMonthLabel(m.year, m.month) }}</span>
-                      <span class="trend-net" [class.negative]="getMonthNet(m.year, m.month) < 0">
-                        {{ getMonthNet(m.year, m.month) | currency: 'EUR' }}
-                      </span>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          }
-
-          @if (activeBudgets().length > 0) {
-            <div class="panel-wrap">
-              <button
-                type="button"
-                class="panel-toggle card-glass"
-                (click)="toggle('budgets')"
-                [attr.aria-expanded]="isExpanded('budgets')"
-              >
-                <span class="material-symbols-outlined panel-icon">account_balance_wallet</span>
-                <span class="panel-text">
-                  <span class="panel-title">{{ 'dashboard.panelBudgets' | translate }}</span>
-                  <span class="panel-teaser">{{ budgetsTeaser() }}</span>
-                </span>
-                <span class="material-symbols-outlined chevron" [class.open]="isExpanded('budgets')">expand_more</span>
-              </button>
-              @if (isExpanded('budgets')) {
-                <div class="panel-body">
-                  <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'budgets' }" />
-                  @for (b of activeBudgets(); track b.id) {
-                    <div class="budget-row" [class]="budgetStatusClass(b)">
-                      <div class="budget-row-head">
-                        <span>{{ b.name }}</span>
-                        <span>{{ budgetUsagePercent(b) | number: '1.0-0' }} %</span>
-                      </div>
-                      <div class="bar-track">
-                        <div class="bar-fill" [style.width.%]="budgetUsagePercent(b)"></div>
-                      </div>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          }
-
-          @if (recentNotifications.length > 0) {
-            <div class="panel-wrap">
-              <button
-                type="button"
-                class="panel-toggle card-glass"
-                (click)="toggle('hinweise')"
-                [attr.aria-expanded]="isExpanded('hinweise')"
-              >
-                <span class="material-symbols-outlined panel-icon">notifications</span>
-                <span class="panel-text">
-                  <span class="panel-title">{{ 'dashboard.panelHints' | translate }}</span>
-                  <span class="panel-teaser">{{ hinweiseTeaser() }}</span>
-                </span>
-                <span class="material-symbols-outlined chevron" [class.open]="isExpanded('hinweise')">expand_more</span>
-              </button>
-              @if (isExpanded('hinweise')) {
-                <div class="panel-body">
-                  <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'hinweise' }" />
-                  <ul class="hint-list">
-                    @for (n of recentNotifications; track n.id) {
-                      <li><strong>{{ n.title }}</strong><p>{{ n.message }}</p></li>
-                    }
-                  </ul>
-                  <a routerLink="/notifications" class="text-link">{{ 'dashboard.allHints' | translate }}</a>
-                </div>
-              }
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-  }
-</div>
-
-<ng-template #panelAiBlock let-panel="panel">
-  <div class="panel-ai-block">
-    <div class="panel-ai-head">
-      <span class="spark spark-sm" aria-hidden="true"></span>
-      <span>{{ 'dashboard.aiAnalyzing' | translate }}</span>
-    </div>
-    @if (panelAi(panel).loading) {
-      <p class="panel-ai-status">
-        <span class="material-symbols-outlined spin">progress_activity</span>
-        {{ 'dashboard.aiCreating' | translate }}
-      </p>
-    } @else if (panelAi(panel).error) {
-      <p class="panel-ai-error">{{ panelAi(panel).error }}</p>
-    } @else if (panelAi(panel).text) {
-      @for (para of splitAiParagraphs(panelAi(panel).text); track para) {
-        <p class="panel-ai-text">{{ para }}</p>
-      }
-    }
-  </div>
-</ng-template>
+<div class="dashboard page-content-inner">
+  <header class="dash-header">
+    <div>
+      <h1>{{ greeting }}</h1>
+
+      <p class="dash-period">
+        {{ 'dashboard.overviewPeriod' | translate: { period: periodLabel } }}
+      </p>
+    </div>
+
+    <a routerLink="/assistant" class="header-assistant-link">
+      <span class="material-symbols-outlined">auto_awesome</span>
+
+      <span class="hide-mobile">{{ 'dashboard.openChat' | translate }}</span>
+    </a>
+  </header>
+
+  @if (loading) {
+    <p class="loading-hint">{{ 'dashboard.loading' | translate }}</p>
+  } @else {
+    <section class="overview-strip card-glass" aria-label="KPIs">
+      <div class="overview-item" [class.highlight-negative]="currentTotals.net < 0">
+        <span class="overview-label">{{ 'dashboard.balanceMonth' | translate }}</span>
+
+        <span class="overview-value">{{ currentTotals.net | currency: 'EUR' }}</span>
+
+        <span class="overview-hint">{{ periodLabel }}</span>
+      </div>
+
+      <div class="overview-item">
+        <span class="overview-label">{{ 'dashboard.expenses' | translate }}</span>
+
+        <span class="overview-value">{{ currentTotals.expenses | currency: 'EUR' }}</span>
+
+        @if (expenseTrendLabel) {
+          <span class="overview-hint">{{ expenseTrendLabel }}</span>
+        }
+      </div>
+
+      <div class="overview-item">
+        <span class="overview-label">{{ 'dashboard.income' | translate }}</span>
+
+        <span class="overview-value">{{ currentTotals.income | currency: 'EUR' }}</span>
+
+        <span class="overview-hint">{{ periodLabel }}</span>
+      </div>
+
+      <div class="overview-item">
+        <span class="overview-label">{{ 'dashboard.accountBalance' | translate }}</span>
+
+        <span class="overview-value">{{ totalBalance | currency: 'EUR' }}</span>
+
+        <span class="overview-hint">{{ 'dashboard.allAccounts' | translate }}</span>
+      </div>
+    </section>
+
+    <div class="dash-layout">
+      <div class="dash-primary">
+        <app-fiscal-north-ask-bar
+          variant="hero"
+          [placeholder]="generalAsk.placeholder"
+          [suggestions]="generalAsk.suggestions"
+          [showAnalysisChip]="true"
+        />
+
+        <section class="hero-compact card-glass">
+          <span class="hero-label">{{ 'dashboard.availableAfterFixed' | translate }}</span>
+
+          <div class="hero-value" [class.negative]="disposableIncome < 0">
+            {{ disposableIncome | currency: 'EUR' }}
+          </div>
+
+          @if (heroConclusion) {
+            <p class="hero-teaser">{{ heroConclusion }}</p>
+          }
+        </section>
+      </div>
+
+      <div class="dash-panels">
+        <div class="panels-grid">
+          <div class="panel-wrap">
+            <button
+              type="button"
+              class="panel-toggle card-glass"
+              (click)="toggle('fazit')"
+              [attr.aria-expanded]="isExpanded('fazit')"
+            >
+              <span class="material-symbols-outlined panel-icon">lightbulb</span>
+
+              <span class="panel-text">
+                <span class="panel-title">{{ 'dashboard.panelFazit' | translate }}</span>
+
+                <span class="panel-teaser">{{ fazitTeaser() }}</span>
+              </span>
+
+              <span class="material-symbols-outlined chevron" [class.open]="isExpanded('fazit')"
+                >expand_more</span
+              >
+            </button>
+
+            @if (isExpanded('fazit')) {
+              <div class="panel-body">
+                <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'fazit' }" />
+
+                @for (c of conclusions; track c.id) {
+                  <article class="conclusion-item" [class]="conclusionClass(c.severity)">
+                    <strong>{{ c.title }}</strong>
+
+                    <p>{{ c.text }}</p>
+                  </article>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="panel-wrap">
+            <button
+              type="button"
+              class="panel-toggle card-glass"
+              (click)="toggle('monat')"
+              [attr.aria-expanded]="isExpanded('monat')"
+            >
+              <span class="material-symbols-outlined panel-icon">calendar_month</span>
+
+              <span class="panel-text">
+                <span class="panel-title">{{ 'dashboard.panelMonth' | translate }}</span>
+
+                <span class="panel-teaser">{{ monatTeaser() }}</span>
+              </span>
+
+              <span class="material-symbols-outlined chevron" [class.open]="isExpanded('monat')"
+                >expand_more</span
+              >
+            </button>
+
+            @if (isExpanded('monat')) {
+              <div class="panel-body">
+                <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'monat' }" />
+
+                <dl class="detail-list">
+                  <div>
+                    <dt>{{ 'dashboard.fixedCostsMonth' | translate }}</dt>
+                    <dd>{{ fixedCosts | currency: 'EUR' }}</dd>
+                  </div>
+
+                  <div>
+                    <dt>{{ 'dashboard.available' | translate }}</dt>
+                    <dd>{{ disposableIncome | currency: 'EUR' }}</dd>
+                  </div>
+                </dl>
+
+                <div class="kpi-mini-grid">
+                  @for (kpi of kpis; track kpi.label) {
+                    <div class="kpi-mini">
+                      <span class="kpi-mini-label">{{ kpi.label }}</span>
+
+                      @if (isCurrencyKpi(kpi)) {
+                        <span class="kpi-mini-value">{{ kpi.value | currency: 'EUR' }}</span>
+                      } @else {
+                        <span class="kpi-mini-value">{{ formatKpiValue(kpi) }}</span>
+                      }
+
+                      @if (kpi.trend) {
+                        <span class="kpi-mini-trend" [class]="trendClass(kpi)">{{
+                          kpi.trend.label
+                        }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          @if (categoryBreakdown.length > 0) {
+            <div class="panel-wrap">
+              <button
+                type="button"
+                class="panel-toggle card-glass"
+                (click)="toggle('kategorien')"
+                [attr.aria-expanded]="isExpanded('kategorien')"
+              >
+                <span class="material-symbols-outlined panel-icon">pie_chart</span>
+
+                <span class="panel-text">
+                  <span class="panel-title">{{ 'dashboard.panelCategories' | translate }}</span>
+
+                  <span class="panel-teaser">{{ kategorienTeaser() }}</span>
+                </span>
+
+                <span
+                  class="material-symbols-outlined chevron"
+                  [class.open]="isExpanded('kategorien')"
+                  >expand_more</span
+                >
+              </button>
+
+              @if (isExpanded('kategorien')) {
+                <div class="panel-body">
+                  <ng-container
+                    *ngTemplateOutlet="panelAiBlock; context: { panel: 'kategorien' }"
+                  />
+
+                  @for (c of categoryBreakdown; track c.categoryName) {
+                    <div class="category-bar">
+                      <span class="cat-name">{{ c.categoryName }}</span>
+
+                      <div class="bar-track">
+                        <div class="bar-fill" [style.width.%]="getBarWidth(c.sharePercent)"></div>
+                      </div>
+
+                      <span class="cat-meta"
+                        >{{ c.sharePercent | number: '1.0-0' }} % ·
+                        {{ c.amount | currency: 'EUR' }}</span
+                      >
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          @if (uniqueMonths.length > 1) {
+            <div class="panel-wrap">
+              <button
+                type="button"
+                class="panel-toggle card-glass"
+                (click)="toggle('verlauf')"
+                [attr.aria-expanded]="isExpanded('verlauf')"
+              >
+                <span class="material-symbols-outlined panel-icon">show_chart</span>
+
+                <span class="panel-text">
+                  <span class="panel-title">{{ 'dashboard.panelTrend' | translate }}</span>
+
+                  <span class="panel-teaser">{{ verlaufTeaser() }}</span>
+                </span>
+
+                <span class="material-symbols-outlined chevron" [class.open]="isExpanded('verlauf')"
+                  >expand_more</span
+                >
+              </button>
+
+              @if (isExpanded('verlauf')) {
+                <div class="panel-body">
+                  <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'verlauf' }" />
+
+                  @for (m of uniqueMonths; track m.year + '-' + m.month) {
+                    <div
+                      class="trend-row"
+                      [class.current]="m.year === currentYear && m.month === currentMonth"
+                    >
+                      <span>{{ getMonthLabel(m.year, m.month) }}</span>
+
+                      <span class="trend-net" [class.negative]="getMonthNet(m.year, m.month) < 0">
+                        {{ getMonthNet(m.year, m.month) | currency: 'EUR' }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          @if (activeBudgets().length > 0) {
+            <div class="panel-wrap">
+              <button
+                type="button"
+                class="panel-toggle card-glass"
+                (click)="toggle('budgets')"
+                [attr.aria-expanded]="isExpanded('budgets')"
+              >
+                <span class="material-symbols-outlined panel-icon">account_balance_wallet</span>
+
+                <span class="panel-text">
+                  <span class="panel-title">{{ 'dashboard.panelBudgets' | translate }}</span>
+
+                  <span class="panel-teaser">{{ budgetsTeaser() }}</span>
+                </span>
+
+                <span class="material-symbols-outlined chevron" [class.open]="isExpanded('budgets')"
+                  >expand_more</span
+                >
+              </button>
+
+              @if (isExpanded('budgets')) {
+                <div class="panel-body">
+                  <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'budgets' }" />
+
+                  @for (b of activeBudgets(); track b.id) {
+                    <div class="budget-row" [class]="budgetStatusClass(b)">
+                      <div class="budget-row-head">
+                        <span>{{ b.name }}</span>
+
+                        <span>{{ budgetUsagePercent(b) | number: '1.0-0' }} %</span>
+                      </div>
+
+                      <div class="bar-track">
+                        <div class="bar-fill" [style.width.%]="budgetUsagePercent(b)"></div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          @if (recentNotifications.length > 0) {
+            <div class="panel-wrap">
+              <button
+                type="button"
+                class="panel-toggle card-glass"
+                (click)="toggle('hinweise')"
+                [attr.aria-expanded]="isExpanded('hinweise')"
+              >
+                <span class="material-symbols-outlined panel-icon">notifications</span>
+
+                <span class="panel-text">
+                  <span class="panel-title">{{ 'dashboard.panelHints' | translate }}</span>
+
+                  <span class="panel-teaser">{{ hinweiseTeaser() }}</span>
+                </span>
+
+                <span
+                  class="material-symbols-outlined chevron"
+                  [class.open]="isExpanded('hinweise')"
+                  >expand_more</span
+                >
+              </button>
+
+              @if (isExpanded('hinweise')) {
+                <div class="panel-body">
+                  <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'hinweise' }" />
+
+                  <ul class="hint-list">
+                    @for (n of recentNotifications; track n.id) {
+                      <li>
+                        <strong>{{ n.title }}</strong>
+                        <p>{{ n.message }}</p>
+                      </li>
+                    }
+                  </ul>
+
+                  <a routerLink="/notifications" class="text-link">{{
+                    'dashboard.allHints' | translate
+                  }}</a>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<ng-template #panelAiBlock let-panel="panel">
+  <div class="panel-ai-block">
+    <div class="panel-ai-head">
+      <span class="spark spark-sm" aria-hidden="true"></span>
+
+      <span>{{ 'dashboard.aiAnalyzing' | translate }}</span>
+    </div>
+
+    @if (panelAi(panel).loading) {
+      <p class="panel-ai-status">
+        <span class="material-symbols-outlined spin">progress_activity</span>
+
+        {{ 'dashboard.aiCreating' | translate }}
+      </p>
+    } @else if (panelAi(panel).error) {
+      <p class="panel-ai-error">{{ panelAi(panel).error }}</p>
+    } @else if (panelAi(panel).text) {
+      @for (para of splitAiParagraphs(panelAi(panel).text); track para) {
+        <p class="panel-ai-text">{{ para }}</p>
+      }
+    }
+  </div>
+</ng-template>

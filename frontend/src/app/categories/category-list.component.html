@@ -14,7 +14,9 @@
         {{ typeLabel(cat.transactionType) }}
       </span>
     </div>
-    <button class="btn-danger" type="button" (click)="deleteCategory(cat.id)">{{ 'common.delete' | translate }}</button>
+    <button class="btn-danger" type="button" (click)="deleteCategory(cat.id)">
+      {{ 'common.delete' | translate }}
+    </button>
   </div>
 
   <div class="empty-state" *ngIf="categories.length === 0">

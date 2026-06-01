@@ -13,7 +13,7 @@ import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './transaction-create.component.html',
-  styleUrl: './transaction-create.component.css'
+  styleUrl: './transaction-create.component.css',
 })
 export class TransactionCreateComponent implements OnInit {
   transactionForm: FormGroup;
@@ -25,7 +25,7 @@ export class TransactionCreateComponent implements OnInit {
     private transactionService: TransactionService,
     private categoryService: CategoryService,
     private contractService: ContractService,
-    private router: Router
+    private router: Router,
   ) {
     this.transactionForm = this.fb.group({
       description: ['', Validators.required],
@@ -33,13 +33,13 @@ export class TransactionCreateComponent implements OnInit {
       transactionDate: [new Date().toISOString().split('T')[0], Validators.required],
       transactionType: ['Expense', Validators.required],
       categoryId: [null],
-      contractId: [null]
+      contractId: [null],
     });
   }
 
   ngOnInit() {
-    this.categoryService.getCategories().subscribe(data => this.categories = data);
-    this.contractService.getContracts().subscribe(data => this.contracts = data);
+    this.categoryService.getCategories().subscribe((data) => (this.categories = data));
+    this.contractService.getContracts().subscribe((data) => (this.contracts = data));
   }
 
   onSubmit() {
@@ -51,11 +51,11 @@ export class TransactionCreateComponent implements OnInit {
         transactionDate: val.transactionDate,
         transactionType: val.transactionType,
         category: val.categoryId ? { id: val.categoryId } : null,
-        contract: val.contractId ? { id: val.contractId } : null
+        contract: val.contractId ? { id: val.contractId } : null,
       };
       this.transactionService.createPaymentTransaction(payload).subscribe({
         next: () => this.router.navigate(['/transactions']),
-        error: (err) => console.error('Failed to create transaction', err)
+        error: (err) => console.error('Failed to create transaction', err),
       });
     }
   }

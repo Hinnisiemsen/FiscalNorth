@@ -3,26 +3,26 @@ import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 
 export interface DepositAccount {
-    id: number;
-    name: string;
-    currency: string;
-    balance: number;
-    interestRate: number;
-    term: string;
-    renewable: boolean;
+  id: number;
+  name: string;
+  currency: string;
+  balance: number;
+  interestRate: number;
+  term: string;
+  renewable: boolean;
 }
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root',
 })
 export class AccountService {
-    constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService) {}
 
-    getDepositAccounts(): Observable<DepositAccount[]> {
-        return this.apiService.get<DepositAccount[]>('/account/deposit');
-    }
+  getDepositAccounts(): Observable<DepositAccount[]> {
+    return this.apiService.get<DepositAccount[]>('/account/deposit');
+  }
 
-    createDepositAccount(account: any): Observable<DepositAccount> {
-        return this.apiService.post<DepositAccount>('/account/deposit', account);
-    }
+  createDepositAccount(account: any): Observable<DepositAccount> {
+    return this.apiService.post<DepositAccount>('/account/deposit', account);
+  }
 }

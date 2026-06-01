@@ -5,7 +5,9 @@ import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 function readCookie(name: string): string | null {
-  const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/[.$?*|{}()[\]\\/+^]/g, '\\$&') + '=([^;]*)'));
+  const match = document.cookie.match(
+    new RegExp('(?:^|; )' + name.replace(/[.$?*|{}()[\]\\/+^]/g, '\\$&') + '=([^;]*)'),
+  );
   return match ? decodeURIComponent(match[1]) : null;
 }
 
@@ -35,6 +37,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         router.navigate(['/login']);
       }
       return throwError(() => err);
-    })
+    }),
   );
 };

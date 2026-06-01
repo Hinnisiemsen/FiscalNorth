@@ -5,15 +5,20 @@
     <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="description">{{ 'transactions.description' | translate }}</label>
-        <input id="description" type="text" formControlName="description" placeholder="e.g. Netflix, Rewe">
+        <input
+          id="description"
+          type="text"
+          formControlName="description"
+          placeholder="e.g. Netflix, Rewe"
+        />
       </div>
       <div class="form-group">
         <label for="amount">{{ 'transactions.amount' | translate }}</label>
-        <input id="amount" type="number" formControlName="amount" placeholder="0.00" step="0.01">
+        <input id="amount" type="number" formControlName="amount" placeholder="0.00" step="0.01" />
       </div>
       <div class="form-group">
         <label for="date">{{ 'transactions.date' | translate }}</label>
-        <input id="date" type="date" formControlName="transactionDate">
+        <input id="date" type="date" formControlName="transactionDate" />
       </div>
       <div class="form-group">
         <label for="type">{{ 'transactions.type' | translate }}</label>
@@ -34,13 +39,17 @@
         <select id="contract" formControlName="contractId">
           <option [ngValue]="null">— {{ 'common.none' | translate }} —</option>
           <option *ngFor="let c of contracts" [ngValue]="c.id">
-            {{ c.name }} ({{ c.amount | currency:'EUR' }}/{{ c.contractInterval }})
+            {{ c.name }} ({{ c.amount | currency: 'EUR' }}/{{ c.contractInterval }})
           </option>
         </select>
       </div>
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" (click)="cancel()">{{ 'transactions.cancel' | translate }}</button>
-        <button type="submit" class="btn btn-primary" [disabled]="transactionForm.invalid">{{ 'transactions.save' | translate }}</button>
+        <button type="button" class="btn btn-secondary" (click)="cancel()">
+          {{ 'transactions.cancel' | translate }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="transactionForm.invalid">
+          {{ 'transactions.save' | translate }}
+        </button>
       </div>
     </form>
   </div>

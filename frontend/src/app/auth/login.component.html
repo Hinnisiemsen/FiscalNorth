@@ -28,7 +28,12 @@
         </div>
         <div class="form-group">
           <label for="login-password">{{ 'auth.password' | translate }}</label>
-          <input id="login-password" type="password" formControlName="password" autocomplete="current-password" />
+          <input
+            id="login-password"
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+          />
         </div>
         <button type="submit" class="btn-primary" [disabled]="loading || loginForm.invalid">
           {{ 'auth.signIn' | translate }}
@@ -46,7 +51,12 @@
         </div>
         <div class="form-group">
           <label for="register-password">{{ 'auth.password' | translate }}</label>
-          <input id="register-password" type="password" formControlName="password" autocomplete="new-password" />
+          <input
+            id="register-password"
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+          />
         </div>
         <button type="submit" class="btn-primary" [disabled]="loading || registerForm.invalid">
           {{ 'auth.createAccount' | translate }}
@@ -54,7 +64,9 @@
       </form>
     }
 
-    <div class="divider"><span>{{ 'auth.or' | translate }}</span></div>
+    <div class="divider">
+      <span>{{ 'auth.or' | translate }}</span>
+    </div>
 
     <button type="button" class="btn-google" (click)="continueWithGoogle()">
       <span class="material-symbols-outlined">login</span>

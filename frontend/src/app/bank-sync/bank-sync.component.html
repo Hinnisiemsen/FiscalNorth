@@ -1,7 +1,12 @@
 <div class="page-content-inner">
   <app-page-header [heading]="'bankSync.title' | translate" />
 
-  <div class="card-glass status-card" *ngIf="status" [class.available]="status.available" [class.unavailable]="!status.available">
+  <div
+    class="card-glass status-card"
+    *ngIf="status"
+    [class.available]="status.available"
+    [class.unavailable]="!status.available"
+  >
     <p>{{ status.message }}</p>
   </div>
 
@@ -23,7 +28,9 @@
         <div class="list-card-title consent-id">{{ c.consentId }}</div>
         <div class="list-card-meta">
           <span class="chip" [class.valid]="c.status === 'VALID'">{{ c.status }}</span>
-          <span *ngIf="c.validUntil"> · {{ 'bankSync.validUntil' | translate:{ date: c.validUntil } }}</span>
+          <span *ngIf="c.validUntil">
+            · {{ 'bankSync.validUntil' | translate: { date: c.validUntil } }}</span
+          >
         </div>
       </div>
       <button

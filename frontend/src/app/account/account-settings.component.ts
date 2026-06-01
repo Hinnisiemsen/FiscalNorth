@@ -58,20 +58,22 @@ export class AccountSettingsComponent implements OnInit {
     this.profileMessage = '';
     this.profileError = '';
     const value = this.profileForm.getRawValue();
-    this.userService.updateProfile({
-      userName: value.userName!,
-      locale: value.locale!,
-    }).subscribe({
-      next: (updated) => {
-        this.user = updated;
-        this.authService.loadCurrentUser().subscribe();
-        this.languageService.setLanguage(updated.locale as AppLocale);
-        this.profileMessage = 'Profile updated';
-      },
-      error: (err) => {
-        this.profileError = err.error?.message ?? 'Could not update profile';
-      },
-    });
+    this.userService
+      .updateProfile({
+        userName: value.userName!,
+        locale: value.locale!,
+      })
+      .subscribe({
+        next: (updated) => {
+          this.user = updated;
+          this.authService.loadCurrentUser().subscribe();
+          this.languageService.setLanguage(updated.locale as AppLocale);
+          this.profileMessage = 'Profile updated';
+        },
+        error: (err) => {
+          this.profileError = err.error?.message ?? 'Could not update profile';
+        },
+      });
   }
 
   changePassword(): void {
@@ -79,17 +81,19 @@ export class AccountSettingsComponent implements OnInit {
     this.passwordMessage = '';
     this.passwordError = '';
     const value = this.passwordForm.getRawValue();
-    this.userService.changePassword({
-      currentPassword: value.currentPassword!,
-      newPassword: value.newPassword!,
-    }).subscribe({
-      next: () => {
-        this.passwordMessage = 'Password updated';
-        this.passwordForm.reset();
-      },
-      error: (err) => {
-        this.passwordError = err.error?.message ?? 'Could not change password';
-      },
-    });
+    this.userService
+      .changePassword({
+        currentPassword: value.currentPassword!,
+        newPassword: value.newPassword!,
+      })
+      .subscribe({
+        next: () => {
+          this.passwordMessage = 'Password updated';
+          this.passwordForm.reset();
+        },
+        error: (err) => {
+          this.passwordError = err.error?.message ?? 'Could not change password';
+        },
+      });
   }
 }

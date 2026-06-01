@@ -10,15 +10,15 @@ import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
   standalone: true,
   imports: [CommonModule, RouterLink, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './budget-list.component.html',
-  styleUrl: './budget-list.component.css'
+  styleUrl: './budget-list.component.css',
 })
 export class BudgetListComponent implements OnInit {
   budgets: BudgetWithUsage[] = [];
 
-  constructor(private budgetService: BudgetService) { }
+  constructor(private budgetService: BudgetService) {}
 
   ngOnInit() {
-    this.budgetService.getBudgetsWithUsage().subscribe(data => {
+    this.budgetService.getBudgetsWithUsage().subscribe((data) => {
       this.budgets = data;
     });
   }

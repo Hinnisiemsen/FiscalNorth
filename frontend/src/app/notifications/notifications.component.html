@@ -3,9 +3,15 @@
 
   <div class="toolbar">
     <button type="button" class="btn btn-secondary" (click)="toggleFilter()">
-      {{ filterUnread ? ('notifications.showAll' | translate) : ('notifications.filterUnread' | translate) }}
+      {{
+        filterUnread
+          ? ('notifications.showAll' | translate)
+          : ('notifications.filterUnread' | translate)
+      }}
     </button>
-    <button type="button" class="btn btn-primary" (click)="markAllRead()">{{ 'notifications.markAllRead' | translate }}</button>
+    <button type="button" class="btn btn-primary" (click)="markAllRead()">
+      {{ 'notifications.markAllRead' | translate }}
+    </button>
   </div>
 
   @if (loading) {
@@ -32,7 +38,9 @@
           <h3>{{ n.title }}</h3>
           <p>{{ n.message }}</p>
           @if (!n.read) {
-            <button type="button" class="btn btn-secondary btn-sm" (click)="markRead(n)">{{ 'notifications.markRead' | translate }}</button>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="markRead(n)">
+              {{ 'notifications.markRead' | translate }}
+            </button>
           }
         </li>
       }

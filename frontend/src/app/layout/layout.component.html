@@ -21,12 +21,7 @@
   </aside>
 
   <!-- Mobile drawer -->
-  <div
-    class="drawer-backdrop"
-    *ngIf="drawerOpen"
-    (click)="closeDrawer()"
-    aria-hidden="true"
-  ></div>
+  <div class="drawer-backdrop" *ngIf="drawerOpen" (click)="closeDrawer()" aria-hidden="true"></div>
   <aside
     class="nav-drawer"
     [class.open]="drawerOpen"
@@ -68,10 +63,16 @@
       </button>
       <h1 class="topbar-title">{{ pageTitle }}</h1>
       <app-language-switcher />
-      <a routerLink="/notifications" class="notification-bell" [title]="'layout.notificationsTitle' | translate">
+      <a
+        routerLink="/notifications"
+        class="notification-bell"
+        [title]="'layout.notificationsTitle' | translate"
+      >
         <span class="material-symbols-outlined">notifications</span>
         @if (unreadNotifications > 0) {
-          <span class="notification-badge">{{ unreadNotifications > 9 ? '9+' : unreadNotifications }}</span>
+          <span class="notification-badge">{{
+            unreadNotifications > 9 ? '9+' : unreadNotifications
+          }}</span>
         }
       </a>
       <app-user-menu />

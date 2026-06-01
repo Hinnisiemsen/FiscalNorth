@@ -26,7 +26,11 @@ export class AuthService {
 
   register(userName: string, email: string, password: string): Observable<UserProfile> {
     return this.http
-      .post<UserProfile>('/api/auth/register', { userName, email, password }, { withCredentials: true })
+      .post<UserProfile>(
+        '/api/auth/register',
+        { userName, email, password },
+        { withCredentials: true },
+      )
       .pipe(tap((profile) => this.currentUserSubject.next(profile)));
   }
 
@@ -35,7 +39,7 @@ export class AuthService {
       tap(() => {
         this.currentUserSubject.next(null);
         this.router.navigate(['/login']);
-      })
+      }),
     );
   }
 
@@ -44,9 +48,9 @@ export class AuthService {
   }
 
   loadCurrentUser(): Observable<UserProfile> {
-    return this.userService.getCurrentUser().pipe(
-      tap((profile) => this.currentUserSubject.next(profile))
-    );
+    return this.userService
+      .getCurrentUser()
+      .pipe(tap((profile) => this.currentUserSubject.next(profile)));
   }
 
   refreshSession(): Observable<UserProfile | null> {

@@ -11,7 +11,7 @@ import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './account-create.component.html',
-  styleUrl: './account-create.component.css'
+  styleUrl: './account-create.component.css',
 })
 export class AccountCreateComponent {
   accountForm: FormGroup;
@@ -19,7 +19,7 @@ export class AccountCreateComponent {
   constructor(
     private fb: FormBuilder,
     private accountService: AccountService,
-    private router: Router
+    private router: Router,
   ) {
     this.accountForm = this.fb.group({
       name: ['', Validators.required],
@@ -27,7 +27,7 @@ export class AccountCreateComponent {
       balance: [0, [Validators.required, Validators.min(0)]],
       interestRate: [0, [Validators.required, Validators.min(0)]],
       term: ['Flexible', Validators.required],
-      renewable: [false]
+      renewable: [false],
     });
   }
 
@@ -35,7 +35,7 @@ export class AccountCreateComponent {
     if (this.accountForm.valid) {
       this.accountService.createDepositAccount(this.accountForm.value).subscribe({
         next: () => this.router.navigate(['/accounts']),
-        error: (err) => console.error('Failed to create account', err)
+        error: (err) => console.error('Failed to create account', err),
       });
     }
   }

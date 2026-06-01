@@ -5,7 +5,12 @@
     <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="name">{{ 'accounts.accountName' | translate }}</label>
-        <input id="name" type="text" formControlName="name" placeholder="e.g. Main Account, Savings">
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="e.g. Main Account, Savings"
+        />
       </div>
       <div class="form-group">
         <label for="currency">{{ 'accounts.currency' | translate }}</label>
@@ -16,11 +21,23 @@
       </div>
       <div class="form-group">
         <label for="balance">{{ 'accounts.currentBalance' | translate }}</label>
-        <input id="balance" type="number" formControlName="balance" placeholder="0.00" step="0.01">
+        <input
+          id="balance"
+          type="number"
+          formControlName="balance"
+          placeholder="0.00"
+          step="0.01"
+        />
       </div>
       <div class="form-group">
         <label for="interestRate">{{ 'accounts.interestRate' | translate }}</label>
-        <input id="interestRate" type="number" formControlName="interestRate" placeholder="0" step="0.1">
+        <input
+          id="interestRate"
+          type="number"
+          formControlName="interestRate"
+          placeholder="0"
+          step="0.1"
+        />
       </div>
       <div class="form-group">
         <label for="term">{{ 'accounts.term' | translate }}</label>
@@ -35,13 +52,17 @@
       </div>
       <div class="form-group checkbox-group">
         <label>
-          <input type="checkbox" formControlName="renewable">
+          <input type="checkbox" formControlName="renewable" />
           {{ 'accounts.renewable' | translate }}
         </label>
       </div>
       <div class="form-actions">
-        <button type="button" class="btn btn-secondary" (click)="cancel()">{{ 'accounts.cancel' | translate }}</button>
-        <button type="submit" class="btn btn-primary" [disabled]="accountForm.invalid">{{ 'accounts.save' | translate }}</button>
+        <button type="button" class="btn btn-secondary" (click)="cancel()">
+          {{ 'accounts.cancel' | translate }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="accountForm.invalid">
+          {{ 'accounts.save' | translate }}
+        </button>
       </div>
     </form>
   </div>
