@@ -1,7 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActionCardComponent } from './action-card.component';
 import { ProposedAction } from '../core/services/ai.service';
+import { LOCALE_STORAGE_KEY } from '../core/i18n/supported-locales';
+
+const ACTION_CARD_EN = {
+  actionCard: {
+    titleBudget: 'New budget',
+    titleCategory: 'New category',
+    titleTransaction: 'New transaction',
+    titleDefault: 'Suggestion',
+    labelName: 'Name',
+    labelLimit: 'Limit',
+    labelPeriod: 'Period',
+    labelCategoryId: 'Category ID',
+    labelDescription: 'Description',
+    labelAmount: 'Amount',
+    labelDate: 'Date',
+    labelType: 'Type',
+  },
+};
 
 describe('ActionCardComponent', () => {
   let fixture: ComponentFixture<ActionCardComponent>;
@@ -18,9 +36,16 @@ describe('ActionCardComponent', () => {
   };
 
   beforeEach(async () => {
+    localStorage.removeItem(LOCALE_STORAGE_KEY);
+
     await TestBed.configureTestingModule({
       imports: [ActionCardComponent, TranslateModule.forRoot()],
     }).compileComponents();
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en');
+    translate.setTranslation('en', ACTION_CARD_EN);
+    translate.use('en');
 
     fixture = TestBed.createComponent(ActionCardComponent);
     fixture.componentRef.setInput('action', budgetAction);
