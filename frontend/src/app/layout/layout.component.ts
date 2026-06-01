@@ -8,7 +8,8 @@ import {
     RouterOutlet,
 } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { filter, Subscription } from 'rxjs';
+import { filter, interval, Subscription, switchMap, startWith } from 'rxjs';
+import { NotificationService } from '../core/services/notification.service';
 
 @Component({
     selector: 'app-layout',
@@ -24,6 +25,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
     drawerOpen = false;
     pageTitle = 'Fiscal North';
+    unreadNotifications = 0;
+    private countSub?: Subscription;
 
     menuItems = [
         { label: 'Dashboard', path: '/', icon: 'dashboard' },
@@ -37,16 +40,41 @@ export class LayoutComponent implements OnInit, OnDestroy {
         { label: 'Categories', path: '/categories', icon: 'category' },
     ];
 
+    constructor(private notificationService: NotificationService) {}
+
     ngOnInit(): void {
         this.updateTitle();
         this.navSub = this.router.events
             .pipe(filter((e) => e instanceof NavigationEnd))
-            .subscribe(() => this.updateTitle());
+            .subscribe(() => {
+                this.updateTitle();
+                this.refreshUnreadCount();
+            });
+        this.countSub = interval(60_000)
+            .pipe(
+                startWith(0),
+                switchMap(() => this.notificationService.unreadCount())
+            )
+            .subscribe({
+                next: (res) => {
+                    this.unreadNotifications = res.count;
+                },
+            });
+        this.refreshUnreadCount();
     }
 
     ngOnDestroy(): void {
         this.navSub?.unsubscribe();
+        this.countSub?.unsubscribe();
         document.body.style.overflow = '';
+    }
+
+    private refreshUnreadCount(): void {
+        this.notificationService.unreadCount().subscribe({
+            next: (res) => {
+                this.unreadNotifications = res.count;
+            },
+        });
     }
 
     @HostListener('document:keydown.escape')

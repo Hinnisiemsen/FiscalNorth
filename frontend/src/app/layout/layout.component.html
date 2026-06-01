@@ -68,6 +68,12 @@
         <span class="material-symbols-outlined">menu</span>
       </button>
       <h1 class="topbar-title">{{ pageTitle }}</h1>
+      <a routerLink="/notifications" class="notification-bell" title="Hinweise von Fiscal North">
+        <span class="material-symbols-outlined">notifications</span>
+        @if (unreadNotifications > 0) {
+          <span class="notification-badge">{{ unreadNotifications > 9 ? '9+' : unreadNotifications }}</span>
+        }
+      </a>
       <div class="user-chip">
         <span class="material-symbols-outlined">account_circle</span>
         <span class="user-chip-label">User</span>

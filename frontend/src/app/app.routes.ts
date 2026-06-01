@@ -16,6 +16,7 @@ import { CategoryCreateComponent } from './categories/category-create.component'
 import { BankSyncComponent } from './bank-sync/bank-sync.component';
 import { BankSyncCallbackComponent } from './bank-sync/bank-sync-callback.component';
 import { AssistantComponent } from './assistant/assistant.component';
+import { NotificationsComponent } from './notifications/notifications.component';
 
 export const routes: Routes = [
     {
@@ -24,6 +25,7 @@ export const routes: Routes = [
         children: [
             { path: '', component: DashboardComponent, data: { title: 'Home' } },
             { path: 'assistant', component: AssistantComponent, data: { title: 'Fiscal North' } },
+            { path: 'notifications', component: NotificationsComponent, data: { title: 'Hinweise' } },
             { path: 'accounts', component: AccountListComponent, data: { title: 'Accounts' } },
             { path: 'accounts/new', component: AccountCreateComponent, data: { title: 'New Account' } },
             { path: 'accounts/:id', component: AccountDetailComponent, data: { title: 'Account' } },

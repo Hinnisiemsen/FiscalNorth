@@ -5,13 +5,15 @@ import { AccountService } from '../core/services/account.service';
 import { ContractService } from '../core/services/contract.service';
 import { InsightsService, CategorySpending, MonthlyTrend } from '../core/services/insights.service';
 import { forkJoin } from 'rxjs';
+import { AppNotification, NotificationService } from '../core/services/notification.service';
+import { RouterLink } from '@angular/router';
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ...GLASS_CARD_IMPORTS],
+  imports: [CommonModule, RouterLink, ...GLASS_CARD_IMPORTS],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
@@ -35,11 +37,13 @@ export class DashboardComponent implements OnInit {
   }
   selectedMonth = new Date().getMonth() + 1;
   periodLabel = '';
+  recentNotifications: AppNotification[] = [];
 
   constructor(
     private accountService: AccountService,
     private contractService: ContractService,
-    private insightsService: InsightsService
+    private insightsService: InsightsService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -47,8 +51,10 @@ export class DashboardComponent implements OnInit {
     forkJoin({
       accounts: this.accountService.getDepositAccounts(),
       contracts: this.contractService.getContracts(),
-      insights: this.insightsService.getInsights(this.selectedYear, 0)
-    }).subscribe(({ accounts, contracts, insights }) => {
+      insights: this.insightsService.getInsights(this.selectedYear, 0),
+      notifications: this.notificationService.list(true),
+    }).subscribe(({ accounts, contracts, insights, notifications }) => {
+      this.recentNotifications = notifications.slice(0, 3);
       this.accountCount = accounts.length;
       this.totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
       this.contractCount = contracts.length;

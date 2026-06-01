@@ -145,6 +145,41 @@
   margin: 0;
 }
 
+.notification-bell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--color-secondary);
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+
+.notification-bell:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.notification-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .user-chip {
   display: flex;
   align-items: center;

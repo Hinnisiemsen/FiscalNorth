@@ -15,6 +15,23 @@
     </div>
   </section>
 
+  @if (recentNotifications.length > 0) {
+    <section class="notifications-preview card-glass">
+      <div class="preview-head">
+        <h2>Hinweise von Fiscal North</h2>
+        <a routerLink="/notifications" class="preview-link">Alle anzeigen</a>
+      </div>
+      <ul class="preview-list">
+        @for (n of recentNotifications; track n.id) {
+          <li [class.unread]="!n.read">
+            <strong>{{ n.title }}</strong>
+            <p>{{ n.message }}</p>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
   <div class="cards-grid stat-grid">
     <div class="stat-card card-glass">
       <span class="material-symbols-outlined stat-icon">account_balance</span>

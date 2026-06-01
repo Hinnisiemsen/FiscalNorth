@@ -1,0 +1,41 @@
+<div class="notifications page-content-inner">
+  <app-page-header heading="Hinweise" />
+
+  <div class="toolbar">
+    <button type="button" class="btn btn-secondary" (click)="toggleFilter()">
+      {{ filterUnread ? 'Alle anzeigen' : 'Nur ungelesen' }}
+    </button>
+    <button type="button" class="btn btn-primary" (click)="markAllRead()">Alle gelesen</button>
+  </div>
+
+  @if (loading) {
+    <p class="status-text">Lade Hinweise…</p>
+  } @else if (notifications.length === 0) {
+    <div class="empty card-glass">
+      <span class="material-symbols-outlined">notifications_none</span>
+      <p>Keine Hinweise von Fiscal North — alles im grünen Bereich.</p>
+      <a routerLink="/" class="link-back">Zur Übersicht</a>
+    </div>
+  } @else {
+    <ul class="notification-list">
+      @for (n of notifications; track n.id) {
+        <li
+          class="notification-card card-glass"
+          [class.unread]="!n.read"
+          [class.warning]="n.severity === 'WARNING'"
+          [class.critical]="n.severity === 'CRITICAL'"
+        >
+          <div class="notification-head">
+            <span class="type-badge">{{ typeLabel(n.type) }}</span>
+            <time>{{ formatDate(n.createdAt) }}</time>
+          </div>
+          <h3>{{ n.title }}</h3>
+          <p>{{ n.message }}</p>
+          @if (!n.read) {
+            <button type="button" class="btn btn-secondary btn-sm" (click)="markRead(n)">Als gelesen markieren</button>
+          }
+        </li>
+      }
+    </ul>
+  }
+</div>
