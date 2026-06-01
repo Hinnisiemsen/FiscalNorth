@@ -10,6 +10,12 @@ export interface Budget {
     endDate: string;
 }
 
+export interface BudgetWithUsage extends Budget {
+    spent: number;
+    categoryId?: number;
+    categoryName?: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -18,6 +24,10 @@ export class BudgetService {
 
     getBudgets(): Observable<Budget[]> {
         return this.apiService.get<Budget[]>('/budget');
+    }
+
+    getBudgetsWithUsage(): Observable<BudgetWithUsage[]> {
+        return this.apiService.get<BudgetWithUsage[]>('/budget/with-usage');
     }
 
     createBudget(budget: any): Observable<Budget> {

@@ -8,7 +8,7 @@ export interface Contract {
     startDate: string;
     endDate: string;
     amount: number;
-    interval: string;
+    contractInterval: string;
     autoDetected: boolean;
 }
 
