@@ -1,0 +1,117 @@
+<div class="home page-content-inner">
+  <section class="welcome-section">
+    <span class="spark" aria-hidden="true"></span>
+    <h1>{{ greeting }},</h1>
+    <p class="welcome-sub">Your financial overview at a glance.</p>
+  </section>
+
+  @if (loading) {
+    <app-skeleton height="140px" />
+    <app-skeleton height="100px" />
+    <app-skeleton height="200px" />
+  } @else if (summary) {
+    <section class="hero-card card-glass">
+      <span class="hero-label">Total balance</span>
+      <div class="hero-value">{{ summary.totalBalance | currency:'EUR' }}</div>
+      <div class="hero-details">
+        <span>Disposable {{ summary.disposableIncome | currency:'EUR' }}</span>
+        <span class="dot">┬À</span>
+        <span>Fixed {{ summary.monthlyFixedCosts | currency:'EUR' }}/mo</span>
+      </div>
+    </section>
+
+    <section class="quick-actions">
+      <a routerLink="/transactions/new" class="chip-action">
+        <span class="material-symbols-outlined">add</span> Transaction
+      </a>
+      <a routerLink="/transactions/import" class="chip-action">
+        <span class="material-symbols-outlined">upload</span> Import
+      </a>
+      <a routerLink="/bank-sync" class="chip-action">
+        <span class="material-symbols-outlined">link</span> Bank
+      </a>
+      <a routerLink="/assistant" class="chip-action chip-action-accent">
+        <span class="material-symbols-outlined">smart_toy</span> Assistant
+      </a>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Accounts</h2>
+        <a routerLink="/accounts" class="link">See all</a>
+      </div>
+      <div class="account-scroller">
+        @for (acc of summary.accounts; track acc.id) {
+          <a [routerLink]="['/accounts', acc.id]" class="account-chip card-glass">
+            <span class="acc-name">{{ acc.name }}</span>
+            <span class="acc-balance">{{ acc.balance | currency: getCurrencyCode(acc.currency) }}</span>
+          </a>
+        }
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Recent transactions</h2>
+        <a routerLink="/transactions" class="link">See all</a>
+      </div>
+      @for (tx of summary.recentTransactions; track tx.id) {
+        <div class="list-card stagger-item">
+          <div class="list-card-icon">
+            <span class="material-symbols-outlined">receipt</span>
+          </div>
+          <div class="list-card-body">
+            <div class="list-card-title">{{ tx.description }}</div>
+            <div class="list-card-meta">{{ tx.transactionDate | date:'mediumDate' }}</div>
+          </div>
+          <div
+            class="list-card-amount"
+            [class.negative]="tx.transactionType === 'Expense'"
+            [class.positive]="tx.transactionType === 'Income'"
+          >
+            {{ tx.transactionType === 'Expense' ? 'ÔêÆ' : '+' }}{{ tx.amount | currency:'EUR' }}
+          </div>
+        </div>
+      }
+    </section>
+
+  @if (summary.budgets.length) {
+      <section class="section">
+        <div class="section-header">
+          <h2>Budgets</h2>
+          <a routerLink="/budgets" class="link">Manage</a>
+        </div>
+        <div class="budget-grid">
+          @for (b of summary.budgets.slice(0, 3); track b.id) {
+            <div class="budget-widget card-glass">
+              <div class="budget-widget-header">
+                <span>{{ b.name }}</span>
+                <span>{{ b.spent | currency:'EUR' }} / {{ b.limit | currency:'EUR' }}</span>
+              </div>
+              <div class="progress-track">
+                <div
+                  class="progress-fill"
+                  [ngClass]="budgetClass(b.spent, b.limit)"
+                  [style.width.%]="budgetPercent(b.spent, b.limit)"
+                ></div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <section class="section subscriptions card-glass">
+      <span class="material-symbols-outlined">subscriptions</span>
+      <div>
+        <strong>{{ summary.contractCount }}</strong> active subscriptions / contracts
+        <span class="sub-amount">Ôëê {{ summary.monthlyFixedCosts | currency:'EUR' }}/month</span>
+      </div>
+      <a routerLink="/contracts" class="btn btn-ghost">View</a>
+    </section>
+  }
+
+  <a routerLink="/assistant" class="fab-assistant" title="Open assistant">
+    <span class="material-symbols-outlined">smart_toy</span>
+  </a>
+</div>
