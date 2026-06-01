@@ -1,0 +1,170 @@
+name: Auto approve and merge
+
+# Approves and enables GitHub auto-merge when CI, Lint, and Docker checks all pass.
+# Requires allow_auto_merge on the repository (enabled via repo settings or API).
+
+on:
+  workflow_run:
+    workflows: [CI, Lint, Docker Build]
+    types: [completed]
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: automerge-${{ github.event.workflow_run.head_branch || github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Approve and enable auto-merge
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            let headSha;
+            let headBranch;
+
+            if (context.payload.pull_request) {
+              const pr = context.payload.pull_request;
+              if (pr.draft) {
+                core.info('Skipping draft pull request.');
+                return;
+              }
+              if (pr.head.repo.full_name !== `${owner}/${repo}`) {
+                core.info('Skipping fork pull request.');
+                return;
+              }
+              headSha = pr.head.sha;
+              headBranch = pr.head.ref;
+            } else {
+              const run = context.payload.workflow_run;
+              headSha = run.head_sha;
+              headBranch = run.head_branch;
+            }
+
+            const { data: pulls } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              head: `${owner}:${headBranch}`,
+            });
+
+            const pr = pulls.find(
+              (p) => p.head.sha === headSha && ['master', 'main'].includes(p.base.ref),
+            );
+            if (!pr) {
+              core.info('No open pull request found for this commit.');
+              return;
+            }
+            if (pr.draft) {
+              core.info('Skipping draft pull request.');
+              return;
+            }
+
+            const checkRuns = await github.paginate(github.rest.checks.listForRef, {
+              owner,
+              repo,
+              ref: headSha,
+              per_page: 100,
+            });
+
+            if (checkRuns.length === 0) {
+              core.info('No check runs yet.');
+              return;
+            }
+
+            const pending = checkRuns.filter((run) => run.status !== 'completed');
+            if (pending.length > 0) {
+              core.info(`Waiting for ${pending.length} check(s) to finish.`);
+              return;
+            }
+
+            const failed = checkRuns.filter((run) =>
+              ['failure', 'cancelled', 'timed_out', 'action_required'].includes(run.conclusion),
+            );
+            if (failed.length > 0) {
+              core.info(`Checks failed: ${failed.map((r) => r.name).join(', ')}`);
+              return;
+            }
+
+            const { data: workflowRuns } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner,
+              repo,
+              head_sha: headSha,
+              per_page: 30,
+            });
+
+            const requiredWorkflows = ['CI', 'Lint', 'Docker Build'];
+            for (const workflowName of requiredWorkflows) {
+              const latest = workflowRuns.workflow_runs.find(
+                (run) => run.name === workflowName && run.head_sha === headSha,
+              );
+              if (!latest) {
+                core.info(`Workflow "${workflowName}" has not run yet.`);
+                return;
+              }
+              if (latest.status !== 'completed') {
+                core.info(`Workflow "${workflowName}" is still ${latest.status}.`);
+                return;
+              }
+              if (latest.conclusion !== 'success') {
+                core.info(`Workflow "${workflowName}" concluded with ${latest.conclusion}.`);
+                return;
+              }
+            }
+
+            try {
+              await github.rest.pulls.createReview({
+                owner,
+                repo,
+                pull_number: pr.number,
+                event: 'APPROVE',
+                body: 'Auto-approved: all required checks passed.',
+              });
+              core.info(`Approved PR #${pr.number}.`);
+            } catch (error) {
+              if (error.status === 422) {
+                core.info(`PR #${pr.number} already approved or cannot be approved.`);
+              } else {
+                throw error;
+              }
+            }
+
+            try {
+              await github.graphql(
+                `mutation($pullRequestId: ID!) {
+                  enablePullRequestAutoMerge(
+                    input: { pullRequestId: $pullRequestId, mergeMethod: SQUASH }
+                  ) {
+                    pullRequest {
+                      number
+                      autoMergeRequest {
+                        enabledAt
+                      }
+                    }
+                  }
+                }`,
+                { pullRequestId: pr.node_id },
+              );
+              core.info(`Auto-merge enabled for PR #${pr.number}.`);
+            } catch (error) {
+              const alreadyEnabled =
+                error.message?.includes('Pull request auto merge is already enabled') ||
+                error.errors?.some((e) => e.type === 'UNPROCESSABLE');
+              if (alreadyEnabled) {
+                core.info(`Auto-merge already enabled for PR #${pr.number}.`);
+              } else {
+                throw error;
+              }
+            }
