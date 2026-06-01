@@ -18,4 +18,7 @@ public abstract class Transaction extends BaseEntity {
     private LocalDate transactionDate;
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
+    /** Hash for duplicate detection when re-importing (date|amount|description) */
+    @Column(name = "import_hash", unique = true)
+    private String importHash;
 }

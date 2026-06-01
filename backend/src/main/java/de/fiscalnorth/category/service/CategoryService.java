@@ -19,6 +19,7 @@ import java.util.List;
 public class CategoryService {
     private final CategoryRepository repository;
 
+    @Transactional(readOnly = false)
     public Category createCategory(CreateCategoryRequest createCategoryRequest) {
         Category category = new Category();
         category.setName(createCategoryRequest.name());
@@ -39,6 +40,7 @@ public class CategoryService {
                 .orElseThrow(() -> new RessourceNotFoundException("Category doesn't exist in datasource!", "id", id));
     }
 
+    @Transactional(readOnly = false)
     public void deleteCategory(Long id) {
         repository.deleteById(id);
     }

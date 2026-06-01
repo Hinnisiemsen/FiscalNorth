@@ -8,6 +8,7 @@ import de.fiscalnorth.contract.repository.ContractRepository;
 import de.fiscalnorth.transaction.dto.CreatePaymentTransactionRequest;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,11 +28,10 @@ public class PaymentTransactionService {
 
     @Autowired
     public PaymentTransactionService(PaymentTransactionRepository paymentTransactionRepository,
-                                     BankAccountRepository bankAccountRepository,
-                                     DepositAccountRepository depositAccountRepository,
-                                     CategoryRepository categoryRepository,
-                                     ContractRepository contractRepository)
-    {
+            BankAccountRepository bankAccountRepository,
+            DepositAccountRepository depositAccountRepository,
+            CategoryRepository categoryRepository,
+            ContractRepository contractRepository) {
         this.paymentTransactionRepository = paymentTransactionRepository;
         this.bankAccountRepository = bankAccountRepository;
         this.depositAccountRepository = depositAccountRepository;
@@ -39,6 +39,13 @@ public class PaymentTransactionService {
         this.contractRepository = contractRepository;
     }
 
+    public List<PaymentTransaction> getAllPaymentTransactions() {
+        return paymentTransactionRepository.findAll();
+    }
+
+    public List<PaymentTransaction> getRecentTransactions(int limit) {
+        return paymentTransactionRepository.findAllByOrderByTransactionDateDesc(PageRequest.of(0, limit));
+    }
 
     public List<PaymentTransaction> getExpensesBySingleCategory(Category category) {
         return paymentTransactionRepository.findPaymentTransactionByCategory(category);
@@ -47,7 +54,7 @@ public class PaymentTransactionService {
     public List<List<PaymentTransaction>> getExpensesSeperatedIntoCategories(List<Category> categories) {
         List<List<PaymentTransaction>> resultList = new ArrayList<>(List.of());
 
-        for (Category category: categories) {
+        for (Category category : categories) {
             resultList.add(paymentTransactionRepository.findPaymentTransactionByCategory(category));
         }
         return resultList;
@@ -61,12 +68,17 @@ public class PaymentTransactionService {
     public PaymentTransaction createPaymentTransaction(CreatePaymentTransactionRequest paymentTransactionRequest) {
         PaymentTransaction paymentTransaction = new PaymentTransaction();
 
-        checkCategoryAndContract(paymentTransactionRequest);
+        Category category = paymentTransactionRequest.category();
+        if (category == null) {
+            category = categorizeTransaction(paymentTransactionRequest.description());
+        }
+
+        checkCategoryAndContract(category, paymentTransactionRequest.contract());
 
         paymentTransaction.setTransactionDate(paymentTransactionRequest.transactionDate());
         paymentTransaction.setTransactionType(paymentTransactionRequest.transactionType());
         paymentTransaction.setAmount(paymentTransactionRequest.amount());
-        paymentTransaction.setCategory(paymentTransactionRequest.category());
+        paymentTransaction.setCategory(category);
         paymentTransaction.setContract(paymentTransactionRequest.contract());
         paymentTransaction.setDescription(paymentTransactionRequest.description());
         paymentTransaction.setTags(paymentTransactionRequest.tags());
@@ -74,12 +86,51 @@ public class PaymentTransactionService {
         return paymentTransactionRepository.save(paymentTransaction);
     }
 
-    private void checkCategoryAndContract(CreatePaymentTransactionRequest paymentTransactionRequest) {
-        if (!categoryRepository.existsById(paymentTransactionRequest.category().getId())) {
-            categoryRepository.save(paymentTransactionRequest.category());
+    private Category categorizeTransaction(String description) {
+        if (description == null)
+            return null;
+        String descLower = description.toLowerCase();
+
+        // Simple keyword mapping for MVP
+        if (descLower.contains("rewe") || descLower.contains("lidl") || descLower.contains("aldi")) {
+            return findOrCreateCategory("Groceries", de.fiscalnorth.transaction.model.TransactionType.Expense);
+        } else if (descLower.contains("netflix") || descLower.contains("spotify") || descLower.contains("cinema")) {
+            return findOrCreateCategory("Entertainment", de.fiscalnorth.transaction.model.TransactionType.Expense);
+        } else if (descLower.contains("shell") || descLower.contains("aral")) {
+            return findOrCreateCategory("Transport", de.fiscalnorth.transaction.model.TransactionType.Expense);
+        } else if (descLower.contains("miete") || descLower.contains("rent")) {
+            return findOrCreateCategory("Housing", de.fiscalnorth.transaction.model.TransactionType.Expense);
+        } else if (descLower.contains("salary") || descLower.contains("gehalt")) {
+            return findOrCreateCategory("Income", de.fiscalnorth.transaction.model.TransactionType.Income);
         }
-        if (!contractRepository.existsById(paymentTransactionRequest.contract().getId())) {
-            contractRepository.save(paymentTransactionRequest.contract());
+
+        return findOrCreateCategory("General", de.fiscalnorth.transaction.model.TransactionType.Expense);
+    }
+
+    private Category findOrCreateCategory(String name) {
+        return findOrCreateCategory(name, de.fiscalnorth.transaction.model.TransactionType.Expense);
+    }
+
+    private Category findOrCreateCategory(String name, de.fiscalnorth.transaction.model.TransactionType type) {
+        return categoryRepository.findByNameAndTransactionType(name, type)
+                .orElseGet(() -> {
+                    Category category = new Category();
+                    category.setName(name);
+                    category.setTransactionType(type);
+                    return categoryRepository.save(category);
+                });
+    }
+
+    private void checkCategoryAndContract(Category category, de.fiscalnorth.contract.model.Contract contract) {
+        if (category != null && category.getId() != null) {
+            if (!categoryRepository.existsById(category.getId())) {
+                categoryRepository.save(category);
+            }
+        }
+        if (contract != null && contract.getId() != null) {
+            if (!contractRepository.existsById(contract.getId())) {
+                contractRepository.save(contract);
+            }
         }
     }
 }

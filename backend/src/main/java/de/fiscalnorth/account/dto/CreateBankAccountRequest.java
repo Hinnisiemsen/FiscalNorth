@@ -3,9 +3,9 @@ package de.fiscalnorth.account.dto;
 import de.fiscalnorth.account.model.AccountType;
 
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public record CreateBankAccountRequest(
         @NotNull(message = "Name can't be empty")

@@ -5,6 +5,7 @@ import de.fiscalnorth.user.dto.CreateUserRequest;
 import de.fiscalnorth.user.model.User;
 import de.fiscalnorth.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -30,7 +32,7 @@ public class UserService {
         User user = new User();
         user.setUserName(request.userName());
         user.setEmail(request.email());
-        user.setPasswordHash(request.password()); // TODO: Hash password
+        user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setUserRole(request.userRole());
         return userRepository.save(user);
     }

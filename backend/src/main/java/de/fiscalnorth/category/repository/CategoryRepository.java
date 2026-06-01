@@ -13,4 +13,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     boolean existsByNameEqualsAndTransactionTypeEquals(String name, TransactionType transactionType);
 
     List<Category> findCategoryByNameEquals(String name);
+
+    java.util.Optional<Category> findByNameAndTransactionType(String name, TransactionType transactionType);
 }

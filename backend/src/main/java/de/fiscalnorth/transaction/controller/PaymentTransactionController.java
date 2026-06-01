@@ -24,6 +24,18 @@ public class PaymentTransactionController {
         this.categoryService = categoryService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<PaymentTransaction>> getAllPaymentTransactions() {
+        return ResponseEntity.ok(paymentTransactionService.getAllPaymentTransactions());
+    }
+
+    @GetMapping("/recent")
+    public ResponseEntity<List<PaymentTransaction>> getRecentPaymentTransactions(
+            @RequestParam(defaultValue = "10") int limit) {
+        int safeLimit = Math.min(Math.max(limit, 1), 50);
+        return ResponseEntity.ok(paymentTransactionService.getRecentTransactions(safeLimit));
+    }
+
     @PostMapping
     public ResponseEntity<PaymentTransaction> createPaymentTransaction(
             CreatePaymentTransactionRequest paymentTransactionRequest) {
