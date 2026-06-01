@@ -1,10 +1,8 @@
 package de.fiscalnorth.transaction;
 
+import de.fiscalnorth.support.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -12,11 +10,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(properties = {
-    "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration,org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration,org.springframework.ai.model.mistralai.autoconfigure.MistralAiChatAutoConfiguration,org.springframework.ai.model.mistralai.autoconfigure.MistralAiEmbeddingAutoConfiguration,org.springframework.ai.model.mistralai.autoconfigure.MistralAiModerationAutoConfiguration"
-})
-@AutoConfigureMockMvc
-class CsvImportIntegrationTest {
+class CsvImportIntegrationTest extends IntegrationTestBase {
 
     @Autowired
     private MockMvc mockMvc;
