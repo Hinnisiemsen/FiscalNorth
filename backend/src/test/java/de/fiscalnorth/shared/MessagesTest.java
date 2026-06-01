@@ -40,6 +40,7 @@ class MessagesTest {
         ResourceBundleMessageSource source = new ResourceBundleMessageSource();
         source.setBasename("messages");
         source.setDefaultEncoding("UTF-8");
+        source.setFallbackToSystemLocale(false);
         return source;
     }
 }
