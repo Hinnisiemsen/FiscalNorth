@@ -1,12 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AiService, ChatResponse, ProposedAction } from '../core/services/ai.service';
 import { BudgetService } from '../core/services/budget.service';
 import { CategoryService } from '../core/services/category.service';
 import { TransactionService } from '../core/services/transaction.service';
 import { ActionCardComponent } from './action-card.component';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
+import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
+import { LanguageService } from '../core/i18n/language.service';
 
 interface ChatMessage {
     role: 'user' | 'assistant';
@@ -24,16 +27,18 @@ interface MessageBlock {
 @Component({
     selector: 'app-assistant',
     standalone: true,
-    imports: [CommonModule, FormsModule, ActionCardComponent, ...PAGE_HEADER_IMPORTS],
+    imports: [CommonModule, FormsModule, ActionCardComponent, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
     templateUrl: './assistant.component.html',
     styleUrl: './assistant.component.css',
 })
 export class AssistantComponent implements OnInit {
-    readonly welcomeFollowUps = [
-        'Wie viel habe ich diesen Monat für Lebensmittel ausgegeben?',
-        'Lege ein Budget für Transport an.',
-        'Wo gebe ich am meisten aus?',
-    ];
+    private readonly lang = inject(LanguageService);
+
+    readonly welcomeFollowUpKeys = [
+        'assistant.welcomeExample1',
+        'assistant.welcomeExample2',
+        'assistant.welcomeExample3',
+    ] as const;
 
     messages: ChatMessage[] = [];
     inputText = '';
@@ -44,24 +49,63 @@ export class AssistantComponent implements OnInit {
     actionBusyIndex: number | null = null;
     actionResults = new Map<number, { text: string; error: boolean }>();
 
+    private pendingQuery: string | null = null;
+    private pendingAnalysis = false;
+
     constructor(
         private ai: AiService,
         private budgetService: BudgetService,
         private categoryService: CategoryService,
-        private transactionService: TransactionService
+        private transactionService: TransactionService,
+        private route: ActivatedRoute,
+        private router: Router
     ) {}
 
     ngOnInit(): void {
+        this.route.queryParamMap.subscribe((params) => {
+            const q = params.get('q');
+            const mode = params.get('mode');
+            this.pendingQuery = q?.trim() || null;
+            this.pendingAnalysis = mode === 'analysis';
+            if (q || this.pendingAnalysis) {
+                this.router.navigate([], {
+                    relativeTo: this.route,
+                    queryParams: { q: null, mode: null },
+                    queryParamsHandling: 'merge',
+                    replaceUrl: true,
+                });
+            }
+            this.tryConsumePendingQuery();
+        });
+
         this.ai.getStatus().subscribe({
             next: (s) => {
                 this.aiAvailable = s.available;
                 this.setupHint = s.available ? '' : s.message;
+                this.tryConsumePendingQuery();
             },
             error: () => {
                 this.aiAvailable = false;
-                this.setupHint = 'Fiscal North ist gerade nicht erreichbar. Bitte später erneut versuchen.';
+                this.setupHint = this.lang.instant('assistant.unavailable');
             },
         });
+    }
+
+    private tryConsumePendingQuery(): void {
+        if (!this.aiAvailable || this.loading) return;
+        if (this.pendingAnalysis) {
+            const query =
+                'Erstelle eine Gesamtanalyse meiner Finanzen: Stärken, Risiken und 3 konkrete Empfehlungen auf Deutsch.';
+            this.pendingAnalysis = false;
+            this.pendingQuery = null;
+            this.sendMessage(query);
+            return;
+        }
+        if (this.pendingQuery) {
+            const q = this.pendingQuery;
+            this.pendingQuery = null;
+            this.sendMessage(q);
+        }
     }
 
     send(): void {
@@ -74,6 +118,10 @@ export class AssistantComponent implements OnInit {
         const text = question.trim();
         if (!text || this.loading) return;
         this.sendMessage(text);
+    }
+
+    askWelcomeExample(key: string): void {
+        this.askFollowUp(this.lang.instant(key));
     }
 
     showFollowUps(msgIndex: number): boolean {
@@ -100,9 +148,7 @@ export class AssistantComponent implements OnInit {
                 this.loading = false;
             },
             error: (err) => {
-                const msg =
-                    err?.error?.message ||
-                    'Fiscal North konnte gerade nicht antworten. Bitte versuche es erneut.';
+                const msg = err?.error?.message || this.lang.instant('assistant.chatFailed');
                 this.messages.push({ role: 'assistant', text: msg });
                 this.loading = false;
             },
@@ -135,8 +181,8 @@ export class AssistantComponent implements OnInit {
                         categoryId: p['categoryId'] ? Number(p['categoryId']) : null,
                     })
                     .subscribe({
-                        next: () => done('Budget wurde in Fiscal North angelegt.'),
-                        error: () => done('Budget konnte nicht angelegt werden.', true),
+                        next: () => done(this.lang.instant('assistant.actionBudgetCreated')),
+                        error: () => done(this.lang.instant('assistant.actionBudgetFailed'), true),
                     });
                 break;
             case 'CREATE_CATEGORY':
@@ -146,8 +192,8 @@ export class AssistantComponent implements OnInit {
                         transactionType: String(p['transactionType']),
                     })
                     .subscribe({
-                        next: () => done('Kategorie wurde in Fiscal North angelegt.'),
-                        error: () => done('Kategorie konnte nicht angelegt werden.', true),
+                        next: () => done(this.lang.instant('assistant.actionCategoryCreated')),
+                        error: () => done(this.lang.instant('assistant.actionCategoryFailed'), true),
                     });
                 break;
             case 'CREATE_TRANSACTION':
@@ -162,8 +208,8 @@ export class AssistantComponent implements OnInit {
                         tags: null,
                     })
                     .subscribe({
-                        next: () => done('Buchung wurde in Fiscal North erfasst.'),
-                        error: () => done('Buchung konnte nicht erfasst werden.', true),
+                        next: () => done(this.lang.instant('assistant.actionTransactionCreated')),
+                        error: () => done(this.lang.instant('assistant.actionTransactionFailed'), true),
                     });
                 break;
         }

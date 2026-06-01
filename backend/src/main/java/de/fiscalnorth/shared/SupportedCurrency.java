@@ -24,6 +24,6 @@ public enum SupportedCurrency {
         for (SupportedCurrency c : values()) {
             if (c.code.equalsIgnoreCase(s) || c.name().equalsIgnoreCase(s)) return c;
         }
-        throw new IllegalArgumentException("Unknown currency: " + s);
+        throw new LocalizedException("error.currency.unknown", s);
     }
 }

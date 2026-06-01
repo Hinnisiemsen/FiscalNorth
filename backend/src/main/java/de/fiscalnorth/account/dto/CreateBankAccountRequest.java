@@ -8,20 +8,20 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record CreateBankAccountRequest(
-        @NotNull(message = "Name can't be empty")
+        @NotNull(message = "{validation.bankAccount.nameRequired}")
         String bankName,
 
-        @NotNull(message = "IBAN is mandatory")
+        @NotNull(message = "{validation.bankAccount.ibanRequired}")
         @Size(min = 15, max = 34)
         String iban,
 
-        @NotNull(message = "BIC is mandatory")
+        @NotNull(message = "{validation.bankAccount.bicRequired}")
         @Pattern(
                 regexp = "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
-                message = "BIC muss 8 oder 11 Zeichen lang sein (Großbuchstaben/Zahlen)"
+                message = "{validation.bankAccount.bicFormat}"
         )
         String bic,
 
-        @NotNull(message = "Please select an Account Type")
+        @NotNull(message = "{validation.bankAccount.accountTypeRequired}")
         AccountType accountType
 ) {}

@@ -1,5 +1,6 @@
 package de.fiscalnorth.budget.service;
 
+import de.fiscalnorth.auth.CurrentUserService;
 import de.fiscalnorth.budget.dto.BudgetWithUsage;
 import de.fiscalnorth.budget.dto.CreateBudgetRequest;
 import de.fiscalnorth.budget.model.Budget;
@@ -7,6 +8,7 @@ import de.fiscalnorth.budget.repository.BudgetRepository;
 import de.fiscalnorth.category.model.Category;
 import de.fiscalnorth.category.repository.CategoryRepository;
 import de.fiscalnorth.shared.RessourceNotFoundException;
+import de.fiscalnorth.user.model.User;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,22 +25,29 @@ public class BudgetService {
     private final BudgetRepository budgetRepository;
     private final PaymentTransactionRepository paymentTransactionRepository;
     private final CategoryRepository categoryRepository;
+    private final CurrentUserService currentUserService;
 
     public List<Budget> getAllBudgets() {
-        return budgetRepository.findAll();
+        return budgetRepository.findAllByOwnerId(currentUserService.getCurrentUserId());
     }
 
     public List<BudgetWithUsage> getBudgetsWithUsage() {
-        return budgetRepository.findAll().stream()
+        return getBudgetsWithUsageForOwner(currentUserService.getCurrentUserId());
+    }
+
+    public List<BudgetWithUsage> getBudgetsWithUsageForOwner(Long ownerId) {
+        return budgetRepository.findAllByOwnerId(ownerId).stream()
                 .map(budget -> {
                     BigDecimal spent;
                     if (budget.getCategory() != null) {
                         spent = paymentTransactionRepository.sumExpenseAmountByCategoryIdAndDateRange(
+                                ownerId,
                                 budget.getCategory().getId(),
                                 budget.getStartDate(),
                                 budget.getEndDate());
                     } else {
                         spent = paymentTransactionRepository.sumExpenseAmountByCategoryNameAndDateRange(
+                                ownerId,
                                 budget.getName(),
                                 budget.getStartDate(),
                                 budget.getEndDate());
@@ -57,19 +66,21 @@ public class BudgetService {
     }
 
     public Budget getBudgetById(Long id) {
-        return budgetRepository.findById(id)
+        return budgetRepository.findByIdAndOwnerId(id, currentUserService.getCurrentUserId())
                 .orElseThrow(() -> new RessourceNotFoundException("Budget", "id", id));
     }
 
     @Transactional
     public Budget createBudget(CreateBudgetRequest request) {
+        User owner = currentUserService.getCurrentUser();
         Budget budget = new Budget();
         budget.setName(request.name());
         budget.setLimit(request.limit());
         budget.setStartDate(request.startDate());
         budget.setEndDate(request.endDate());
+        budget.setOwner(owner);
         if (request.categoryId() != null) {
-            Category category = categoryRepository.findById(request.categoryId())
+            Category category = categoryRepository.findByIdAndOwnerId(request.categoryId(), owner.getId())
                     .orElseThrow(() -> new RessourceNotFoundException("Category", "id", request.categoryId()));
             budget.setCategory(category);
         }
@@ -78,9 +89,8 @@ public class BudgetService {
 
     @Transactional
     public void deleteBudget(Long id) {
-        if (!budgetRepository.existsById(id)) {
-            throw new RessourceNotFoundException("Budget", "id", id);
-        }
-        budgetRepository.deleteById(id);
+        Budget budget = budgetRepository.findByIdAndOwnerId(id, currentUserService.getCurrentUserId())
+                .orElseThrow(() -> new RessourceNotFoundException("Budget", "id", id));
+        budgetRepository.delete(budget);
     }
 }

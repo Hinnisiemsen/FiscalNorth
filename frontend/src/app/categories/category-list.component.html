@@ -1,6 +1,6 @@
 <div class="page-content-inner">
-  <app-page-header heading="Categories">
-    <a routerLink="/categories/new" class="btn btn-primary">Add Category</a>
+  <app-page-header [heading]="'categories.title' | translate">
+    <a routerLink="/categories/new" class="btn btn-primary">{{ 'categories.add' | translate }}</a>
   </app-page-header>
 
   <div class="list-card" *ngFor="let cat of categories">
@@ -11,13 +11,13 @@
         [class.expense]="cat.transactionType === 'Expense'"
         [class.income]="cat.transactionType === 'Income'"
       >
-        {{ cat.transactionType }}
+        {{ typeLabel(cat.transactionType) }}
       </span>
     </div>
-    <button class="btn-danger" type="button" (click)="deleteCategory(cat.id)">Delete</button>
+    <button class="btn-danger" type="button" (click)="deleteCategory(cat.id)">{{ 'common.delete' | translate }}</button>
   </div>
 
   <div class="empty-state" *ngIf="categories.length === 0">
-    <p>No categories yet. Create one to categorize your transactions.</p>
+    <p>{{ 'categories.empty' | translate }}</p>
   </div>
 </div>

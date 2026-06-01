@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BudgetService, BudgetWithUsage } from '../core/services/budget.service';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
+import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 
 @Component({
   selector: 'app-budget-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, ...PAGE_HEADER_IMPORTS],
+  imports: [CommonModule, RouterLink, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './budget-list.component.html',
   styleUrl: './budget-list.component.css'
 })

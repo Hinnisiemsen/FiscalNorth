@@ -1,0 +1,28 @@
+<div class="user-menu-root">
+  <button type="button" class="user-chip" (click)="toggle()" [attr.aria-expanded]="open">
+    @if (user?.avatarUrl) {
+      <img [src]="user!.avatarUrl!" [alt]="user!.userName" class="user-avatar" />
+    } @else {
+      <span class="material-symbols-outlined">account_circle</span>
+    }
+    <span class="user-chip-label">{{ user?.userName ?? ('layout.user' | translate) }}</span>
+    <span class="material-symbols-outlined chevron">expand_more</span>
+  </button>
+
+  @if (open) {
+    <div class="user-dropdown" role="menu">
+      <div class="user-dropdown-header">
+        <strong>{{ user?.userName }}</strong>
+        <span>{{ user?.email }}</span>
+      </div>
+      <a routerLink="/account" class="dropdown-item" role="menuitem" (click)="close()">
+        <span class="material-symbols-outlined">settings</span>
+        {{ 'auth.accountSettings' | translate }}
+      </a>
+      <button type="button" class="dropdown-item" role="menuitem" (click)="signOut()">
+        <span class="material-symbols-outlined">logout</span>
+        {{ 'auth.signOut' | translate }}
+      </button>
+    </div>
+  }
+</div>

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import de.fiscalnorth.shared.LocalizedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -31,7 +32,7 @@ public class GeminiClient {
 
     public String generate(String systemPrompt, String userMessage) {
         if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("GEMINI_API_KEY is not configured");
+            throw new LocalizedException("error.gemini.apiKeyNotConfigured");
         }
 
         ObjectNode body = objectMapper.createObjectNode();
@@ -68,11 +69,11 @@ public class GeminiClient {
         }
 
         if (response == null) {
-            throw new IllegalStateException("Empty response from Gemini API");
+            throw new LocalizedException("error.gemini.emptyResponse");
         }
         JsonNode candidates = response.path("candidates");
         if (!candidates.isArray() || candidates.isEmpty()) {
-            throw new IllegalStateException("No candidates in Gemini response: " + response);
+            throw new LocalizedException("error.gemini.noCandidates", response);
         }
         return candidates.get(0).path("content").path("parts").get(0).path("text").asText("");
     }

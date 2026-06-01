@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TranslateModule } from '@ngx-translate/core';
 import { ActionCardComponent } from './action-card.component';
 import { ProposedAction } from '../core/services/ai.service';
 
@@ -18,7 +19,7 @@ describe('ActionCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ActionCardComponent],
+      imports: [ActionCardComponent, TranslateModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ActionCardComponent);
@@ -28,9 +29,9 @@ describe('ActionCardComponent', () => {
 
   it('should show budget title and detail rows', () => {
     const component = fixture.componentInstance;
-    expect(component.actionTitle()).toBe('Neues Budget');
+    expect(component.actionTitle()).toBe('New budget');
     expect(component.detailRows().map((r) => r.label)).toEqual(
-      jasmine.arrayContaining(['Bezeichnung', 'Limit', 'Zeitraum']),
+      jasmine.arrayContaining(['Name', 'Limit', 'Period']),
     );
   });
 

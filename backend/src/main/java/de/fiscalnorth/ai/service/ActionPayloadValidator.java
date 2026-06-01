@@ -2,6 +2,7 @@ package de.fiscalnorth.ai.service;
 
 import de.fiscalnorth.ai.dto.ProposedAction;
 import de.fiscalnorth.ai.dto.ProposedActionType;
+import de.fiscalnorth.shared.LocalizedException;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -28,7 +29,7 @@ public class ActionPayloadValidator {
                     case CREATE_CATEGORY -> validateCategory(action);
                     case CREATE_TRANSACTION -> validateTransaction(action);
                 });
-            } catch (IllegalArgumentException ignored) {
+            } catch (RuntimeException ignored) {
                 // skip invalid proposals
             }
         }
@@ -58,7 +59,7 @@ public class ActionPayloadValidator {
         String name = requireString(p, "name");
         String type = requireString(p, "transactionType");
         if (!type.equalsIgnoreCase("Expense") && !type.equalsIgnoreCase("Income")) {
-            throw new IllegalArgumentException("invalid transactionType");
+            throw new LocalizedException("error.action.invalidTransactionType");
         }
         String normalizedType = type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase();
         String summary = enrichSummary(action.summary(), buildCategorySummary(name, normalizedType));
@@ -75,7 +76,7 @@ public class ActionPayloadValidator {
         LocalDate date = requireDate(p, "transactionDate");
         String type = requireString(p, "transactionType");
         if (!type.equalsIgnoreCase("Expense") && !type.equalsIgnoreCase("Income")) {
-            throw new IllegalArgumentException("invalid transactionType");
+            throw new LocalizedException("error.action.invalidTransactionType");
         }
         Map<String, Object> normalized = new java.util.HashMap<>();
         normalized.put("amount", amount);
@@ -93,7 +94,7 @@ public class ActionPayloadValidator {
     private String requireString(Map<String, Object> p, String key) {
         Object v = p.get(key);
         if (v == null || v.toString().isBlank()) {
-            throw new IllegalArgumentException("missing " + key);
+            throw new LocalizedException("error.action.missingField", key);
         }
         return v.toString().trim();
     }
@@ -101,11 +102,11 @@ public class ActionPayloadValidator {
     private BigDecimal requirePositiveDecimal(Map<String, Object> p, String key) {
         Object v = p.get(key);
         if (v == null) {
-            throw new IllegalArgumentException("missing " + key);
+            throw new LocalizedException("error.action.missingField", key);
         }
         BigDecimal d = new BigDecimal(v.toString());
         if (d.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("must be positive");
+            throw new LocalizedException("error.action.mustBePositive");
         }
         return d;
     }

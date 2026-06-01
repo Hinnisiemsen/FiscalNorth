@@ -2,8 +2,10 @@ package de.fiscalnorth.budget.model;
 
 import de.fiscalnorth.category.model.Category;
 import de.fiscalnorth.shared.BaseEntity;
+import de.fiscalnorth.user.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
@@ -25,4 +27,8 @@ public class Budget extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 }

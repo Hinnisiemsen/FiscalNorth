@@ -4,6 +4,7 @@ import de.fiscalnorth.ai.dto.AssistantStatusDto;
 import de.fiscalnorth.ai.dto.ChatRequest;
 import de.fiscalnorth.ai.dto.ChatResponse;
 import de.fiscalnorth.ai.service.AssistantService;
+import de.fiscalnorth.shared.Messages;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AssistantController {
 
     private final AssistantService assistantService;
+    private final Messages messages;
 
     @GetMapping("/status")
     public ResponseEntity<AssistantStatusDto> status() {
         boolean available = assistantService.isAvailable();
         String message = available
-                ? "Fiscal North ist bereit, deine Fragen zu beantworten."
-                : "Fiscal North ist vorübergehend nicht verfügbar. Bitte den Administrator kontaktieren.";
+                ? messages.get("assistant.status.ready")
+                : messages.get("assistant.status.unavailable");
         return ResponseEntity.ok(new AssistantStatusDto(available, message));
     }
 

@@ -7,6 +7,7 @@ import de.fiscalnorth.ai.config.AiProperties;
 import de.fiscalnorth.notification.model.NotificationSeverity;
 import de.fiscalnorth.notification.model.NotificationType;
 import de.fiscalnorth.notification.service.NotificationService;
+import de.fiscalnorth.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ public class FinancialOptimizationService {
     private final GeminiClient geminiClient;
     private final FinancialContextService financialContextService;
     private final NotificationService notificationService;
+    private final UserRepository userRepository;
     private final AiProperties aiProperties;
     private final ObjectMapper objectMapper;
 
@@ -44,8 +46,19 @@ public class FinancialOptimizationService {
             log.debug("Skipping AI optimization: assistant not configured");
             return 0;
         }
+        int totalCreated = 0;
+        for (var user : userRepository.findAll()) {
+            totalCreated += runOptimizationPassForOwner(user.getId());
+        }
+        return totalCreated;
+    }
 
-        String context = financialContextService.buildContextSnapshot();
+    public int runOptimizationPassForOwner(Long ownerId) {
+        if (!isAvailable()) {
+            return 0;
+        }
+
+        String context = financialContextService.buildContextSnapshotForOwner(ownerId);
         String systemPrompt = """
                 Du bist der Finanzoptimierungs-Assistent von Fiscal North.
                 Analysiere die Finanzdaten und schlage konkrete, umsetzbare Verbesserungen vor.
@@ -86,6 +99,7 @@ public class FinancialOptimizationService {
             ParsedTip tip = tips.get(i);
             String dedupeKey = "ai-opt:" + dateKey + ":" + i + ":" + slug(tip.title());
             var saved = notificationService.createIfAbsent(
+                    ownerId,
                     dedupeKey,
                     tip.title(),
                     tip.message(),

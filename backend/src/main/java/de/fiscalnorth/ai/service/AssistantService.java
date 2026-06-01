@@ -3,6 +3,7 @@ package de.fiscalnorth.ai.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.fiscalnorth.ai.AiDisabledException;
+import de.fiscalnorth.shared.Messages;
 import de.fiscalnorth.ai.client.GeminiClient;
 import de.fiscalnorth.ai.config.AiProperties;
 import de.fiscalnorth.ai.dto.ChatResponse;
@@ -31,6 +32,7 @@ public class AssistantService {
     private final FollowUpRecommendationService followUpRecommendationService;
     private final AiProperties aiProperties;
     private final ObjectMapper objectMapper;
+    private final Messages messages;
 
     @Value("${spring.ai.google.genai.api-key:}")
     private String apiKey;
@@ -41,8 +43,7 @@ public class AssistantService {
 
     public ChatResponse chat(String message, String conversationId) {
         if (!isAvailable()) {
-            throw new AiDisabledException(
-                    "Fiscal North ist vorübergehend nicht verfügbar. Bitte später erneut versuchen.");
+            throw new AiDisabledException();
         }
 
         String context = financialContextService.buildContextSnapshot();
@@ -104,7 +105,7 @@ public class AssistantService {
 
     private ParsedAssistantResponse parseResponse(String raw) {
         if (raw == null || raw.isBlank()) {
-            return new ParsedAssistantResponse("Keine Antwort vom Modell erhalten.", List.of(), List.of());
+            return new ParsedAssistantResponse(messages.get("assistant.error.noModelReply"), List.of(), List.of());
         }
         String json = raw.trim();
         Matcher m = JSON_BLOCK.matcher(json);

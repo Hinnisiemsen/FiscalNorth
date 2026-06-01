@@ -1,6 +1,6 @@
 <div class="page-content-inner">
-  <app-page-header heading="Budgets">
-    <a routerLink="/budgets/new" class="btn btn-primary">Create Budget</a>
+  <app-page-header [heading]="'budgets.title' | translate">
+    <a routerLink="/budgets/new" class="btn btn-primary">{{ 'budgets.add' | translate }}</a>
   </app-page-header>
 
   <div class="budget-grid">
@@ -25,6 +25,6 @@
   </div>
 
   <div class="empty-state" *ngIf="budgets.length === 0">
-    <p>No budgets found.</p>
+    <p>{{ 'budgets.empty' | translate }}</p>
   </div>
 </div>

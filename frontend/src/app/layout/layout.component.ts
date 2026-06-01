@@ -10,17 +10,30 @@ import {
 import { CommonModule } from '@angular/common';
 import { filter, interval, Subscription, switchMap, startWith } from 'rxjs';
 import { NotificationService } from '../core/services/notification.service';
+import { LanguageSwitcherComponent } from '../shared/language-switcher.component';
+import { UserMenuComponent } from './user-menu.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 
 @Component({
     selector: 'app-layout',
     standalone: true,
-    imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+    imports: [
+        CommonModule,
+        RouterOutlet,
+        RouterLink,
+        RouterLinkActive,
+        LanguageSwitcherComponent,
+        UserMenuComponent,
+        ...TRANSLATE_IMPORTS,
+    ],
     templateUrl: './layout.component.html',
     styleUrls: ['./layout.component.css'],
 })
 export class LayoutComponent implements OnInit, OnDestroy {
     private readonly router = inject(Router);
     private readonly route = inject(ActivatedRoute);
+    private readonly translate = inject(TranslateService);
     private navSub?: Subscription;
 
     drawerOpen = false;
@@ -29,15 +42,15 @@ export class LayoutComponent implements OnInit, OnDestroy {
     private countSub?: Subscription;
 
     menuItems = [
-        { label: 'Dashboard', path: '/', icon: 'dashboard' },
-        { label: 'Fiscal North', path: '/assistant', icon: 'auto_awesome' },
-        { label: 'Transactions', path: '/transactions', icon: 'receipt_long' },
-        { label: 'Import', path: '/transactions/import', icon: 'upload' },
-        { label: 'Contracts', path: '/contracts', icon: 'description' },
-        { label: 'Budgets', path: '/budgets', icon: 'pie_chart' },
-        { label: 'Accounts', path: '/accounts', icon: 'account_balance' },
-        { label: 'Bank verbinden', path: '/bank-sync', icon: 'link' },
-        { label: 'Categories', path: '/categories', icon: 'category' },
+        { labelKey: 'nav.dashboard', path: '/', icon: 'dashboard' },
+        { labelKey: 'nav.assistant', path: '/assistant', icon: 'auto_awesome' },
+        { labelKey: 'nav.transactions', path: '/transactions', icon: 'receipt_long' },
+        { labelKey: 'nav.import', path: '/transactions/import', icon: 'upload' },
+        { labelKey: 'nav.contracts', path: '/contracts', icon: 'description' },
+        { labelKey: 'nav.budgets', path: '/budgets', icon: 'pie_chart' },
+        { labelKey: 'nav.accounts', path: '/accounts', icon: 'account_balance' },
+        { labelKey: 'nav.bankSync', path: '/bank-sync', icon: 'link' },
+        { labelKey: 'nav.categories', path: '/categories', icon: 'category' },
     ];
 
     constructor(private notificationService: NotificationService) {}
@@ -50,6 +63,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
                 this.updateTitle();
                 this.refreshUnreadCount();
             });
+        this.translate.onLangChange.subscribe(() => this.updateTitle());
         this.countSub = interval(60_000)
             .pipe(
                 startWith(0),
@@ -105,6 +119,9 @@ export class LayoutComponent implements OnInit, OnDestroy {
         while (child?.firstChild) {
             child = child.firstChild;
         }
-        this.pageTitle = child?.snapshot.data['title'] ?? 'Fiscal North';
+        const titleKey = child?.snapshot.data['titleKey'] as string | undefined;
+        this.pageTitle = titleKey
+            ? this.translate.instant(titleKey)
+            : this.translate.instant('layout.brand');
     }
 }

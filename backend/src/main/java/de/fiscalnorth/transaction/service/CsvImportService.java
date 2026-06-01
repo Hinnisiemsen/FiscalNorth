@@ -1,11 +1,14 @@
 package de.fiscalnorth.transaction.service;
 
+import de.fiscalnorth.auth.CurrentUserService;
 import de.fiscalnorth.category.model.Category;
 import de.fiscalnorth.category.repository.CategoryRepository;
 import de.fiscalnorth.transaction.dto.CsvImportResult;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
 import de.fiscalnorth.transaction.model.TransactionType;
+import de.fiscalnorth.shared.Messages;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
+import de.fiscalnorth.user.model.User;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -54,15 +57,22 @@ public class CsvImportService {
 
     private final PaymentTransactionRepository paymentTransactionRepository;
     private final CategoryRepository categoryRepository;
+    private final Messages messages;
+    private final CurrentUserService currentUserService;
 
     public CsvImportService(PaymentTransactionRepository paymentTransactionRepository,
-                            CategoryRepository categoryRepository) {
+                            CategoryRepository categoryRepository,
+                            Messages messages,
+                            CurrentUserService currentUserService) {
         this.paymentTransactionRepository = paymentTransactionRepository;
         this.categoryRepository = categoryRepository;
+        this.messages = messages;
+        this.currentUserService = currentUserService;
     }
 
     @Transactional
     public CsvImportResult importFromCsv(MultipartFile file, BankPreset preset) {
+        User owner = currentUserService.getCurrentUser();
         int imported = 0;
         int skippedDuplicates = 0;
         List<String> errors = new ArrayList<>();
@@ -71,7 +81,7 @@ public class CsvImportService {
             // Try common encodings: UTF-8 first, then Windows-1252 (common for German exports)
             String content = readFileContent(file);
             if (content == null || content.isBlank()) {
-                return new CsvImportResult(0, 0, 1, List.of("File is empty or could not be decoded"));
+                return new CsvImportResult(0, 0, 1, List.of(messages.get("csv.fileEmpty")));
             }
 
             CSVFormat format = CSVFormat.DEFAULT.builder()
@@ -102,7 +112,7 @@ public class CsvImportService {
                         String description = buildDescription(purpose, party);
 
                         String hash = computeImportHash(date, amount, description);
-                        if (paymentTransactionRepository.existsByImportHash(hash)) {
+                        if (paymentTransactionRepository.existsByOwnerIdAndImportHash(owner.getId(), hash)) {
                             skippedDuplicates++;
                             continue;
                         }
@@ -113,16 +123,17 @@ public class CsvImportService {
                         tx.setTransactionType(amount.compareTo(BigDecimal.ZERO) >= 0 ? TransactionType.Income : TransactionType.Expense);
                         tx.setDescription(description);
                         tx.setImportHash(hash);
-                        tx.setCategory(categorizeTransaction(description));
+                        tx.setCategory(categorizeTransaction(description, owner));
+                        tx.setOwner(owner);
                         paymentTransactionRepository.save(tx);
                         imported++;
                     } catch (Exception e) {
-                        errors.add("Row " + (record.getRecordNumber() + 1) + ": " + e.getMessage());
+                        errors.add(messages.get("csv.rowError", record.getRecordNumber() + 1, e.getMessage()));
                     }
                 }
             }
         } catch (Exception e) {
-            errors.add("Parse error: " + e.getMessage());
+            errors.add(messages.get("csv.parseError", e.getMessage()));
         }
 
         return new CsvImportResult(imported, skippedDuplicates, errors.size(), errors);
@@ -201,36 +212,38 @@ public class CsvImportService {
         }
     }
 
-    private Category categorizeTransaction(String description) {
-        if (description == null) return findOrCreateCategory("General");
+    private Category categorizeTransaction(String description, User owner) {
+        if (description == null) return findOrCreateCategory("General", owner);
         String lower = description.toLowerCase();
         if (lower.contains("rewe") || lower.contains("lidl") || lower.contains("aldi") || lower.contains("edeka")) {
-            return findOrCreateCategory("Groceries");
+            return findOrCreateCategory("Groceries", owner);
         }
         if (lower.contains("netflix") || lower.contains("spotify") || lower.contains("prime") || lower.contains("disney")) {
-            return findOrCreateCategory("Entertainment");
+            return findOrCreateCategory("Entertainment", owner);
         }
         if (lower.contains("shell") || lower.contains("aral") || lower.contains("total") || lower.contains("esso")) {
-            return findOrCreateCategory("Transport");
+            return findOrCreateCategory("Transport", owner);
         }
         if (lower.contains("miete") || lower.contains("rent") || lower.contains("wohnung")) {
-            return findOrCreateCategory("Rent");
+            return findOrCreateCategory("Rent", owner);
         }
         if (lower.contains("gehalt") || lower.contains("salary") || lower.contains("lohn")) {
-            return findOrCreateCategory("Salary");
+            return findOrCreateCategory("Salary", owner);
         }
-        return findOrCreateCategory("General");
+        return findOrCreateCategory("General", owner);
     }
 
-    private Category findOrCreateCategory(String name) {
-        return categoryRepository.findAll().stream()
-                .filter(c -> c.getName() != null && c.getName().equalsIgnoreCase(name))
-                .findFirst()
+    private Category findOrCreateCategory(String name, User owner) {
+        return categoryRepository.findByOwnerIdAndNameAndTransactionType(
+                        owner.getId(), name,
+                        "Salary".equalsIgnoreCase(name) || "Income".equalsIgnoreCase(name)
+                                ? TransactionType.Income : TransactionType.Expense)
                 .orElseGet(() -> {
                     Category c = new Category();
                     c.setName(name);
                     c.setTransactionType("Salary".equalsIgnoreCase(name) || "Income".equalsIgnoreCase(name)
                             ? TransactionType.Income : TransactionType.Expense);
+                    c.setOwner(owner);
                     return categoryRepository.save(c);
                 });
     }

@@ -17,7 +17,7 @@ public record BankConsentDto(
         return new BankConsentDto(
                 c.getId(),
                 c.getConsentId(),
-                c.getPsuId(),
+                c.getOwner() != null ? c.getOwner().getId().toString() : null,
                 c.getStatus().name(),
                 c.getValidUntil(),
                 c.getCreatedAt()

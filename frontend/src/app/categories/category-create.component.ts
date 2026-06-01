@@ -4,11 +4,12 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router } from '@angular/router';
 import { CategoryService } from '../core/services/category.service';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
+import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 
 @Component({
     selector: 'app-category-create',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, ...PAGE_HEADER_IMPORTS],
+    imports: [CommonModule, ReactiveFormsModule, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
     templateUrl: './category-create.component.html',
     styleUrl: './category-create.component.css'
 })

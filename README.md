@@ -132,6 +132,7 @@ Integrationstests nutzen Testcontainers (Kafka, RabbitMQ, PostgreSQL).
 
 ## 📖 Weitere Dokumentation
 
+* [docs/AUTH.md](docs/AUTH.md) – Authentication, OAuth, user isolation, demo login
 * [xs2a-client/README.md](xs2a-client/README.md) – Berlin Group XS2A API Client
 * [frontend/README.md](frontend/README.md) – Angular-Projekt
 

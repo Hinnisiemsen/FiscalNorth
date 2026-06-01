@@ -1,5 +1,8 @@
 -- Rich demo data (Jun 2026) for Fiscal North
 
+INSERT INTO app_user (id, user_name, email, password_hash, user_role) VALUES
+(1, 'Alex', 'alex@fiscalnorth.local', '{noop}demo', 'USER');
+
 -- Categories (1-12)
 INSERT INTO category (id, name, transaction_type) VALUES (1, 'Groceries', 'Expense');
 INSERT INTO category (id, name, transaction_type) VALUES (2, 'Salary', 'Income');

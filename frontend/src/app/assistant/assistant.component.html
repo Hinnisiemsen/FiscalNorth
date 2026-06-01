@@ -1,5 +1,5 @@
 <div class="assistant page-content-inner">
-  <app-page-header heading="Fiscal North" />
+  <app-page-header [heading]="'routes.assistant' | translate" />
 
   @if (setupHint && !aiAvailable) {
     <div class="setup-hint card-glass">
@@ -12,12 +12,12 @@
     @if (messages.length === 0 && !loading) {
       <div class="chat-welcome">
         <span class="spark spark-lg" aria-hidden="true"></span>
-        <h2>Hallo, ich bin Fiscal North</h2>
-        <p>Stell mir Fragen zu Konten, Ausgaben und Budgets — ich antworte auf Basis deiner Daten in der App.</p>
-        <p class="welcome-follow-label">Beispiele zum Antippen:</p>
+        <h2>{{ 'assistant.welcomeTitle' | translate }}</h2>
+        <p>{{ 'assistant.welcomeText' | translate }}</p>
+        <p class="welcome-follow-label">{{ 'assistant.examplesLabel' | translate }}</p>
         <div class="follow-up-chips">
-          @for (q of welcomeFollowUps; track q) {
-            <button type="button" class="follow-up-chip" (click)="askFollowUp(q)">{{ q }}</button>
+          @for (key of welcomeFollowUpKeys; track key) {
+            <button type="button" class="follow-up-chip" (click)="askWelcomeExample(key)">{{ key | translate }}</button>
           }
         </div>
       </div>
@@ -28,7 +28,7 @@
         @if (msg.role === 'assistant') {
           <div class="message-meta">
             <span class="spark spark-xs" aria-hidden="true"></span>
-            <span class="sender-name">Fiscal North</span>
+            <span class="sender-name">{{ 'assistant.senderName' | translate }}</span>
           </div>
         }
         <div class="message-bubble" [class.user-bubble]="msg.role === 'user'">
@@ -46,7 +46,7 @@
         </div>
         @if (showFollowUps(mi)) {
           <div class="follow-up-group">
-            <p class="follow-up-label">Als Nächstes fragen:</p>
+            <p class="follow-up-label">{{ 'assistant.followUpLabel' | translate }}</p>
             <div class="follow-up-chips">
               @for (q of msg.followUps; track q) {
                 <button type="button" class="follow-up-chip" (click)="askFollowUp(q)">{{ q }}</button>
@@ -56,7 +56,7 @@
         }
         @if (msg.actions?.length) {
           <div class="actions-group">
-            <p class="actions-label">Vorschläge — bitte prüfen und bestätigen:</p>
+            <p class="actions-label">{{ 'assistant.actionsLabel' | translate }}</p>
             @for (action of msg.actions; track $index; let ai = $index) {
               <app-action-card
                 [action]="action"
@@ -78,7 +78,7 @@
         <div class="typing-indicator">
           <span></span><span></span><span></span>
         </div>
-        <span class="typing-label">Fiscal North antwortet…</span>
+        <span class="typing-label">{{ 'assistant.typing' | translate }}</span>
       </div>
     }
   </div>
@@ -89,16 +89,16 @@
       class="chat-input"
       [(ngModel)]="inputText"
       (keydown)="onKeydown($event)"
-      placeholder="Frage an Fiscal North stellen…"
+      [placeholder]="'assistant.inputPlaceholder' | translate"
       [disabled]="loading"
-      aria-label="Nachricht an Fiscal North"
+      [attr.aria-label]="'assistant.inputPlaceholder' | translate"
     />
     <button
       type="button"
       class="send-btn"
       (click)="send()"
       [disabled]="loading || !inputText.trim()"
-      aria-label="Senden"
+      [attr.aria-label]="'askBar.send' | translate"
     >
       <span class="material-symbols-outlined">send</span>
     </button>

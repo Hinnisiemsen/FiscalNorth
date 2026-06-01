@@ -2,10 +2,13 @@ package de.fiscalnorth.xs2a.service;
 
 import de.fiscalnorth.account.model.DepositAccount;
 import de.fiscalnorth.account.repository.DepositAccountRepository;
+import de.fiscalnorth.auth.CurrentUserService;
+import de.fiscalnorth.shared.Messages;
 import de.fiscalnorth.shared.SupportedCurrency;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
 import de.fiscalnorth.transaction.model.TransactionType;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
+import de.fiscalnorth.user.model.User;
 import de.fiscalnorth.xs2a.config.Xs2aProperties;
 import de.fiscalnorth.xs2a.dto.BankConsentDto;
 import de.fiscalnorth.xs2a.dto.BankSyncStatusDto;
@@ -28,10 +31,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Service for Berlin Group XS2A bank sync.
- * When credentials are not configured (app.xs2a.enabled=false), all operations return unavailable/empty.
- */
 @Service
 public class BankSyncService {
 
@@ -43,6 +42,8 @@ public class BankSyncService {
     private final BankConsentRepository bankConsentRepository;
     private final DepositAccountRepository depositAccountRepository;
     private final PaymentTransactionRepository paymentTransactionRepository;
+    private final Messages messages;
+    private final CurrentUserService currentUserService;
 
     @Autowired(required = false)
     private io.finapi.xs2a.api.AccountInformationServiceAisApi aisApi;
@@ -50,32 +51,33 @@ public class BankSyncService {
     public BankSyncService(Xs2aProperties properties,
                            BankConsentRepository bankConsentRepository,
                            DepositAccountRepository depositAccountRepository,
-                           PaymentTransactionRepository paymentTransactionRepository) {
+                           PaymentTransactionRepository paymentTransactionRepository,
+                           Messages messages,
+                           CurrentUserService currentUserService) {
         this.properties = properties;
         this.bankConsentRepository = bankConsentRepository;
         this.depositAccountRepository = depositAccountRepository;
         this.paymentTransactionRepository = paymentTransactionRepository;
+        this.messages = messages;
+        this.currentUserService = currentUserService;
     }
 
     public BankSyncStatusDto getStatus() {
         if (!properties.isEnabled()) {
-            return BankSyncStatusDto.unavailable(
-                    "XS2A Bank Sync is not configured. Set app.xs2a.enabled=true, app.xs2a.base-url and app.xs2a.access-token in application.properties. " +
-                            "See finAPI documentation: https://xs2a-sandbox.finapi.io/api-docs/");
+            return BankSyncStatusDto.unavailable(messages.get("bankSync.unavailable"));
         }
-        return BankSyncStatusDto.available("XS2A Bank Sync is ready. Create a consent to connect bank accounts.");
+        return BankSyncStatusDto.available(messages.get("bankSync.ready"));
     }
 
-    /**
-     * Create consent and start authorisation. Returns redirect URL for user to complete SCA at bank.
-     */
     @Transactional
     public CreateConsentResponseDto createConsent() {
         if (!properties.isEnabled() || aisApi == null) {
-            return new CreateConsentResponseDto(null, null, "XS2A not configured. Enable app.xs2a.* in application.properties.");
+            return new CreateConsentResponseDto(null, null, messages.get("bankSync.notConfigured"));
         }
 
         try {
+            User owner = currentUserService.getCurrentUser();
+            String psuId = owner.getId().toString();
             UUID xRequestId = UUID.randomUUID();
             Consents consents = buildConsentsBody();
             URI redirectUri = URI.create(properties.getRedirectUri());
@@ -84,10 +86,10 @@ public class BankSyncService {
                     xRequestId,
                     consents,
                     null, null, null,
-                    properties.getPsuId(),
+                    psuId,
                     null, null, null,
-                    true,  // tpPRedirectPreferred
-                    false, // tpPDecoupledPreferred
+                    true,
+                    false,
                     redirectUri,
                     null, null, null, null, null, null,
                     null, null, null, null, null, null, null, null, null);
@@ -95,17 +97,16 @@ public class BankSyncService {
             String consentId = response.getConsentId();
             BankConsent bankConsent = new BankConsent();
             bankConsent.setConsentId(consentId);
-            bankConsent.setPsuId(properties.getPsuId());
+            bankConsent.setOwner(owner);
             bankConsent.setStatus(ConsentStatus.PENDING);
             bankConsent.setValidUntil(LocalDate.now().plusDays(CONSENT_VALID_DAYS));
             bankConsentRepository.save(bankConsent);
 
-            // Start authorisation to get redirect URL
             StartScaprocessResponse authResponse = aisApi.startConsentAuthorisation(
                     consentId,
                     UUID.randomUUID(),
                     null, null, null,
-                    properties.getPsuId(),
+                    psuId,
                     null, null, null,
                     true, redirectUri, null, null, null,
                     null, null, null, null, null, null, null, null, null, null,
@@ -117,9 +118,11 @@ public class BankSyncService {
             }
 
             return new CreateConsentResponseDto(consentId, redirectUrl,
-                    redirectUrl != null ? "Redirect to bank for authentication." : "Consent created. Check authorisation status.");
+                    redirectUrl != null
+                            ? messages.get("bankSync.redirectAuth")
+                            : messages.get("bankSync.consentCreated"));
         } catch (ApiException e) {
-            return new CreateConsentResponseDto(null, null, "XS2A error: " + e.getMessage());
+            return new CreateConsentResponseDto(null, null, messages.get("bankSync.xs2aError", e.getMessage()));
         }
     }
 
@@ -137,16 +140,14 @@ public class BankSyncService {
         return consents;
     }
 
-    /**
-     * Handle callback after user completed SCA. Check consent status and sync if valid.
-     */
     @Transactional
     public String handleCallback(String consentId) {
         if (!properties.isEnabled() || aisApi == null) {
             return "/bank-sync?error=not_configured";
         }
 
-        Optional<BankConsent> opt = bankConsentRepository.findByConsentId(consentId);
+        Optional<BankConsent> opt = bankConsentRepository.findByConsentIdAndOwnerId(
+                consentId, currentUserService.getCurrentUserId());
         if (opt.isEmpty()) {
             return "/bank-sync?error=consent_not_found";
         }
@@ -167,23 +168,21 @@ public class BankSyncService {
         return "/bank-sync?error=consent_not_valid";
     }
 
-    /**
-     * Manually trigger sync for a valid consent.
-     */
     @Transactional
     public SyncResultDto sync(String consentId) {
         if (!properties.isEnabled() || aisApi == null) {
-            return new SyncResultDto(false, 0, 0, "XS2A not configured");
+            return new SyncResultDto(false, 0, 0, messages.get("bankSync.notConfigured"));
         }
 
-        Optional<BankConsent> opt = bankConsentRepository.findByConsentId(consentId);
+        Optional<BankConsent> opt = bankConsentRepository.findByConsentIdAndOwnerId(
+                consentId, currentUserService.getCurrentUserId());
         if (opt.isEmpty()) {
-            return new SyncResultDto(false, 0, 0, "Consent not found");
+            return new SyncResultDto(false, 0, 0, messages.get("bankSync.consentNotFound"));
         }
 
         BankConsent consent = opt.get();
         if (consent.getStatus() != ConsentStatus.VALID) {
-            return new SyncResultDto(false, 0, 0, "Consent not valid. Status: " + consent.getStatus());
+            return new SyncResultDto(false, 0, 0, messages.get("bankSync.consentNotValid", consent.getStatus()));
         }
 
         return syncAccountsAndTransactions(consentId);
@@ -196,7 +195,7 @@ public class BankSyncService {
         try {
             AccountList accountList = aisApi.getAccountList(UUID.randomUUID(), consentId, true, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
             if (accountList == null || accountList.getAccounts() == null) {
-                return new SyncResultDto(true, 0, 0, "No accounts returned");
+                return new SyncResultDto(true, 0, 0, messages.get("bankSync.noAccounts"));
             }
 
             BankConsent consent = bankConsentRepository.findByConsentId(consentId).orElseThrow();
@@ -204,7 +203,8 @@ public class BankSyncService {
 
             for (AccountDetails acc : accountList.getAccounts()) {
                 String resourceId = acc.getResourceId();
-                boolean wasNew = resourceId != null && depositAccountRepository.findByExternalId(resourceId).isEmpty();
+                boolean wasNew = resourceId != null && depositAccountRepository
+                        .findByOwnerIdAndExternalId(consent.getOwner().getId(), resourceId).isEmpty();
                 DepositAccount depositAccount = syncAccount(acc, consent);
                 if (depositAccount != null && wasNew) {
                     accountsCreated++;
@@ -229,14 +229,14 @@ public class BankSyncService {
                             }
                         }
                     } catch (ApiException e) {
-                        // Log and continue with next account
+                        // continue with next account
                     }
                 }
             }
 
-            return new SyncResultDto(true, accountsCreated, transactionsCreated, "Sync completed");
+            return new SyncResultDto(true, accountsCreated, transactionsCreated, messages.get("bankSync.syncCompleted"));
         } catch (ApiException e) {
-            return new SyncResultDto(false, 0, 0, "Sync failed: " + e.getMessage());
+            return new SyncResultDto(false, 0, 0, messages.get("bankSync.syncFailed", e.getMessage()));
         }
     }
 
@@ -244,7 +244,7 @@ public class BankSyncService {
         String resourceId = acc.getResourceId();
         if (resourceId == null) return null;
 
-        return depositAccountRepository.findByExternalId(resourceId)
+        return depositAccountRepository.findByOwnerIdAndExternalId(consent.getOwner().getId(), resourceId)
                 .map(existing -> {
                     if (acc.getCurrency() != null) {
                         existing.setCurrency(mapCurrency(acc.getCurrency()));
@@ -257,6 +257,7 @@ public class BankSyncService {
                     DepositAccount newAcc = new DepositAccount();
                     newAcc.setExternalId(resourceId);
                     newAcc.setBankConsent(consent);
+                    newAcc.setOwner(consent.getOwner());
                     newAcc.setName(acc.getIban() != null ? acc.getIban() : acc.getName() != null ? acc.getName() : "Account " + resourceId);
                     newAcc.setCurrency(acc.getCurrency() != null ? mapCurrency(acc.getCurrency()) : SupportedCurrency.EURO);
                     newAcc.setBalance(getBalanceFromAccount(acc) != null ? getBalanceFromAccount(acc) : BigDecimal.ZERO);
@@ -285,7 +286,7 @@ public class BankSyncService {
 
     private boolean createTransactionIfNew(TransactionsV1 tx, DepositAccount account) {
         String hash = buildImportHash(tx);
-        if (paymentTransactionRepository.existsByImportHash(hash)) {
+        if (paymentTransactionRepository.existsByOwnerIdAndImportHash(account.getOwner().getId(), hash)) {
             return false;
         }
 
@@ -296,11 +297,7 @@ public class BankSyncService {
         pt.setTransactionDate(tx.getBookingDate() != null ? tx.getBookingDate() : LocalDate.now());
         pt.setDescription(buildDescription(tx));
         pt.setImportHash(hash);
-        pt.setCategory(null);
-        // Need to link to account - PaymentTransaction doesn't have account ref. Check Transaction model.
-
-        // PaymentTransaction extends Transaction - no account field. Our model has Transaction without account. Check if we need to add.
-        // Looking at the code - PaymentTransaction has category and contract. No account. So transactions might be global? Let me check the CSV import and transaction model again.
+        pt.setOwner(account.getOwner());
         paymentTransactionRepository.save(pt);
         return true;
     }
@@ -337,7 +334,7 @@ public class BankSyncService {
     }
 
     public List<BankConsentDto> getConsents() {
-        return bankConsentRepository.findByPsuId(properties.getPsuId()).stream()
+        return bankConsentRepository.findByOwnerId(currentUserService.getCurrentUserId()).stream()
                 .map(BankConsentDto::from)
                 .collect(Collectors.toList());
     }

@@ -3,15 +3,15 @@
     <app-skeleton height="2rem" />
     <app-skeleton height="120px" />
   } @else if (!account) {
-    <p class="empty-state">Account not found.</p>
-    <a routerLink="/accounts" class="btn btn-secondary">Back to accounts</a>
+    <p class="empty-state">{{ 'accounts.notFound' | translate }}</p>
+    <a routerLink="/accounts" class="btn btn-secondary">{{ 'accounts.backToList' | translate }}</a>
   } @else {
     <app-page-header [heading]="account.name">
-      <a routerLink="/accounts" class="btn btn-ghost">Back</a>
+      <a routerLink="/accounts" class="btn btn-ghost">{{ 'accounts.back' | translate }}</a>
     </app-page-header>
 
     <div class="detail-hero card-glass">
-      <span class="label">Balance</span>
+      <span class="label">{{ 'accounts.detailBalance' | translate }}</span>
       <div class="balance">
         {{ account.balance | currency: getCurrencyCode(account.currency):'symbol':'1.2-2' }}
       </div>
@@ -19,8 +19,8 @@
     </div>
 
     <section class="section">
-      <h3>Recent activity</h3>
-      <p class="hint">All accounts share the same transaction list until account linking is added.</p>
+      <h3>{{ 'accounts.recentActivity' | translate }}</h3>
+      <p class="hint">{{ 'accounts.activityHint' | translate }}</p>
       @for (tx of recentTransactions; track tx.id) {
         <div class="list-card">
           <div class="list-card-body">
@@ -36,7 +36,7 @@
           </div>
         </div>
       }
-      <a routerLink="/transactions" class="btn btn-secondary">All transactions</a>
+      <a routerLink="/transactions" class="btn btn-secondary">{{ 'accounts.allTransactions' | translate }}</a>
     </section>
   }
 </div>

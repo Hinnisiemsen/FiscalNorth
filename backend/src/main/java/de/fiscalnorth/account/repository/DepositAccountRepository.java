@@ -3,9 +3,16 @@ package de.fiscalnorth.account.repository;
 import de.fiscalnorth.account.model.DepositAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface DepositAccountRepository extends JpaRepository<DepositAccount, Long> {
 
-    java.util.Optional<DepositAccount> findByExternalId(String externalId);
+    List<DepositAccount> findAllByOwnerId(Long ownerId);
 
-    java.util.List<DepositAccount> findByBankConsentId(Long bankConsentId);
+    Optional<DepositAccount> findByIdAndOwnerId(Long id, Long ownerId);
+
+    Optional<DepositAccount> findByOwnerIdAndExternalId(Long ownerId, String externalId);
+
+    List<DepositAccount> findByOwnerIdAndBankConsentId(Long ownerId, Long bankConsentId);
 }

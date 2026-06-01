@@ -11,16 +11,19 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 import de.fiscalnorth.contract.service.ContractAnalysisService;
+import de.fiscalnorth.shared.Messages;
 
 @RestController
 @RequestMapping("/api/contract")
 public class ContractController {
     private final ContractService contractService;
     private final ContractAnalysisService contractAnalysisService;
+    private final Messages messages;
 
-    public ContractController(ContractService contractService, ContractAnalysisService contractAnalysisService) {
+    public ContractController(ContractService contractService, ContractAnalysisService contractAnalysisService, Messages messages) {
         this.contractService = contractService;
         this.contractAnalysisService = contractAnalysisService;
+        this.messages = messages;
     }
 
     @GetMapping
@@ -42,7 +45,7 @@ public class ContractController {
     @PostMapping("/analyze")
     public ResponseEntity<String> analyzeContracts() {
         int count = contractAnalysisService.analyzeAndCreateContracts();
-        return ResponseEntity.ok("Analysis complete. Created " + count + " new contracts.");
+        return ResponseEntity.ok(messages.get("contract.analysisComplete", count));
     }
 
     @DeleteMapping("/{id}")

@@ -1,11 +1,16 @@
 package de.fiscalnorth.transaction.service;
 
+import de.fiscalnorth.auth.CurrentUserService;
 import de.fiscalnorth.category.model.Category;
 import de.fiscalnorth.category.repository.CategoryRepository;
 import de.fiscalnorth.transaction.dto.CsvImportResult;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
 import de.fiscalnorth.transaction.model.TransactionType;
+import de.fiscalnorth.support.TestMessages;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
+import de.fiscalnorth.user.model.AuthProvider;
+import de.fiscalnorth.user.model.User;
+import de.fiscalnorth.user.model.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,10 +21,10 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,17 +32,29 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CsvImportServiceTest {
 
+    private static final Long OWNER_ID = 1L;
+
     @Mock
     private PaymentTransactionRepository paymentTransactionRepository;
 
     @Mock
     private CategoryRepository categoryRepository;
 
+    @Mock
+    private CurrentUserService currentUserService;
+
     private CsvImportService service;
 
     @BeforeEach
     void setUp() {
-        service = new CsvImportService(paymentTransactionRepository, categoryRepository);
+        service = new CsvImportService(paymentTransactionRepository, categoryRepository, TestMessages.create(), currentUserService);
+        User owner = new User();
+        owner.setId(OWNER_ID);
+        owner.setEmail("test@example.com");
+        owner.setUserName("Test");
+        owner.setUserRole(UserRole.User);
+        owner.setAuthProvider(AuthProvider.LOCAL);
+        when(currentUserService.getCurrentUser()).thenReturn(owner);
     }
 
     @Test
@@ -50,8 +67,9 @@ class CsvImportServiceTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "test.csv", "text/csv", csv.getBytes(StandardCharsets.UTF_8));
 
-        when(paymentTransactionRepository.existsByImportHash(anyString())).thenReturn(false);
-        when(categoryRepository.findAll()).thenReturn(List.of());
+        when(paymentTransactionRepository.existsByOwnerIdAndImportHash(eq(OWNER_ID), anyString())).thenReturn(false);
+        when(categoryRepository.findByOwnerIdAndNameAndTransactionType(anyLong(), anyString(), any()))
+                .thenReturn(Optional.empty());
         when(categoryRepository.save(any(Category.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
 
@@ -77,7 +95,7 @@ class CsvImportServiceTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file", "dup.csv", "text/csv", csv.getBytes(StandardCharsets.UTF_8));
 
-        when(paymentTransactionRepository.existsByImportHash(anyString())).thenReturn(true);
+        when(paymentTransactionRepository.existsByOwnerIdAndImportHash(eq(OWNER_ID), anyString())).thenReturn(true);
 
         CsvImportResult result = service.importFromCsv(file, CsvImportService.BankPreset.SPARKASSE);
 
@@ -95,5 +113,4 @@ class CsvImportServiceTest {
         assertThat(result.imported()).isZero();
         assertThat(result.errorMessages()).isNotEmpty();
     }
-
 }

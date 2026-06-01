@@ -2,8 +2,8 @@
   <div class="ambient-gradient" aria-hidden="true"></div>
 
   <!-- Desktop icon rail -->
-  <aside class="icon-rail" aria-label="Main navigation">
-    <a routerLink="/" class="rail-logo" title="Fiscal North">
+  <aside class="icon-rail" [attr.aria-label]="'layout.mainNav' | translate">
+    <a routerLink="/" class="rail-logo" [title]="'layout.brand' | translate">
       <span class="spark" aria-hidden="true"></span>
     </a>
     <nav class="rail-nav">
@@ -12,7 +12,7 @@
         [routerLink]="item.path"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: item.path === '/' }"
-        [title]="item.label"
+        [title]="item.labelKey | translate"
         class="rail-link"
       >
         <span class="material-symbols-outlined">{{ item.icon }}</span>
@@ -30,12 +30,12 @@
   <aside
     class="nav-drawer"
     [class.open]="drawerOpen"
-    aria-label="Navigation menu"
+    [attr.aria-label]="'layout.navMenu' | translate"
     [attr.aria-hidden]="!drawerOpen"
   >
     <div class="drawer-header">
       <span class="spark spark-lg" aria-hidden="true"></span>
-      <h2>Fiscal North</h2>
+      <h2>{{ 'layout.brand' | translate }}</h2>
     </div>
     <nav class="drawer-nav">
       <a
@@ -47,12 +47,11 @@
         (click)="onNavClick()"
       >
         <span class="material-symbols-outlined">{{ item.icon }}</span>
-        {{ item.label }}
+        {{ item.labelKey | translate }}
       </a>
     </nav>
     <div class="drawer-account">
-      <span class="material-symbols-outlined">account_circle</span>
-      <span>User</span>
+      <app-user-menu />
     </div>
   </aside>
 
@@ -63,24 +62,23 @@
         class="menu-btn"
         (click)="toggleDrawer()"
         [attr.aria-expanded]="drawerOpen"
-        aria-label="Open navigation menu"
+        [attr.aria-label]="'layout.openMenu' | translate"
       >
         <span class="material-symbols-outlined">menu</span>
       </button>
       <h1 class="topbar-title">{{ pageTitle }}</h1>
-      <a routerLink="/notifications" class="notification-bell" title="Hinweise von Fiscal North">
+      <app-language-switcher />
+      <a routerLink="/notifications" class="notification-bell" [title]="'layout.notificationsTitle' | translate">
         <span class="material-symbols-outlined">notifications</span>
         @if (unreadNotifications > 0) {
           <span class="notification-badge">{{ unreadNotifications > 9 ? '9+' : unreadNotifications }}</span>
         }
       </a>
-      <div class="user-chip">
-        <span class="material-symbols-outlined">account_circle</span>
-        <span class="user-chip-label">User</span>
-      </div>
+      <app-user-menu />
     </header>
-    <div class="page-content page-enter">
-      <router-outlet></router-outlet>
+
+    <div class="page-content">
+      <router-outlet />
     </div>
   </main>
 </div>

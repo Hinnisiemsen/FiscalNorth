@@ -4,11 +4,12 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router } from '@angular/router';
 import { AccountService } from '../core/services/account.service';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
+import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 
 @Component({
   selector: 'app-account-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ...PAGE_HEADER_IMPORTS],
+  imports: [CommonModule, ReactiveFormsModule, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './account-create.component.html',
   styleUrl: './account-create.component.css'
 })

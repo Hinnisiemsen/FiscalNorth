@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import {
@@ -7,15 +7,19 @@ import {
     NotificationSeverity,
 } from '../core/services/notification.service';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
+import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
+import { LanguageService } from '../core/i18n/language.service';
 
 @Component({
     selector: 'app-notifications',
     standalone: true,
-    imports: [CommonModule, RouterLink, ...PAGE_HEADER_IMPORTS],
+    imports: [CommonModule, RouterLink, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
     templateUrl: './notifications.component.html',
     styleUrl: './notifications.component.css',
 })
 export class NotificationsComponent implements OnInit {
+    private readonly lang = inject(LanguageService);
+
     notifications: AppNotification[] = [];
     loading = true;
     filterUnread = false;
@@ -64,13 +68,13 @@ export class NotificationsComponent implements OnInit {
     typeLabel(type: AppNotification['type']): string {
         switch (type) {
             case 'BUDGET_ALERT':
-                return 'Budget';
+                return this.lang.instant('notifications.typeBudget');
             case 'SPENDING_INSIGHT':
-                return 'Ausgaben';
+                return this.lang.instant('notifications.typeInsight');
             case 'OPTIMIZATION_TIP':
-                return 'Optimierung';
+                return this.lang.instant('notifications.typeOptimization');
             default:
-                return 'System';
+                return this.lang.instant('notifications.typeOther');
         }
     }
 
@@ -81,7 +85,7 @@ export class NotificationsComponent implements OnInit {
     formatDate(iso: string): string {
         const d = new Date(iso);
         if (Number.isNaN(d.getTime())) return iso;
-        return d.toLocaleString('de-DE', {
+        return d.toLocaleString(this.lang.intlLocale(), {
             day: 'numeric',
             month: 'short',
             hour: '2-digit',

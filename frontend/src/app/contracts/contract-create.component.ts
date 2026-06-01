@@ -4,11 +4,12 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router } from '@angular/router';
 import { ContractService } from '../core/services/contract.service';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
+import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 
 @Component({
   selector: 'app-contract-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ...PAGE_HEADER_IMPORTS],
+  imports: [CommonModule, ReactiveFormsModule, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './contract-create.component.html',
   styleUrl: './contract-create.component.css'
 })
@@ -25,7 +26,7 @@ export class ContractCreateComponent {
       amount: ['', [Validators.required, Validators.min(0.01)]],
       contractInterval: ['MONTHLY', Validators.required],
       startDate: [new Date().toISOString().split('T')[0], Validators.required],
-      endDate: [new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0], Validators.required], // Default 1 year
+      endDate: [new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0], Validators.required],
       autoDetected: [false]
     });
   }

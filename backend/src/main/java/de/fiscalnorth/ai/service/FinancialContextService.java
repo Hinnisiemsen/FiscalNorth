@@ -2,6 +2,7 @@ package de.fiscalnorth.ai.service;
 
 import de.fiscalnorth.account.model.DepositAccount;
 import de.fiscalnorth.account.repository.DepositAccountRepository;
+import de.fiscalnorth.auth.CurrentUserService;
 import de.fiscalnorth.budget.dto.BudgetWithUsage;
 import de.fiscalnorth.budget.service.BudgetService;
 import de.fiscalnorth.contract.model.Contract;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class FinancialContextService {
@@ -23,22 +25,27 @@ public class FinancialContextService {
     private final PaymentTransactionRepository paymentTransactionRepository;
     private final BudgetService budgetService;
     private final ContractRepository contractRepository;
+    private final CurrentUserService currentUserService;
 
     public String buildContextSnapshot() {
-        List<DepositAccount> accounts = depositAccountRepository.findAll();
+        return buildContextSnapshotForOwner(currentUserService.getCurrentUserId());
+    }
+
+    public String buildContextSnapshotForOwner(Long ownerId) {
+        List<DepositAccount> accounts = depositAccountRepository.findAllByOwnerId(ownerId);
         BigDecimal totalBalance = accounts.stream()
                 .map(DepositAccount::getBalance)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        List<Contract> contracts = contractRepository.findAll();
+        List<Contract> contracts = contractRepository.findAllByOwnerId(ownerId);
         BigDecimal monthlyFixed = contracts.stream()
                 .map(Contract::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         List<PaymentTransaction> recent = paymentTransactionRepository
-                .findAllByOrderByTransactionDateDesc(PageRequest.of(0, 15));
+                .findAllByOwnerIdOrderByTransactionDateDesc(ownerId, PageRequest.of(0, 15));
 
-        List<BudgetWithUsage> budgets = budgetService.getBudgetsWithUsage().stream()
+        List<BudgetWithUsage> budgets = budgetService.getBudgetsWithUsageForOwner(ownerId).stream()
                 .filter(b -> !b.endDate().isBefore(LocalDate.now().withDayOfMonth(1))
                         && !b.startDate().isAfter(LocalDate.now()))
                 .limit(8)

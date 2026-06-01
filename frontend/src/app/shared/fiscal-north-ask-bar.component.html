@@ -1,0 +1,40 @@
+<div class="ask-bar" [class.hero]="variant() === 'hero'" [class.compact]="variant() === 'compact'" [class.inline]="variant() === 'inline'">
+  @if (variant() === 'hero') {
+    <div class="ask-brand">
+      <span class="spark spark-sm" aria-hidden="true"></span>
+      <div>
+        <span class="ask-brand-title">{{ 'askBar.brandTitle' | translate }}</span>
+        <span class="ask-brand-sub">{{ 'askBar.brandSub' | translate }}</span>
+      </div>
+    </div>
+  }
+
+  <div class="ask-input-row">
+    <span class="material-symbols-outlined ask-input-icon">auto_awesome</span>
+    <input
+      type="text"
+      class="ask-input"
+      [placeholder]="placeholder() ?? ('askBar.placeholder' | translate)"
+      [ngModel]="question()"
+      (ngModelChange)="question.set($event)"
+      (keydown)="onKeydown($event)"
+      [attr.aria-label]="'askBar.inputAriaLabel' | translate"
+    />
+    <button type="button" class="ask-send" (click)="submit()" [disabled]="!question().trim()" [attr.aria-label]="'askBar.send' | translate">
+      <span class="material-symbols-outlined">arrow_forward</span>
+    </button>
+  </div>
+
+  <div class="ask-actions">
+    @if (showAnalysisChip() && variant() === 'hero') {
+      <button type="button" class="ask-chip ask-chip-primary" (click)="startGeneralAnalysis()">
+        <span class="material-symbols-outlined">analytics</span>
+        {{ 'askBar.analysisStart' | translate }}
+      </button>
+    }
+    @for (s of suggestions(); track s) {
+      <button type="button" class="ask-chip" (click)="ask(s)">{{ s }}</button>
+    }
+  </div>
+</div>
+

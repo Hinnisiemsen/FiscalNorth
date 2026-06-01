@@ -11,7 +11,9 @@ public interface BankConsentRepository extends JpaRepository<BankConsent, Long> 
 
     Optional<BankConsent> findByConsentId(String consentId);
 
-    List<BankConsent> findByPsuId(String psuId);
+    Optional<BankConsent> findByConsentIdAndOwnerId(String consentId, Long ownerId);
 
-    List<BankConsent> findByPsuIdAndStatus(String psuId, ConsentStatus status);
+    List<BankConsent> findByOwnerId(Long ownerId);
+
+    List<BankConsent> findByOwnerIdAndStatus(Long ownerId, ConsentStatus status);
 }

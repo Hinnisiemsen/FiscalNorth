@@ -6,11 +6,12 @@ import { HomeService } from '../core/services/home.service';
 import { PaymentTransaction } from '../core/services/transaction.service';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
 import { SkeletonComponent } from '../shared/skeleton.component';
+import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 
 @Component({
     selector: 'app-account-detail',
     standalone: true,
-    imports: [CommonModule, RouterLink, SkeletonComponent, ...PAGE_HEADER_IMPORTS],
+    imports: [CommonModule, RouterLink, SkeletonComponent, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
     templateUrl: './account-detail.component.html',
     styleUrl: './account-detail.component.css',
 })

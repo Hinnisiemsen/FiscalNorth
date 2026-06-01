@@ -5,16 +5,19 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface FinancialNotificationRepository extends JpaRepository<FinancialNotification, Long> {
 
-    List<FinancialNotification> findAllByOrderByCreatedAtDesc();
+    List<FinancialNotification> findAllByOwnerIdOrderByCreatedAtDesc(Long ownerId);
 
-    List<FinancialNotification> findByReadFalseOrderByCreatedAtDesc();
+    List<FinancialNotification> findByOwnerIdAndReadFalseOrderByCreatedAtDesc(Long ownerId);
 
-    long countByReadFalse();
+    long countByOwnerIdAndReadFalse(Long ownerId);
 
-    boolean existsByDedupeKey(String dedupeKey);
+    boolean existsByOwnerIdAndDedupeKey(Long ownerId, String dedupeKey);
 
-    void deleteByReadTrueAndCreatedAtBefore(LocalDateTime cutoff);
+    Optional<FinancialNotification> findByIdAndOwnerId(Long id, Long ownerId);
+
+    void deleteByOwnerIdAndReadTrueAndCreatedAtBefore(Long ownerId, LocalDateTime cutoff);
 }

@@ -1,20 +1,20 @@
 <div class="notifications page-content-inner">
-  <app-page-header heading="Hinweise" />
+  <app-page-header [heading]="'routes.notifications' | translate" />
 
   <div class="toolbar">
     <button type="button" class="btn btn-secondary" (click)="toggleFilter()">
-      {{ filterUnread ? 'Alle anzeigen' : 'Nur ungelesen' }}
+      {{ filterUnread ? ('notifications.showAll' | translate) : ('notifications.filterUnread' | translate) }}
     </button>
-    <button type="button" class="btn btn-primary" (click)="markAllRead()">Alle gelesen</button>
+    <button type="button" class="btn btn-primary" (click)="markAllRead()">{{ 'notifications.markAllRead' | translate }}</button>
   </div>
 
   @if (loading) {
-    <p class="status-text">Lade Hinweise…</p>
+    <p class="status-text">{{ 'notifications.loading' | translate }}</p>
   } @else if (notifications.length === 0) {
     <div class="empty card-glass">
       <span class="material-symbols-outlined">notifications_none</span>
-      <p>Keine Hinweise von Fiscal North — alles im grünen Bereich.</p>
-      <a routerLink="/" class="link-back">Zur Übersicht</a>
+      <p>{{ 'notifications.empty' | translate }}</p>
+      <a routerLink="/" class="link-back">{{ 'notifications.backDashboard' | translate }}</a>
     </div>
   } @else {
     <ul class="notification-list">
@@ -32,7 +32,7 @@
           <h3>{{ n.title }}</h3>
           <p>{{ n.message }}</p>
           @if (!n.read) {
-            <button type="button" class="btn btn-secondary btn-sm" (click)="markRead(n)">Als gelesen markieren</button>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="markRead(n)">{{ 'notifications.markRead' | translate }}</button>
           }
         </li>
       }

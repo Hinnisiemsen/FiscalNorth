@@ -1,10 +1,12 @@
 package de.fiscalnorth.contract.service;
 
+import de.fiscalnorth.auth.CurrentUserService;
 import de.fiscalnorth.contract.model.Contract;
 import de.fiscalnorth.contract.model.ContractInterval;
 import de.fiscalnorth.contract.repository.ContractRepository;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
+import de.fiscalnorth.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,13 +22,15 @@ public class ContractAnalysisService {
 
     private final PaymentTransactionRepository paymentTransactionRepository;
     private final ContractRepository contractRepository;
+    private final CurrentUserService currentUserService;
 
     @Transactional
     public int analyzeAndCreateContracts() {
-        List<PaymentTransaction> allTransactions = paymentTransactionRepository.findAll();
+        User owner = currentUserService.getCurrentUser();
+        List<PaymentTransaction> allTransactions =
+                paymentTransactionRepository.findAllByOwnerId(owner.getId());
         int createdContracts = 0;
 
-        // Group by description and amount to find identical recurring payments (skip nulls - groupingBy rejects null keys)
         Map<String, Map<Double, List<PaymentTransaction>>> groupedTransactions = allTransactions.stream()
                 .filter(t -> t.getDescription() != null && t.getAmount() != null)
                 .collect(Collectors.groupingBy(PaymentTransaction::getDescription,
@@ -37,14 +41,12 @@ public class ContractAnalysisService {
             for (var amountEntry : entry.getValue().entrySet()) {
                 List<PaymentTransaction> transactions = amountEntry.getValue();
 
-                // Simple heuristic: If it appears 3 or more times, it's likely a contract
                 if (transactions.size() >= 3) {
-                    // Check if contract already exists
-                    boolean exists = contractRepository.findAll().stream()
+                    boolean exists = contractRepository.findAllByOwnerId(owner.getId()).stream()
                             .anyMatch(c -> c.getName() != null && c.getName().equalsIgnoreCase(description));
 
                     if (!exists) {
-                        createContractFromTransactions(description, transactions);
+                        createContractFromTransactions(owner, description, transactions);
                         createdContracts++;
                     }
                 }
@@ -53,16 +55,17 @@ public class ContractAnalysisService {
         return createdContracts;
     }
 
-    private void createContractFromTransactions(String name, List<PaymentTransaction> transactions) {
+    private void createContractFromTransactions(User owner, String name, List<PaymentTransaction> transactions) {
         PaymentTransaction latest = transactions.get(transactions.size() - 1);
 
         Contract contract = new Contract();
         contract.setName(name);
         contract.setAmount(latest.getAmount());
         contract.setStartDate(transactions.get(0).getTransactionDate());
-        contract.setEndDate(LocalDate.now().plusYears(1)); // Default to 1 year from now
-        contract.setContractInterval(ContractInterval.MONTHLY); // Default to monthly for MVP
+        contract.setEndDate(LocalDate.now().plusYears(1));
+        contract.setContractInterval(ContractInterval.MONTHLY);
         contract.setAutoDetected(true);
+        contract.setOwner(owner);
 
         contractRepository.save(contract);
     }

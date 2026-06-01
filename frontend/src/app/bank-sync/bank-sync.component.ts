@@ -1,17 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BankSyncService } from '../core/services/bank-sync.service';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
+import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
+import { LanguageService } from '../core/i18n/language.service';
 
 @Component({
   selector: 'app-bank-sync',
   standalone: true,
-  imports: [CommonModule, ...PAGE_HEADER_IMPORTS],
+  imports: [CommonModule, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './bank-sync.component.html',
   styleUrl: './bank-sync.component.css'
 })
 export class BankSyncComponent implements OnInit {
+  private readonly lang = inject(LanguageService);
+
   status: { available: boolean; message: string } | null = null;
   consents: Array<{ id: number; consentId: string; status: string; validUntil: string }> = [];
   loading = false;
@@ -30,7 +34,9 @@ export class BankSyncComponent implements OnInit {
 
         this.route.queryParams.subscribe(params => {
             const err = params['error'];
-            if (err) {
+            if (err === 'callback_failed') {
+                this.error = this.lang.instant('bankSync.callbackFailed');
+            } else if (err) {
                 this.error = err;
             }
         });
@@ -62,12 +68,12 @@ export class BankSyncComponent implements OnInit {
         if (res.redirectUrl) {
           window.location.href = res.redirectUrl;
         } else {
-          this.error = res.message || 'No redirect URL received';
+          this.error = res.message || this.lang.instant('bankSync.noRedirect');
         }
       },
       error: err => {
         this.loading = false;
-        this.error = err.error?.message || err.message || 'Failed to create consent';
+        this.error = err.error?.message || err.message || this.lang.instant('bankSync.consentFailed');
       }
     });
   }
@@ -98,7 +104,7 @@ export class BankSyncComponent implements OnInit {
       },
       error: err => {
         this.loading = false;
-        this.error = err.error?.message || err.message || 'Sync failed';
+        this.error = err.error?.message || err.message || this.lang.instant('bankSync.syncFailed');
       }
     });
   }

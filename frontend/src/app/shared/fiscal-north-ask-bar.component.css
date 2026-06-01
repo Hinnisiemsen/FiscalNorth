@@ -1,0 +1,157 @@
+.ask-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ask-bar.hero {
+  padding: 1.25rem 1.5rem;
+  background: var(--color-surface-glass);
+  backdrop-filter: blur(var(--blur-glass));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-glass);
+}
+
+.ask-bar.compact,
+.ask-bar.inline {
+  gap: 0.5rem;
+}
+
+.ask-brand {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.ask-brand .spark-sm {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.ask-brand-title {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.ask-brand-sub {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--color-text-light);
+  margin-top: 0.125rem;
+}
+
+.ask-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.35rem 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.ask-input-row:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.ask-input-icon {
+  color: var(--color-accent);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.ask-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  outline: none;
+  padding: 0.5rem 0;
+}
+
+.ask-bar.compact .ask-input,
+.ask-bar.inline .ask-input {
+  font-size: 0.875rem;
+  padding: 0.35rem 0;
+}
+
+.ask-send {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.ask-send:hover:not(:disabled) {
+  transform: scale(1.04);
+}
+
+.ask-send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ask-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ask-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8125rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.ask-chip:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.ask-chip-primary {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.ask-chip .material-symbols-outlined {
+  font-size: 1rem;
+}
+
+.ask-bar.inline .ask-actions {
+  display: none;
+}
+
+.ask-bar.inline .ask-input-row {
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+}
+
+.ask-bar.inline .ask-send {
+  width: 36px;
+  height: 36px;
+}

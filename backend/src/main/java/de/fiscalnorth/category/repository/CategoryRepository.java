@@ -6,13 +6,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    boolean existsByNameEqualsAndTransactionTypeEquals(String name, TransactionType transactionType);
+    boolean existsByOwnerId(Long ownerId);
 
-    List<Category> findCategoryByNameEquals(String name);
+    boolean existsByOwnerIdAndNameEqualsAndTransactionTypeEquals(Long ownerId, String name, TransactionType transactionType);
 
-    java.util.Optional<Category> findByNameAndTransactionType(String name, TransactionType transactionType);
+    List<Category> findAllByOwnerId(Long ownerId);
+
+    Optional<Category> findByIdAndOwnerId(Long id, Long ownerId);
+
+    Optional<Category> findByOwnerIdAndNameAndTransactionType(Long ownerId, String name, TransactionType transactionType);
 }

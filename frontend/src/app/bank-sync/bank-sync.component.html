@@ -1,5 +1,5 @@
 <div class="page-content-inner">
-  <app-page-header heading="Bank verbinden" />
+  <app-page-header [heading]="'bankSync.title' | translate" />
 
   <div class="card-glass status-card" *ngIf="status" [class.available]="status.available" [class.unavailable]="!status.available">
     <p>{{ status.message }}</p>
@@ -12,18 +12,18 @@
 
   <div class="sync-actions" *ngIf="status?.available">
     <button class="btn btn-primary" type="button" (click)="connectBank()" [disabled]="loading">
-      {{ loading ? 'Wird verbunden...' : 'Bank verbinden' }}
+      {{ loading ? ('bankSync.connecting' | translate) : ('bankSync.connect' | translate) }}
     </button>
   </div>
 
   <section class="consents-section" *ngIf="consents.length > 0">
-    <h3 class="section-title">Verbundene Bank-Zugänge</h3>
+    <h3 class="section-title">{{ 'bankSync.consentsTitle' | translate }}</h3>
     <div class="list-card" *ngFor="let c of consents">
       <div class="list-card-body">
         <div class="list-card-title consent-id">{{ c.consentId }}</div>
         <div class="list-card-meta">
           <span class="chip" [class.valid]="c.status === 'VALID'">{{ c.status }}</span>
-          <span *ngIf="c.validUntil"> · gültig bis {{ c.validUntil }}</span>
+          <span *ngIf="c.validUntil"> · {{ 'bankSync.validUntil' | translate:{ date: c.validUntil } }}</span>
         </div>
       </div>
       <button
@@ -33,12 +33,12 @@
         (click)="sync(c.consentId)"
         [disabled]="loading"
       >
-        Sync
+        {{ 'bankSync.sync' | translate }}
       </button>
     </div>
   </section>
 
   <p class="hint" *ngIf="!status?.available && status">
-    Konfigurieren Sie app.xs2a.enabled, app.xs2a.base-url und app.xs2a.access-token in der Backend-Konfiguration.
+    {{ 'bankSync.configHint' | translate }}
   </p>
 </div>

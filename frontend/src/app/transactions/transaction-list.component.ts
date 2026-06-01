@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TransactionService, PaymentTransaction } from '../core/services/transaction.service';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
+import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 
 @Component({
     selector: 'app-transaction-list',
     standalone: true,
-    imports: [CommonModule, RouterLink, ...PAGE_HEADER_IMPORTS],
+    imports: [CommonModule, RouterLink, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
     templateUrl: './transaction-list.component.html',
     styleUrl: './transaction-list.component.css'
 })

@@ -89,6 +89,11 @@ button {
   box-shadow: 0 2px 8px rgba(26, 115, 232, 0.25);
 }
 
+.spark-sm {
+  width: 20px;
+  height: 20px;
+}
+
 .spark-lg {
   width: 36px;
   height: 36px;

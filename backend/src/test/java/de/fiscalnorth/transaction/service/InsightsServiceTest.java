@@ -1,7 +1,9 @@
 package de.fiscalnorth.transaction.service;
 
+import de.fiscalnorth.auth.CurrentUserService;
 import de.fiscalnorth.transaction.dto.InsightsResponse;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,20 +21,30 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class InsightsServiceTest {
 
+    private static final Long OWNER_ID = 42L;
+
     @Mock
     private PaymentTransactionRepository paymentTransactionRepository;
 
+    @Mock
+    private CurrentUserService currentUserService;
+
     @InjectMocks
     private InsightsService insightsService;
+
+    @BeforeEach
+    void setUp() {
+        when(currentUserService.getCurrentUserId()).thenReturn(OWNER_ID);
+    }
 
     @Test
     void getInsights_mapsRepositoryRows() {
         LocalDate start = LocalDate.of(2026, 6, 1);
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
 
-        when(paymentTransactionRepository.sumExpensesByCategoryBetween(eq(start), eq(end)))
+        when(paymentTransactionRepository.sumExpensesByCategoryBetween(eq(OWNER_ID), eq(start), eq(end)))
                 .thenReturn(List.<Object[]>of(new Object[]{"Groceries", new BigDecimal("120.50")}));
-        when(paymentTransactionRepository.sumByMonthAndTypeBetween(eq(start), eq(end)))
+        when(paymentTransactionRepository.sumByMonthAndTypeBetween(eq(OWNER_ID), eq(start), eq(end)))
                 .thenReturn(List.<Object[]>of(new Object[]{2026, 6, "Expense", new BigDecimal("200.00")}));
 
         InsightsResponse response = insightsService.getInsights(2026, 6);

@@ -1,6 +1,6 @@
 <div class="page-content-inner">
-  <app-page-header heading="Accounts">
-    <a routerLink="/accounts/new" class="btn btn-primary">Add Account</a>
+  <app-page-header [heading]="'accounts.title' | translate">
+    <a routerLink="/accounts/new" class="btn btn-primary">{{ 'accounts.add' | translate }}</a>
   </app-page-header>
 
   <div class="list-card" *ngFor="let account of accounts">
@@ -19,6 +19,6 @@
   </div>
 
   <div class="empty-state" *ngIf="accounts.length === 0">
-    <p>No accounts yet. Add your first account to get started.</p>
+    <p>{{ 'accounts.empty' | translate }}</p>
   </div>
 </div>

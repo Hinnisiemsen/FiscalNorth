@@ -6,11 +6,12 @@ import { TransactionService } from '../core/services/transaction.service';
 import { CategoryService, Category } from '../core/services/category.service';
 import { ContractService, Contract } from '../core/services/contract.service';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
+import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 
 @Component({
   selector: 'app-transaction-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ...PAGE_HEADER_IMPORTS],
+  imports: [CommonModule, ReactiveFormsModule, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './transaction-create.component.html',
   styleUrl: './transaction-create.component.css'
 })

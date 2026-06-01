@@ -1,7 +1,7 @@
 <div class="page-content-inner">
-  <app-page-header heading="Transactions">
-    <a routerLink="/transactions/import" class="btn btn-secondary">Import CSV</a>
-    <a routerLink="/transactions/new" class="btn btn-primary">Add Transaction</a>
+  <app-page-header [heading]="'routes.transactions' | translate">
+    <a routerLink="/transactions/import" class="btn btn-secondary">{{ 'transactions.importCsv' | translate }}</a>
+    <a routerLink="/transactions/new" class="btn btn-primary">{{ 'transactions.add' | translate }}</a>
   </app-page-header>
 
   <div class="list-card" *ngFor="let tx of transactions">
@@ -25,6 +25,6 @@
   </div>
 
   <div class="empty-state" *ngIf="transactions.length === 0">
-    <p>No transactions found.</p>
+    <p>{{ 'transactions.empty' | translate }}</p>
   </div>
 </div>

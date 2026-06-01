@@ -1,5 +1,7 @@
-import { Component, input, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { ProposedAction } from '../core/services/ai.service';
+import { LanguageService } from '../core/i18n/language.service';
+import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 
 export interface ActionDetailRow {
     label: string;
@@ -9,11 +11,13 @@ export interface ActionDetailRow {
 @Component({
     selector: 'app-action-card',
     standalone: true,
-    imports: [],
+    imports: [...TRANSLATE_IMPORTS],
     templateUrl: './action-card.component.html',
     styleUrl: './action-card.component.css',
 })
 export class ActionCardComponent {
+    private readonly lang = inject(LanguageService);
+
     action = input.required<ProposedAction>();
     busy = input(false);
     result = input('');
@@ -24,13 +28,13 @@ export class ActionCardComponent {
     actionTitle(): string {
         switch (this.action().type) {
             case 'CREATE_BUDGET':
-                return 'Neues Budget';
+                return this.lang.instant('actionCard.titleBudget');
             case 'CREATE_CATEGORY':
-                return 'Neue Kategorie';
+                return this.lang.instant('actionCard.titleCategory');
             case 'CREATE_TRANSACTION':
-                return 'Neue Buchung';
+                return this.lang.instant('actionCard.titleTransaction');
             default:
-                return 'Vorschlag';
+                return this.lang.instant('actionCard.titleDefault');
         }
     }
 
@@ -63,12 +67,18 @@ export class ActionCardComponent {
 
     private budgetRows(p: Record<string, unknown>): ActionDetailRow[] {
         const rows: ActionDetailRow[] = [
-            { label: 'Bezeichnung', value: String(p['name'] ?? '') },
-            { label: 'Limit', value: this.formatMoney(p['limit']) },
-            { label: 'Zeitraum', value: `${this.formatDate(p['startDate'])} – ${this.formatDate(p['endDate'])}` },
+            { label: this.lang.instant('actionCard.labelName'), value: String(p['name'] ?? '') },
+            { label: this.lang.instant('actionCard.labelLimit'), value: this.formatMoney(p['limit']) },
+            {
+                label: this.lang.instant('actionCard.labelPeriod'),
+                value: `${this.formatDate(p['startDate'])} – ${this.formatDate(p['endDate'])}`,
+            },
         ];
         if (p['categoryId']) {
-            rows.push({ label: 'Kategorie-ID', value: String(p['categoryId']) });
+            rows.push({
+                label: this.lang.instant('actionCard.labelCategoryId'),
+                value: String(p['categoryId']),
+            });
         }
         return rows;
     }
@@ -76,35 +86,54 @@ export class ActionCardComponent {
     private categoryRows(p: Record<string, unknown>): ActionDetailRow[] {
         const type = String(p['transactionType'] ?? '');
         return [
-            { label: 'Name', value: String(p['name'] ?? '') },
-            { label: 'Art', value: type === 'Income' ? 'Einnahme' : 'Ausgabe' },
+            { label: this.lang.instant('actionCard.labelName'), value: String(p['name'] ?? '') },
+            { label: this.lang.instant('actionCard.labelType'), value: this.transactionTypeLabel(type) },
         ];
     }
 
     private transactionRows(p: Record<string, unknown>): ActionDetailRow[] {
         const type = String(p['transactionType'] ?? '');
         const rows: ActionDetailRow[] = [
-            { label: 'Beschreibung', value: String(p['description'] ?? '') },
-            { label: 'Betrag', value: this.formatMoney(p['amount']) },
-            { label: 'Datum', value: this.formatDate(p['transactionDate']) },
-            { label: 'Art', value: type === 'Income' ? 'Einnahme' : 'Ausgabe' },
+            {
+                label: this.lang.instant('actionCard.labelDescription'),
+                value: String(p['description'] ?? ''),
+            },
+            { label: this.lang.instant('actionCard.labelAmount'), value: this.formatMoney(p['amount']) },
+            {
+                label: this.lang.instant('actionCard.labelDate'),
+                value: this.formatDate(p['transactionDate']),
+            },
+            { label: this.lang.instant('actionCard.labelType'), value: this.transactionTypeLabel(type) },
         ];
         if (p['categoryId']) {
-            rows.push({ label: 'Kategorie-ID', value: String(p['categoryId']) });
+            rows.push({
+                label: this.lang.instant('actionCard.labelCategoryId'),
+                value: String(p['categoryId']),
+            });
         }
         return rows;
+    }
+
+    private transactionTypeLabel(type: string): string {
+        return type === 'Income'
+            ? this.lang.instant('transactions.income')
+            : this.lang.instant('transactions.expense');
     }
 
     private formatMoney(value: unknown): string {
         const n = Number(value);
         if (Number.isNaN(n)) return String(value ?? '');
-        return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(n);
+        return new Intl.NumberFormat(this.lang.intlLocale(), { style: 'currency', currency: 'EUR' }).format(n);
     }
 
     private formatDate(value: unknown): string {
         if (!value) return '';
         const d = new Date(String(value));
         if (Number.isNaN(d.getTime())) return String(value);
-        return d.toLocaleDateString('de-DE', { day: 'numeric', month: 'short', year: 'numeric' });
+        return d.toLocaleDateString(this.lang.intlLocale(), {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+        });
     }
 }
