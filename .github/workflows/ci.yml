@@ -85,8 +85,8 @@ jobs:
         run: npm ci
         working-directory: frontend
 
-      - name: Set up Chrome
-        uses: browser-actions/setup-chrome@v1
+      - name: Install Chromium
+        run: sudo apt-get update && sudo apt-get install -y chromium-browser
 
       - name: Build
         run: npm run build
@@ -96,4 +96,4 @@ jobs:
         run: npm run test -- --no-watch --no-progress --browsers=ChromeHeadless
         working-directory: frontend
         env:
-          CHROME_BIN: chrome
+          CHROME_BIN: /usr/bin/chromium-browser

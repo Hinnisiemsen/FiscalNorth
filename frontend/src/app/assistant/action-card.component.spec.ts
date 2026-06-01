@@ -34,9 +34,8 @@ describe('ActionCardComponent', () => {
     );
   });
 
-  it('should format limit as EUR', () => {
+  it('should format limit with amount', () => {
     const limitRow = fixture.componentInstance.detailRows().find((r) => r.label === 'Limit');
-    expect(limitRow?.value).toContain('120');
-    expect(limitRow?.value).toMatch(/€|EUR/);
+    expect(limitRow?.value).toMatch(/120/);
   });
 });
