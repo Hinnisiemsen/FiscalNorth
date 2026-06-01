@@ -1,0 +1,80 @@
+<div class="layout-container" [class.drawer-open]="drawerOpen">
+  <div class="ambient-gradient" aria-hidden="true"></div>
+
+  <!-- Desktop icon rail -->
+  <aside class="icon-rail" aria-label="Main navigation">
+    <a routerLink="/" class="rail-logo" title="Fiscal North">
+      <span class="spark" aria-hidden="true"></span>
+    </a>
+    <nav class="rail-nav">
+      <a
+        *ngFor="let item of menuItems"
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+        [title]="item.label"
+        class="rail-link"
+      >
+        <span class="material-symbols-outlined">{{ item.icon }}</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Mobile drawer -->
+  <div
+    class="drawer-backdrop"
+    *ngIf="drawerOpen"
+    (click)="closeDrawer()"
+    aria-hidden="true"
+  ></div>
+  <aside
+    class="nav-drawer"
+    [class.open]="drawerOpen"
+    aria-label="Navigation menu"
+    [attr.aria-hidden]="!drawerOpen"
+  >
+    <div class="drawer-header">
+      <span class="spark spark-lg" aria-hidden="true"></span>
+      <h2>Fiscal North</h2>
+    </div>
+    <nav class="drawer-nav">
+      <a
+        *ngFor="let item of menuItems"
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+        class="drawer-link"
+        (click)="onNavClick()"
+      >
+        <span class="material-symbols-outlined">{{ item.icon }}</span>
+        {{ item.label }}
+      </a>
+    </nav>
+    <div class="drawer-account">
+      <span class="material-symbols-outlined">account_circle</span>
+      <span>User</span>
+    </div>
+  </aside>
+
+  <main class="main-column">
+    <header class="topbar">
+      <button
+        type="button"
+        class="menu-btn"
+        (click)="toggleDrawer()"
+        [attr.aria-expanded]="drawerOpen"
+        aria-label="Open navigation menu"
+      >
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <h1 class="topbar-title">{{ pageTitle }}</h1>
+      <div class="user-chip">
+        <span class="material-symbols-outlined">account_circle</span>
+        <span class="user-chip-label">User</span>
+      </div>
+    </header>
+    <div class="page-content page-enter">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

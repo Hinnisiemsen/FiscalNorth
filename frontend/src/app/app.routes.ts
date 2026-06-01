@@ -5,21 +5,35 @@ import { ContractListComponent } from './contracts/contract-list.component';
 import { ContractCreateComponent } from './contracts/contract-create.component';
 import { TransactionListComponent } from './transactions/transaction-list.component';
 import { TransactionCreateComponent } from './transactions/transaction-create.component';
+import { ImportComponent } from './import/import.component';
 import { BudgetListComponent } from './budgets/budget-list.component';
 import { BudgetCreateComponent } from './budgets/budget-create.component';
+import { AccountListComponent } from './accounts/account-list.component';
+import { AccountCreateComponent } from './accounts/account-create.component';
+import { CategoryListComponent } from './categories/category-list.component';
+import { CategoryCreateComponent } from './categories/category-create.component';
+import { BankSyncComponent } from './bank-sync/bank-sync.component';
+import { BankSyncCallbackComponent } from './bank-sync/bank-sync-callback.component';
 
 export const routes: Routes = [
     {
         path: '',
         component: LayoutComponent,
         children: [
-            { path: '', component: DashboardComponent },
-            { path: 'contracts', component: ContractListComponent },
-            { path: 'contracts/new', component: ContractCreateComponent },
-            { path: 'transactions', component: TransactionListComponent },
-            { path: 'transactions/new', component: TransactionCreateComponent },
-            { path: 'budgets', component: BudgetListComponent },
-            { path: 'budgets/new', component: BudgetCreateComponent },
+            { path: '', component: DashboardComponent, data: { title: 'Dashboard' } },
+            { path: 'contracts', component: ContractListComponent, data: { title: 'Contracts' } },
+            { path: 'contracts/new', component: ContractCreateComponent, data: { title: 'New Contract' } },
+            { path: 'transactions', component: TransactionListComponent, data: { title: 'Transactions' } },
+            { path: 'transactions/new', component: TransactionCreateComponent, data: { title: 'New Transaction' } },
+            { path: 'transactions/import', component: ImportComponent, data: { title: 'Import CSV' } },
+            { path: 'budgets', component: BudgetListComponent, data: { title: 'Budgets' } },
+            { path: 'budgets/new', component: BudgetCreateComponent, data: { title: 'New Budget' } },
+            { path: 'accounts', component: AccountListComponent, data: { title: 'Accounts' } },
+            { path: 'accounts/new', component: AccountCreateComponent, data: { title: 'New Account' } },
+            { path: 'bank-sync', component: BankSyncComponent, data: { title: 'Bank verbinden' } },
+            { path: 'bank-sync/callback', component: BankSyncCallbackComponent, data: { title: 'Bank Sync' } },
+            { path: 'categories', component: CategoryListComponent, data: { title: 'Categories' } },
+            { path: 'categories/new', component: CategoryCreateComponent, data: { title: 'New Category' } },
         ]
     }
 ];

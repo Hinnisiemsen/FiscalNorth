@@ -1,1 +1,116 @@
-/* You can add global styles to this file, and also import other style files */
+/* Gemini Neural Expressive — light theme tokens */
+:root {
+  --color-primary: #1f1f1f;
+  --color-secondary: #5f6368;
+  --color-accent: #1a73e8;
+  --color-accent-hover: #1557b0;
+  --color-accent-soft: rgba(26, 115, 232, 0.12);
+  --color-background: #f6f8fc;
+  --color-surface: #ffffff;
+  --color-surface-glass: rgba(255, 255, 255, 0.72);
+  --color-text: #1f1f1f;
+  --color-text-light: #5f6368;
+  --color-border: rgba(60, 64, 67, 0.12);
+  --color-success: #1e8e3e;
+  --color-danger: #d93025;
+  --color-warning: #f9ab00;
+
+  --gradient-blue: #a8c7fa;
+  --gradient-violet: #c4b5fd;
+
+  --font-family: 'Roboto Flex', system-ui, -apple-system, sans-serif;
+  --spacing-unit: 1rem;
+  --radius-pill: 9999px;
+  --radius-card: 24px;
+  --radius-control: 16px;
+  --border-radius: var(--radius-card);
+
+  --shadow-sm: 0 1px 3px rgba(60, 64, 67, 0.08);
+  --shadow-md: 0 4px 16px rgba(60, 64, 67, 0.1);
+  --shadow-glass: 0 2px 12px rgba(60, 64, 67, 0.06);
+
+  --ease-spring: cubic-bezier(0.2, 0, 0, 1);
+  --transition-fast: 150ms var(--ease-spring);
+  --transition-normal: 250ms var(--ease-spring);
+
+  --rail-width: 72px;
+  --topbar-height: 56px;
+  --content-max-width: 960px;
+  --blur-glass: 12px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  font-size: 0.9375rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 500;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.spark {
+  display: block;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gradient-blue), var(--gradient-violet));
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.25);
+}
+
+.spark-lg {
+  width: 36px;
+  height: 36px;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  font-size: 1.25rem;
+  line-height: 1;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
