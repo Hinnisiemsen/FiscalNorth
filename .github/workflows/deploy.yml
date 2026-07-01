@@ -1,7 +1,7 @@
 name: Deploy
 
 # Runs after Docker Build succeeds on master, or manually from the Actions tab.
-# Requires server setup documented in docs/DEPLOY.md and DEPLOY_ENABLED=true.
+# Requires GCE VM setup in docs/DEPLOY.md and DEPLOY_ENABLED=true.
 
 on:
   workflow_run:
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Deploy to production
+    name: Deploy to Google Cloud (GCE)
     runs-on: ubuntu-latest
     if: >
       vars.DEPLOY_ENABLED == 'true' &&

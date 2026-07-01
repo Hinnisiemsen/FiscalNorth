@@ -1,6 +1,6 @@
-# Deploying Fiscal North
+# Deploying Fiscal North on Google Cloud
 
-Fiscal North ships as Docker containers. For production, run the stack on a VPS with a reverse proxy for HTTPS. CI builds and pushes images to GitHub Container Registry (ghcr.io); merging to `master` can automatically redeploy the server.
+Fiscal North runs in Docker on a **Google Compute Engine (GCE) VM**. CI builds images to GitHub Container Registry (ghcr.io); merging to `master` can auto-deploy over SSH to that VM.
 
 ## Architecture
 
@@ -8,172 +8,185 @@ Fiscal North ships as Docker containers. For production, run the stack on a VPS 
 Internet
    │
    ▼
-Caddy / Traefik / nginx  (TLS on :443)
-   │
-   ▼
-frontend container       (127.0.0.1:3000 → nginx → /api, /oauth2, /login proxy)
-   │
-   ▼
-backend container        (Spring Boot, internal only)
-   ├── postgres
-   └── rabbitmq
+Cloud DNS  →  Static external IP  →  GCE VM
+                                        │
+                                        ▼
+                              Caddy (TLS :443)
+                                        │
+                                        ▼
+                              frontend :3000 (nginx proxy)
+                                        │
+                                        ▼
+                              backend (Spring Boot)
+                                 ├── Cloud SQL optional later
+                                 ├── postgres (container, default)
+                                 └── rabbitmq (container)
 ```
 
-The Angular app and API share one public origin. The frontend nginx container proxies `/api/`, `/oauth2/`, and `/login/` to the backend, which keeps session cookies and CSRF working without CORS issues.
+OAuth and Gemini API keys come from the **same Google Cloud project** (APIs & Services + OAuth credentials).
 
-## What CI already does
+The frontend nginx container proxies `/api/`, `/oauth2/`, and `/login/` to the backend so session cookies and CSRF work on one public origin.
 
-| Workflow | On merge to `master` |
-|----------|----------------------|
-| **CI** | Runs unit/integration tests, frontend tests, and a Docker Compose smoke test |
-| **Docker Build** | Builds and pushes `ghcr.io/<owner>/fiscalnorth-backend:latest` and `ghcr.io/<owner>/fiscalnorth-frontend:latest` |
-| **Deploy** | SSHs into your VPS and runs `./scripts/deploy.sh` (when enabled) |
+## What CI does on merge to `master`
+
+| Workflow | Action |
+|----------|--------|
+| **CI** | Tests + Docker Compose smoke test |
+| **Docker Build** | Pushes `ghcr.io/hinnisiemsen/fiscalnorth-backend:latest` and `...-frontend:latest` |
+| **Deploy** | SSH to GCE VM → `./scripts/deploy.sh` (when `DEPLOY_ENABLED=true`) |
 
 ---
 
-## One-time server setup
+## One-time Google Cloud setup
 
-### 1. Create a VPS
+Replace placeholders: `PROJECT_ID`, `REGION`, `ZONE`, `VM_NAME`, `DOMAIN`.
 
-- **2 GB RAM** or more recommended
-- Ubuntu 22.04/24.04 LTS works well
-- Open firewall ports **22**, **80**, and **443** only
-
-### 2. Install Docker
+### 1. Create / select a project
 
 ```bash
-curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker "$USER"
-newgrp docker
+gcloud config set project PROJECT_ID
+gcloud services enable compute.googleapis.com dns.googleapis.com
 ```
 
-Install the Compose plugin if it is not bundled:
+### 2. Reserve a static external IP
 
 ```bash
-sudo apt-get update && sudo apt-get install -y docker-compose-plugin
+gcloud compute addresses create fiscalnorth-ip --region=REGION
+gcloud compute addresses describe fiscalnorth-ip --region=REGION --format='get(address)'
 ```
 
-### 3. Clone the repository
+Note the IP for DNS.
+
+### 3. Create firewall rules
+
+Allow SSH, HTTP, and HTTPS only:
 
 ```bash
-sudo mkdir -p /opt/fiscalnorth
-sudo chown "$USER":"$USER" /opt/fiscalnorth
-git clone https://github.com/Hinnisiemsen/FiscalNorth.git /opt/fiscalnorth
-cd /opt/fiscalnorth
+gcloud compute firewall-rules create fiscalnorth-allow-web \
+  --allow=tcp:80,tcp:443 \
+  --target-tags=fiscalnorth \
+  --description="HTTP/HTTPS for FiscalNorth"
+
+gcloud compute firewall-rules create fiscalnorth-allow-ssh \
+  --allow=tcp:22 \
+  --target-tags=fiscalnorth \
+  --source-ranges=0.0.0.0/0 \
+  --description="SSH (restrict source-ranges to your IP in production)"
 ```
 
-### 4. Configure production environment
+### 4. Create the VM
 
 ```bash
-cp .env.production.example .env.production
-$EDITOR .env.production
+gcloud compute instances create fiscalnorth-vm \
+  --zone=ZONE \
+  --machine-type=e2-small \
+  --image-family=ubuntu-2404-lts-amd64 \
+  --image-project=ubuntu-os-cloud \
+  --boot-disk-size=30GB \
+  --tags=fiscalnorth \
+  --address=fiscalnorth-ip
 ```
 
-Required values:
+`e2-small` (2 GB RAM) is the minimum recommended size.
 
-| Variable | Example | Notes |
-|----------|---------|-------|
-| `APP_AUTH_FRONTEND_URL` | `https://app.example.com` | Must match your public URL exactly |
-| `POSTGRES_PASSWORD` | long random string | Do not reuse dev defaults |
-| `RABBITMQ_PASSWORD` | long random string | Do not reuse dev defaults |
-| `GOOGLE_CLIENT_ID` | from Google Cloud | Real OAuth client, not the local placeholder |
-| `GOOGLE_CLIENT_SECRET` | from Google Cloud | Pair with client ID |
-| `GEMINI_API_KEY` | optional | Needed for AI assistant features |
+### 5. Point DNS (Cloud DNS or your registrar)
 
-### 5. Allow the server to pull images from ghcr.io
-
-Create a GitHub personal access token (classic) with **`read:packages`**.
-
-On the server:
+**Cloud DNS:**
 
 ```bash
-echo "<YOUR_GITHUB_PAT>" | docker login ghcr.io -u <github-username> --password-stdin
+gcloud dns managed-zones create fiscalnorth-zone --dns-name=example.com. --description="FiscalNorth"
+# Add A record app.example.com → static IP in Console or:
+gcloud dns record-sets transaction start --zone=fiscalnorth-zone
+gcloud dns record-sets transaction add --zone=fiscalnorth-zone --name=app.example.com. --type=A --ttl=300 STATIC_IP
+gcloud dns record-sets transaction execute --zone=fiscalnorth-zone
 ```
 
-Docker stores credentials in `~/.docker/config.json`. Repeat after token rotation.
+**External registrar:** `A  app  →  STATIC_IP`
 
-If package visibility is public, login may not be required.
+### 6. Configure Google OAuth (same GCP project)
 
-### 6. Point DNS at the server
+1. **APIs & Services → OAuth consent screen** — configure (External).
+2. **APIs & Services → Credentials → Create OAuth client ID → Web application**
+3. **Authorized JavaScript origins:** `https://app.example.com`
+4. **Authorized redirect URIs:**
 
-```
-app.example.com  A  <server-public-ip>
-```
+   ```
+   https://app.example.com/login/oauth2/code/google
+   ```
 
-### 7. Configure Google OAuth
+5. Copy **Client ID** and **Client secret** into `.env.production`.
 
-In [Google Cloud Console](https://console.cloud.google.com/), add this authorized redirect URI:
+### 7. Enable Gemini API (optional, for AI assistant)
 
-```
-https://app.example.com/login/oauth2/code/google
-```
+1. **APIs & Services → Library** → enable **Generative Language API**.
+2. **APIs & Services → Credentials → Create API key**.
+3. Restrict the key (HTTP referrer = your domain, or IP = VM static IP).
+4. Set `GEMINI_API_KEY` in `.env.production`.
 
-Use the same domain as `APP_AUTH_FRONTEND_URL`.
+### 8. Bootstrap the VM
 
-### 8. Add HTTPS with Caddy
-
-Install Caddy, then create `/etc/caddy/Caddyfile`:
-
-```caddy
-app.example.com {
-    reverse_proxy 127.0.0.1:3000
-}
-```
-
-Reload Caddy:
+From Cloud Shell or your laptop:
 
 ```bash
-sudo systemctl reload caddy
+gcloud compute scp scripts/gcp-bootstrap.sh fiscalnorth-vm:/tmp/ --zone=ZONE
+gcloud compute ssh fiscalnorth-vm --zone=ZONE --command="sudo DOMAIN=app.example.com bash /tmp/gcp-bootstrap.sh"
 ```
 
-The production compose file binds the frontend to **127.0.0.1:3000** so only the reverse proxy is public.
+Or SSH in manually and run the script from a cloned repo.
 
-### 9. First deploy
+### 9. Configure `.env.production` on the VM
 
 ```bash
-cd /opt/fiscalnorth
-chmod +x scripts/deploy.sh
-./scripts/deploy.sh
+gcloud compute ssh fiscalnorth-vm --zone=ZONE
+sudo -u fiscalnorth nano /opt/fiscalnorth/.env.production
+```
+
+Required:
+
+| Variable | Example |
+|----------|---------|
+| `APP_AUTH_FRONTEND_URL` | `https://app.example.com` |
+| `POSTGRES_PASSWORD` | long random string |
+| `RABBITMQ_PASSWORD` | long random string |
+| `GOOGLE_CLIENT_ID` | from GCP Credentials |
+| `GOOGLE_CLIENT_SECRET` | from GCP Credentials |
+| `GEMINI_API_KEY` | optional |
+
+### 10. Log in to ghcr.io and deploy
+
+```bash
+echo "GITHUB_PAT" | docker login ghcr.io -u Hinnisiemsen --password-stdin
+cd /opt/fiscalnorth && ./scripts/deploy.sh
 ```
 
 Verify:
 
 ```bash
 curl -s https://app.example.com/api/auth/status
-curl -sI https://app.example.com/ | head
 ```
 
 ---
 
 ## Automatic deploy on merge to `master`
 
-The **Deploy** workflow runs after **Docker Build** succeeds on `master`. It connects over SSH and executes `./scripts/deploy.sh` on your server.
+### GitHub secrets (Settings → Secrets and variables → Actions)
 
-### Enable auto-deploy in GitHub
+| Secret | Value |
+|--------|--------|
+| `DEPLOY_HOST` | GCE static external IP or `app.example.com` |
+| `DEPLOY_USER` | `fiscalnorth` (from bootstrap script) |
+| `DEPLOY_SSH_KEY` | Private deploy key (PEM) |
+| `DEPLOY_PATH` | `/opt/fiscalnorth` (optional) |
+| `GHCR_READ_TOKEN` | GitHub PAT with `read:packages` (optional if VM already logged in) |
+| `DEPLOY_URL` | `https://app.example.com` (optional post-deploy smoke check) |
 
-1. Open **Settings → Secrets and variables → Actions**.
-2. Add **repository secrets**:
-
-| Secret | Description |
-|--------|-------------|
-| `DEPLOY_HOST` | Public IP or hostname of the VPS |
-| `DEPLOY_USER` | SSH user (e.g. `ubuntu`) |
-| `DEPLOY_SSH_KEY` | Private key for that user (PEM, including `-----BEGIN...`) |
-| `DEPLOY_PATH` | Optional. Default `/opt/fiscalnorth` |
-| `DEPLOY_PORT` | Optional. Default `22` |
-| `GHCR_READ_TOKEN` | Optional if the server already ran `docker login ghcr.io` |
-
-3. Add a **repository variable**:
+### Repository variable
 
 | Variable | Value |
 |----------|-------|
 | `DEPLOY_ENABLED` | `true` |
 
-Until `DEPLOY_ENABLED=true`, the Deploy workflow skips cleanly so merges do not fail while you are still setting up the server.
-
-4. (Recommended) Create a **production** environment under **Settings → Environments** and attach the deploy secrets there for clearer audit history.
-
-### Generate a deploy SSH key
+### Deploy SSH key on the VM
 
 On your laptop:
 
@@ -181,46 +194,37 @@ On your laptop:
 ssh-keygen -t ed25519 -f fiscalnorth-deploy -N ""
 ```
 
-- Put **`fiscalnorth-deploy.pub`** into `~/.ssh/authorized_keys` on the VPS.
-- Put the contents of **`fiscalnorth-deploy`** into the `DEPLOY_SSH_KEY` secret.
-
-Restrict the key to deployment if you prefer:
+Add the public key to the VM:
 
 ```bash
-command="/opt/fiscalnorth/scripts/deploy.sh",no-port-forwarding,no-X11-forwarding,no-agent-forwarding ssh-ed25519 AAAA...
+gcloud compute ssh fiscalnorth-vm --zone=ZONE
+echo "<paste fiscalnorth-deploy.pub>" >> /home/fiscalnorth/.ssh/authorized_keys
 ```
 
-### What happens on each merge to `master`
+Put the **private** key contents into GitHub secret `DEPLOY_SSH_KEY`.
 
-1. CI and Docker Build run on the new commit.
-2. When Docker Build succeeds, **Deploy** starts.
-3. The workflow SSHs to the VPS, runs `git fetch && git reset --hard origin/master`, optionally logs in to ghcr.io, then runs `./scripts/deploy.sh`.
-4. `deploy.sh` pulls the latest images and recreates containers with `compose.prod.yaml`.
+### Deploy flow
 
-### Manual redeploy
+1. Merge to `master` → CI + Docker Build run.
+2. **Deploy** workflow SSHs to the GCE VM.
+3. `git reset --hard origin/master` → `./scripts/deploy.sh` → pulls latest ghcr.io images.
 
-**Actions → Deploy → Run workflow** triggers the same SSH deploy without a code change.
+Manual redeploy: **Actions → Deploy → Run workflow**.
 
 ---
 
-## Local vs production compose files
+## Compose files
 
-| File | Purpose |
-|------|---------|
-| `compose.yaml` | Local development: builds from source, seeds demo data, exposes ports for debugging |
-| `compose.prod.yaml` | Production: pulls ghcr.io images, no demo seed, DB/message broker not exposed publicly |
-
-Local:
+| File | Use |
+|------|-----|
+| `compose.yaml` | Local dev (build from source, demo seed) |
+| `compose.prod.yaml` | Production on GCE (ghcr.io images, no public DB ports) |
 
 ```bash
-cp .env.example .env
+# Local
 docker compose up -d --build
-```
 
-Production:
-
-```bash
-cp .env.production.example .env.production
+# Production (on VM)
 ./scripts/deploy.sh
 ```
 
@@ -228,30 +232,29 @@ cp .env.production.example .env.production
 
 ## Production checklist
 
-- [ ] Strong passwords for Postgres and RabbitMQ
-- [ ] `SPRING_SQL_INIT_MODE=never` (already set in `compose.prod.yaml`)
-- [ ] Real Google OAuth credentials and redirect URI for your domain
-- [ ] `APP_AUTH_FRONTEND_URL` matches the HTTPS URL
-- [ ] TLS enabled (Caddy/Let's Encrypt or equivalent)
-- [ ] Postgres volume backups scheduled
-- [ ] ghcr.io login configured on the server
-- [ ] GitHub deploy secrets and `DEPLOY_ENABLED=true` configured
+- [ ] Static IP attached to VM
+- [ ] Firewall: only 22, 80, 443 (restrict SSH source in production)
+- [ ] Cloud DNS or registrar A record → static IP
+- [ ] OAuth redirect URI matches `https://<domain>/login/oauth2/code/google`
+- [ ] `APP_AUTH_FRONTEND_URL` matches public HTTPS URL
+- [ ] Strong Postgres/RabbitMQ passwords in `.env.production`
+- [ ] ghcr.io login on VM
+- [ ] `DEPLOY_ENABLED=true` + GitHub deploy secrets
+- [ ] Optional: schedule Postgres volume backups (snapshot disk or `pg_dump` cron)
 
 ---
 
 ## Troubleshooting
 
-### Backend fails with “Client id of registration 'google' must not be empty”
-
-Set real `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env.production`. Empty values are rejected by Spring Boot.
-
 ### OAuth redirect mismatch
 
-Ensure Google Cloud redirect URI is `https://<domain>/login/oauth2/code/google` and matches the URL users actually open.
+Redirect URI in GCP must be `https://<domain>/login/oauth2/code/google` (via frontend proxy, not `:8080`).
 
-### 502 from reverse proxy
+### Cannot pull ghcr.io images
 
-Check containers:
+Run `docker login ghcr.io` on the VM or set `GHCR_READ_TOKEN` in GitHub secrets.
+
+### 502 from Caddy
 
 ```bash
 docker compose -f compose.prod.yaml --env-file .env.production ps
@@ -260,15 +263,19 @@ docker compose -f compose.prod.yaml --env-file .env.production logs backend --ta
 
 ### Deploy workflow skipped
 
-Confirm repository variable `DEPLOY_ENABLED` is exactly `true`.
+Set repository variable `DEPLOY_ENABLED=true`.
 
-### Deploy workflow fails on SSH
+### SSH deploy fails
 
-Verify `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, and that the public key is in `authorized_keys` on the server.
+Confirm `DEPLOY_HOST` is the VM external IP, `DEPLOY_USER=fiscalnorth`, and the deploy public key is in `authorized_keys`.
 
 ---
 
+## Google Cloud AI Assist prompt
+
+Copy the prompt in [DEPLOY-GCP-AI-PROMPT.md](DEPLOY-GCP-AI-PROMPT.md) into **Google Cloud AI Assist** for guided Console + `gcloud` setup.
+
 ## Related docs
 
-- [AUTH.md](AUTH.md) – authentication, OAuth, sessions
-- [README.md](../README.md) – local development and CI overview
+- [AUTH.md](AUTH.md) – authentication and sessions
+- [README.md](../README.md) – local development
