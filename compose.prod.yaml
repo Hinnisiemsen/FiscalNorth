@@ -1,0 +1,70 @@
+# Production stack for a public VPS deployment.
+# Usage: docker compose -f compose.prod.yaml --env-file .env.production up -d
+#
+# Images are built and pushed to ghcr.io by the "Docker Build" workflow on master.
+# TLS termination (Caddy/Traefik) should sit in front of the frontend on port 3000.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fiscalnorth}
+      POSTGRES_USER: ${POSTGRES_USER:-fiscalnorth}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.production}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-fiscalnorth} -d ${POSTGRES_DB:-fiscalnorth}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-fiscalnorth}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?set RABBITMQ_PASSWORD in .env.production}
+
+  backend:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-hinnisiemsen}/fiscalnorth-backend:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-fiscalnorth}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-fiscalnorth}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION: 'true'
+      SPRING_SQL_INIT_MODE: never
+      SPRING_DOCKER_COMPOSE_ENABLED: 'false'
+      SPRING_H2_CONSOLE_ENABLED: 'false'
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-fiscalnorth}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      SPRING_SESSION_JDBC_INITIALIZE_SCHEMA: always
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      AI_ENABLED: ${AI_ENABLED:-true}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?set GOOGLE_CLIENT_ID in .env.production}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?set GOOGLE_CLIENT_SECRET in .env.production}
+      APP_AUTH_FRONTEND_URL: ${APP_AUTH_FRONTEND_URL:?set APP_AUTH_FRONTEND_URL in .env.production}
+      SPRING_AUTOCONFIGURE_EXCLUDE: org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+  frontend:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER:-hinnisiemsen}/fiscalnorth-frontend:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${FRONTEND_PORT:-3000}:80'
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
