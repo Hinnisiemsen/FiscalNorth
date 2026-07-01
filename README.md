@@ -114,7 +114,8 @@ Integrationstests nutzen Testcontainers (Kafka, RabbitMQ, PostgreSQL).
 
 | Workflow | Trigger | Beschreibung |
 |----------|---------|--------------|
-| **CI** | Push/PR auf main/master | Backend: Maven build + Tests. Frontend: npm build + Karma Tests |
+| **CI** | Push/PR auf main/master | Backend: Maven build + Tests. Frontend: npm build + Karma Tests. Docker Compose smoke test |
+| **Deploy** | Nach Docker Build auf master (wenn `DEPLOY_ENABLED=true`) | SSH-Deploy auf VPS via `compose.prod.yaml` |
 | **Docker Build** | Push/PR, Release | Baut Backend- und Frontend-Images, push zu ghcr.io bei Push/Release |
 | **Lint** | PR (nur bei Änderungen in frontend/) | Prettier-Check für TypeScript, HTML, CSS |
 
@@ -135,6 +136,7 @@ Integrationstests nutzen Testcontainers (Kafka, RabbitMQ, PostgreSQL).
 ## 📖 Weitere Dokumentation
 
 * [docs/AUTH.md](docs/AUTH.md) – Authentication, OAuth, user isolation, demo login
+* [docs/DEPLOY.md](docs/DEPLOY.md) – Production deployment and auto-deploy on merge to master
 * [xs2a-client/README.md](xs2a-client/README.md) – Berlin Group XS2A API Client
 * [frontend/README.md](frontend/README.md) – Angular-Projekt
 
