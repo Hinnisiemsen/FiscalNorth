@@ -97,3 +97,42 @@ jobs:
         working-directory: frontend
         env:
           CHROME_BIN: /usr/bin/chromium-browser
+
+  compose-smoke:
+    name: Docker Compose smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start stack
+        run: docker compose up -d --build
+
+      - name: Wait for backend API
+        run: |
+          for attempt in $(seq 1 60); do
+            if curl -sf http://localhost:8080/api/auth/status | grep -q '"authenticated"'; then
+              echo "Backend is ready."
+              exit 0
+            fi
+            echo "Waiting for backend (attempt ${attempt}/60)..."
+            sleep 5
+          done
+          echo "Backend did not become ready in time."
+          docker compose ps
+          docker compose logs backend
+          exit 1
+
+      - name: Smoke test frontend and API proxy
+        run: |
+          curl -sf http://localhost:3000/ | grep -qi '<html'
+          curl -sf http://localhost:8080/api/auth/status | grep -q '"authenticated":false'
+          curl -sf http://localhost:3000/api/auth/status | grep -q '"authenticated":false'
+
+      - name: Dump logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Tear down stack
+        if: always()
+        run: docker compose down -v
