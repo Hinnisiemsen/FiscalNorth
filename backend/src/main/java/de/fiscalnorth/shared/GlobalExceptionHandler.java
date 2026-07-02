@@ -2,6 +2,7 @@ package de.fiscalnorth.shared;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.BadCredentialsException;
+import de.fiscalnorth.ai.AiDisabledException;
 import de.fiscalnorth.auth.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
