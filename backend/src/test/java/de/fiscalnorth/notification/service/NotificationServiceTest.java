@@ -15,11 +15,16 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-@DataJpaTest
+@DataJpaTest(properties = {
+    "spring.sql.init.mode=never",
+    "spring.jpa.defer-datasource-initialization=false"
+})
+@ActiveProfiles("test")
 @Import({NotificationService.class, NotificationServiceTest.TestConfig.class})
 class NotificationServiceTest {
 
