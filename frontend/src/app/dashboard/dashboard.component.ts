@@ -4,6 +4,7 @@ import { AccountService } from '../core/services/account.service';
 import { ContractService } from '../core/services/contract.service';
 import { InsightsService, MonthlyTrend } from '../core/services/insights.service';
 import { BudgetService, BudgetWithUsage } from '../core/services/budget.service';
+import { GoalOverview, GoalService, GoalWithProgress } from '../core/services/goal.service';
 import { UserService } from '../core/services/user.service';
 import { AiService } from '../core/services/ai.service';
 import { forkJoin } from 'rxjs';
@@ -55,6 +56,8 @@ export class DashboardComponent implements OnInit {
   categoryBreakdown: CategoryShare[] = [];
   monthlyTrends: MonthlyTrend[] = [];
   budgets: BudgetWithUsage[] = [];
+  goals: GoalWithProgress[] = [];
+  goalOverview: GoalOverview | null = null;
 
   currentTotals: MonthTotals = { expenses: 0, income: 0, net: 0 };
   previousTotals: MonthTotals = { expenses: 0, income: 0, net: 0 };
@@ -76,6 +79,7 @@ export class DashboardComponent implements OnInit {
     private contractService: ContractService,
     private insightsService: InsightsService,
     private budgetService: BudgetService,
+    private goalService: GoalService,
     private notificationService: NotificationService,
     private userService: UserService,
     private ai: AiService,
@@ -100,6 +104,8 @@ export class DashboardComponent implements OnInit {
       currentInsights: this.insightsService.getInsights(this.currentYear, this.currentMonth),
       previousInsights: this.insightsService.getInsights(prevYear, prevMonth),
       budgets: this.budgetService.getBudgetsWithUsage(),
+      goals: this.goalService.getGoals(),
+      goalOverview: this.goalService.getOverview(),
       notifications: this.notificationService.list(true),
     }).subscribe({
       next: ({
@@ -109,6 +115,8 @@ export class DashboardComponent implements OnInit {
         currentInsights,
         previousInsights,
         budgets,
+        goals,
+        goalOverview,
         notifications,
       }) => {
         this.userName = user.userName?.trim() || this.language.instant('dashboard.defaultUser');
@@ -122,6 +130,8 @@ export class DashboardComponent implements OnInit {
         this.categoryBreakdown = categoryShares(currentInsights.spendingByCategory);
         this.monthlyTrends = [...currentInsights.monthlyTrends, ...previousInsights.monthlyTrends];
         this.budgets = budgets;
+        this.goals = goals;
+        this.goalOverview = goalOverview;
 
         this.currentTotals = monthTotals(this.monthlyTrends, this.currentYear, this.currentMonth);
         this.previousTotals = monthTotals(this.monthlyTrends, prevYear, prevMonth);
@@ -275,6 +285,35 @@ export class DashboardComponent implements OnInit {
       });
     }
     return this.language.instant('dashboard.teaserBudgetsOnTrack', { count: active.length });
+  }
+
+  goalsTeaser(): string {
+    if (!this.goalOverview || this.goalOverview.totalGoals === 0) {
+      return this.language.instant('dashboard.teaserNoGoals');
+    }
+    return this.language.instant('dashboard.teaserGoals', {
+      pct: this.goalOverview.overallProgressPercent.toFixed(0),
+      count: this.goalOverview.activeGoals,
+    });
+  }
+
+  topGoals(): GoalWithProgress[] {
+    return [...this.goals]
+      .filter((g) => g.status === 'ACTIVE')
+      .sort((a, b) => b.progressPercent - a.progressPercent)
+      .slice(0, 3);
+  }
+
+  goalProgressPercent(g: GoalWithProgress): number {
+    return Math.min(100, g.progressPercent ?? 0);
+  }
+
+  goalStatusClass(g: GoalWithProgress): string {
+    if (g.status === 'COMPLETED') return 'ok';
+    if (!g.onTrack) return 'critical';
+    const pct = this.goalProgressPercent(g);
+    if (pct >= 80) return 'warning';
+    return 'ok';
   }
 
   hinweiseTeaser(): string {

@@ -1,0 +1,141 @@
+<div class="page-content-inner">
+  @if (loading) {
+    <p>{{ 'dashboard.loading' | translate }}</p>
+  } @else if (goal) {
+    <app-page-header [heading]="goal.name">
+      <a routerLink="/goals" class="btn btn-secondary">{{ 'goals.backToList' | translate }}</a>
+    </app-page-header>
+
+    <div class="detail-layout">
+      <div class="progress-panel card-glass">
+        <div class="progress-ring-wrap">
+          <span class="progress-percent">{{ getProgressPercent() | number: '1.0-0' }}%</span>
+          <span class="progress-label">{{ 'goals.reached' | translate }}</span>
+        </div>
+        <div class="progress-track large">
+          <div
+            class="progress-fill"
+            [ngClass]="getProgressBarClass()"
+            [style.width.%]="getProgressPercent()"
+          ></div>
+        </div>
+        <p class="progress-amounts">
+          {{ goal.progressAmount | currency: 'EUR' }} / {{ goal.targetAmount | currency: 'EUR' }}
+        </p>
+
+        <div class="stats-grid">
+          <div class="stat">
+            <span class="stat-label">{{ 'goals.remaining' | translate }}</span>
+            <span class="stat-value">{{ goal.remainingAmount | currency: 'EUR' }}</span>
+          </div>
+          @if (goal.daysRemaining != null) {
+            <div class="stat">
+              <span class="stat-label">{{ 'goals.daysLeft' | translate }}</span>
+              <span class="stat-value">{{ goal.daysRemaining }}</span>
+            </div>
+          }
+          @if (goal.monthlyContribution) {
+            <div class="stat">
+              <span class="stat-label">{{ 'goals.monthlyContribution' | translate }}</span>
+              <span class="stat-value">{{ goal.monthlyContribution | currency: 'EUR' }}</span>
+            </div>
+          }
+          <div class="stat">
+            <span class="stat-label">{{ 'goals.onTrack' | translate }}</span>
+            <span class="stat-value" [class.ok]="goal.onTrack" [class.warn]="!goal.onTrack">
+              {{ (goal.onTrack ? 'goals.yes' : 'goals.no') | translate }}
+            </span>
+          </div>
+        </div>
+
+        @if (goal.linkedAccountName) {
+          <p class="linked-account">
+            {{ 'goals.linkedAccount' | translate }}: {{ goal.linkedAccountName }}
+          </p>
+        }
+
+        <button type="button" class="btn btn-secondary ask-ai-btn" (click)="askAi()">
+          {{ 'goals.askAi' | translate }}
+        </button>
+      </div>
+
+      <div class="edit-panel card-glass">
+        <div class="edit-header">
+          <h2>{{ 'goals.details' | translate }}</h2>
+          <button type="button" class="btn btn-secondary" (click)="toggleEdit()">
+            {{ (editMode ? 'goals.cancel' : 'goals.edit') | translate }}
+          </button>
+        </div>
+
+        @if (editMode) {
+          <form (ngSubmit)="save()" class="edit-form">
+            <label>
+              {{ 'goals.name' | translate }}
+              <input type="text" [(ngModel)]="form.name" name="name" required />
+            </label>
+            <label>
+              {{ 'goals.type' | translate }}
+              <select [(ngModel)]="form.goalType" name="goalType">
+                @for (t of goalTypes; track t) {
+                  <option [value]="t">{{ 'goals.types.' + t | translate }}</option>
+                }
+              </select>
+            </label>
+            <label>
+              {{ 'goals.targetAmount' | translate }}
+              <input type="number" [(ngModel)]="form.targetAmount" name="targetAmount" min="0" step="0.01" />
+            </label>
+            <label>
+              {{ 'goals.currentAmount' | translate }}
+              <input type="number" [(ngModel)]="form.currentAmount" name="currentAmount" min="0" step="0.01" />
+            </label>
+            <label>
+              {{ 'goals.targetDate' | translate }}
+              <input type="date" [(ngModel)]="form.targetDate" name="targetDate" />
+            </label>
+            <label>
+              {{ 'goals.linkedAccount' | translate }}
+              <select [(ngModel)]="form.linkedAccountId" name="linkedAccountId">
+                <option [ngValue]="null">{{ 'goals.noLinkedAccount' | translate }}</option>
+                @for (acc of accounts; track acc.id) {
+                  <option [ngValue]="acc.id">{{ acc.name }} ({{ acc.balance | currency: 'EUR' }})</option>
+                }
+              </select>
+            </label>
+            <label>
+              {{ 'goals.monthlyContribution' | translate }}
+              <input type="number" [(ngModel)]="form.monthlyContribution" name="monthlyContribution" min="0" step="0.01" />
+            </label>
+            <label>
+              {{ 'goals.status' | translate }}
+              <select [(ngModel)]="form.status" name="status">
+                @for (s of statuses; track s) {
+                  <option [value]="s">{{ 'goals.statuses.' + s | translate }}</option>
+                }
+              </select>
+            </label>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" [disabled]="saving">
+                {{ 'goals.save' | translate }}
+              </button>
+              <button type="button" class="btn btn-danger" (click)="deleteGoal()">
+                {{ 'goals.delete' | translate }}
+              </button>
+            </div>
+          </form>
+        } @else {
+          <dl class="detail-list">
+            <dt>{{ 'goals.type' | translate }}</dt>
+            <dd>{{ 'goals.types.' + goal.goalType | translate }}</dd>
+            <dt>{{ 'goals.targetAmount' | translate }}</dt>
+            <dd>{{ goal.targetAmount | currency: 'EUR' }}</dd>
+            <dt>{{ 'goals.targetDate' | translate }}</dt>
+            <dd>{{ goal.targetDate ? (goal.targetDate | date: 'mediumDate') : '—' }}</dd>
+            <dt>{{ 'goals.status' | translate }}</dt>
+            <dd>{{ 'goals.statuses.' + goal.status | translate }}</dd>
+          </dl>
+        }
+      </div>
+    </div>
+  }
+</div>

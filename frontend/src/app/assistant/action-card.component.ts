@@ -33,6 +33,8 @@ export class ActionCardComponent {
         return this.lang.instant('actionCard.titleCategory');
       case 'CREATE_TRANSACTION':
         return this.lang.instant('actionCard.titleTransaction');
+      case 'CREATE_GOAL':
+        return this.lang.instant('actionCard.titleGoal');
       default:
         return this.lang.instant('actionCard.titleDefault');
     }
@@ -46,6 +48,8 @@ export class ActionCardComponent {
         return 'category';
       case 'CREATE_TRANSACTION':
         return 'receipt_long';
+      case 'CREATE_GOAL':
+        return 'savings';
       default:
         return 'lightbulb';
     }
@@ -60,6 +64,8 @@ export class ActionCardComponent {
         return this.categoryRows(p);
       case 'CREATE_TRANSACTION':
         return this.transactionRows(p);
+      case 'CREATE_GOAL':
+        return this.goalRows(p);
       default:
         return [];
     }
@@ -78,6 +84,33 @@ export class ActionCardComponent {
       rows.push({
         label: this.lang.instant('actionCard.labelCategoryId'),
         value: String(p['categoryId']),
+      });
+    }
+    return rows;
+  }
+
+  private goalRows(p: Record<string, unknown>): ActionDetailRow[] {
+    const rows: ActionDetailRow[] = [
+      { label: this.lang.instant('actionCard.labelName'), value: String(p['name'] ?? '') },
+      {
+        label: this.lang.instant('goals.type'),
+        value: this.lang.instant(`goals.types.${p['goalType']}`),
+      },
+      {
+        label: this.lang.instant('goals.targetAmount'),
+        value: this.formatMoney(p['targetAmount']),
+      },
+    ];
+    if (p['targetDate']) {
+      rows.push({
+        label: this.lang.instant('goals.targetDate'),
+        value: this.formatDate(p['targetDate']),
+      });
+    }
+    if (p['monthlyContribution']) {
+      rows.push({
+        label: this.lang.instant('goals.monthlyContribution'),
+        value: this.formatMoney(p['monthlyContribution']),
       });
     }
     return rows;

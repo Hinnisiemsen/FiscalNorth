@@ -1,0 +1,156 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'goals.interview.title' | translate"></app-page-header>
+
+  @if (loading && !sessionId) {
+    <p>{{ 'dashboard.loading' | translate }}</p>
+  } @else {
+    <div class="wizard card-glass">
+      <div class="wizard-progress">
+        <span>{{ 'goals.interview.progress' | translate: { current: step, total: totalSteps } }}</span>
+        <div class="step-dots">
+          @for (s of [1, 2, 3, 4, 5, 6]; track s) {
+            <span class="dot" [class.active]="s <= step" [class.current]="s === step"></span>
+          }
+        </div>
+      </div>
+
+      <h2 class="step-title">{{ stepLabel() | translate }}</h2>
+
+      @switch (step) {
+        @case (1) {
+          <p class="step-desc">{{ 'goals.interview.step1Desc' | translate }}</p>
+          <div class="priority-grid">
+            @for (type of goalTypes; track type) {
+              <button
+                type="button"
+                class="priority-chip"
+                [class.selected]="isPrioritySelected(type)"
+                (click)="togglePriority(type)"
+              >
+                {{ 'goals.types.' + type | translate }}
+              </button>
+            }
+          </div>
+          <p class="hint">{{ 'goals.interview.maxPriorities' | translate }}</p>
+        }
+        @case (2) {
+          <p class="step-desc">{{ 'goals.interview.step2Desc' | translate }}</p>
+          @for (type of selectedPriorities; track type) {
+            <div class="target-row">
+              <label>{{ 'goals.types.' + type | translate }}</label>
+              <input
+                type="number"
+                [(ngModel)]="targets[type]"
+                [name]="'target-' + type"
+                min="0"
+                step="100"
+                [placeholder]="'goals.targetAmount' | translate"
+              />
+              <input type="date" [(ngModel)]="targetDates[type]" [name]="'date-' + type" />
+            </div>
+          }
+        }
+        @case (3) {
+          <p class="step-desc">{{ 'goals.interview.step3Desc' | translate }}</p>
+          <label class="field">
+            {{ 'goals.interview.riskTolerance' | translate }}
+            <select [(ngModel)]="riskTolerance" name="risk">
+              @for (r of riskOptions; track r) {
+                <option [value]="r">{{ 'goals.interview.risk.' + r | translate }}</option>
+              }
+            </select>
+          </label>
+          <label class="field">
+            {{ 'goals.interview.savingsComfort' | translate }}
+            <select [(ngModel)]="savingsComfort" name="comfort">
+              @for (c of comfortOptions; track c) {
+                <option [value]="c">{{ 'goals.interview.comfort.' + c | translate }}</option>
+              }
+            </select>
+          </label>
+          <label class="field">
+            {{ 'goals.interview.monthlyWilling' | translate }}
+            <input type="number" [(ngModel)]="monthlyWillingToSave" name="monthly" min="0" step="50" />
+          </label>
+        }
+        @case (4) {
+          <p class="step-desc">{{ 'goals.interview.step4Desc' | translate }}</p>
+          @for (type of selectedPriorities; track type) {
+            <label class="field">
+              {{ 'goals.types.' + type | translate }}
+              <select [(ngModel)]="accountLinks[type]" [name]="'acc-' + type">
+                <option [ngValue]="null">{{ 'goals.noLinkedAccount' | translate }}</option>
+                @for (acc of accounts; track acc.id) {
+                  <option [ngValue]="acc.id">{{ acc.name }}</option>
+                }
+              </select>
+            </label>
+          }
+        }
+        @case (5) {
+          @if (planLoading) {
+            <p class="plan-loading">{{ 'goals.interview.generatingPlan' | translate }}</p>
+          } @else if (planError) {
+            <p class="plan-error">{{ planError | translate }}</p>
+            <button type="button" class="btn btn-primary" (click)="generatePlan()">
+              {{ 'goals.interview.retryPlan' | translate }}
+            </button>
+          } @else if (plan) {
+            <p class="plan-summary">{{ plan.summary }}</p>
+            <p class="monthly-target">
+              {{ 'goals.interview.monthlyTarget' | translate }}:
+              {{ plan.monthlySavingsTarget | currency: 'EUR' }}
+            </p>
+            <ul class="insights">
+              @for (insight of plan.insights; track insight) {
+                <li>{{ insight }}</li>
+              }
+            </ul>
+            <div class="recommended-goals">
+              @for (goal of editableGoals; track $index; let i = $index) {
+                <div class="recommended-card" [class.selected]="selectedGoals.has(i)">
+                  <label class="select-row">
+                    <input type="checkbox" [checked]="selectedGoals.has(i)" (change)="toggleGoalSelection(i)" />
+                    <strong>{{ goal.name }}</strong>
+                  </label>
+                  <input type="number" [(ngModel)]="goal.targetAmount" [name]="'amt-' + i" min="0" />
+                  <input type="date" [(ngModel)]="goal.targetDate" [name]="'td-' + i" />
+                  <p class="rationale">{{ goal.rationale }}</p>
+                </div>
+              }
+            </div>
+          }
+        }
+        @case (6) {
+          <p class="step-desc">{{ 'goals.interview.step6Desc' | translate }}</p>
+          <p>{{ 'goals.interview.confirmCount' | translate: { count: selectedGoals.size } }}</p>
+        }
+      }
+
+      <div class="wizard-actions">
+        @if (step > 1 && step !== 5) {
+          <button type="button" class="btn btn-secondary" (click)="back()">
+            {{ 'goals.interview.back' | translate }}
+          </button>
+        }
+        @if (step < 4) {
+          <button type="button" class="btn btn-primary" [disabled]="!canProceed()" (click)="next()">
+            {{ 'goals.interview.next' | translate }}
+          </button>
+        } @else if (step === 4) {
+          <button type="button" class="btn btn-primary" (click)="next()" [disabled]="planLoading">
+            {{ 'goals.interview.generatePlan' | translate }}
+          </button>
+        } @else if (step === 5 && plan) {
+          <button type="button" class="btn btn-primary" (click)="next()" [disabled]="selectedGoals.size === 0">
+            {{ 'goals.interview.next' | translate }}
+          </button>
+        } @else if (step === 6) {
+          <button type="button" class="btn btn-primary" (click)="applyPlan()" [disabled]="loading">
+            {{ 'goals.interview.createGoals' | translate }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

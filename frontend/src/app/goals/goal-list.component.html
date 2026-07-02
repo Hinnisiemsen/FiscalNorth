@@ -1,0 +1,76 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'goals.title' | translate">
+    <a routerLink="/goals/new" class="btn btn-primary">{{ 'goals.planGoals' | translate }}</a>
+  </app-page-header>
+
+  @if (loading) {
+    <p class="loading-text">{{ 'dashboard.loading' | translate }}</p>
+  } @else {
+    @if (overview) {
+      <div class="kpi-strip">
+        <div class="kpi-tile card-glass">
+          <span class="kpi-label">{{ 'goals.kpiTotal' | translate }}</span>
+          <span class="kpi-value">{{ overview.totalGoals }}</span>
+        </div>
+        <div class="kpi-tile card-glass">
+          <span class="kpi-label">{{ 'goals.kpiProgress' | translate }}</span>
+          <span class="kpi-value">{{ overview.overallProgressPercent | number: '1.0-0' }}%</span>
+        </div>
+        <div class="kpi-tile card-glass">
+          <span class="kpi-label">{{ 'goals.kpiCompleted' | translate }}</span>
+          <span class="kpi-value">{{ overview.completedCount }}</span>
+        </div>
+        <div class="kpi-tile card-glass">
+          <span class="kpi-label">{{ 'goals.kpiRemaining' | translate }}</span>
+          <span class="kpi-value">{{ overview.totalRemaining | currency: 'EUR' }}</span>
+        </div>
+      </div>
+    }
+
+    <div class="goal-grid">
+      @for (goal of goals; track goal.id) {
+        <a [routerLink]="['/goals', goal.id]" class="goal-card card-glass">
+          <div class="goal-header">
+            <div>
+              <h3>{{ goal.name }}</h3>
+              <span class="goal-type-badge">{{ goalTypeKey(goal.goalType) | translate }}</span>
+            </div>
+            <span class="goal-target">{{ goal.targetAmount | currency: 'EUR' }}</span>
+          </div>
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              [ngClass]="getProgressBarClass(goal)"
+              [style.width.%]="getProgressPercent(goal)"
+            ></div>
+          </div>
+          <div class="goal-footer">
+            <span>
+              {{ goal.progressAmount | currency: 'EUR' }} / {{ goal.targetAmount | currency: 'EUR' }}
+              ({{ getProgressPercent(goal) | number: '1.0-1' }}%)
+            </span>
+            @if (goal.targetDate) {
+              <span>{{ goal.targetDate | date: 'MMM y' }}</span>
+            }
+          </div>
+          @if (goal.monthlyContribution) {
+            <p class="goal-contribution">
+              {{ 'goals.monthlyContribution' | translate }}:
+              {{ goal.monthlyContribution | currency: 'EUR' }}
+            </p>
+          }
+          @if (!goal.onTrack && goal.status === 'ACTIVE') {
+            <span class="goal-status-badge warning">{{ 'goals.behindSchedule' | translate }}</span>
+          }
+        </a>
+      }
+    </div>
+
+    @if (goals.length === 0) {
+      <div class="empty-state card-glass">
+        <p>{{ 'goals.empty' | translate }}</p>
+        <a routerLink="/goals/new" class="btn btn-primary">{{ 'goals.startInterview' | translate }}</a>
+      </div>
+    }
+  }
+</div>

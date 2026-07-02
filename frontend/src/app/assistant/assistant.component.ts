@@ -6,6 +6,7 @@ import { AiService, ChatResponse, ProposedAction } from '../core/services/ai.ser
 import { BudgetService } from '../core/services/budget.service';
 import { CategoryService } from '../core/services/category.service';
 import { TransactionService } from '../core/services/transaction.service';
+import { GoalService, GoalType } from '../core/services/goal.service';
 import { ActionCardComponent } from './action-card.component';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
 import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
@@ -63,6 +64,7 @@ export class AssistantComponent implements OnInit {
     private budgetService: BudgetService,
     private categoryService: CategoryService,
     private transactionService: TransactionService,
+    private goalService: GoalService,
     private route: ActivatedRoute,
     private router: Router,
   ) {}
@@ -216,6 +218,23 @@ export class AssistantComponent implements OnInit {
           .subscribe({
             next: () => done(this.lang.instant('assistant.actionTransactionCreated')),
             error: () => done(this.lang.instant('assistant.actionTransactionFailed'), true),
+          });
+        break;
+      case 'CREATE_GOAL':
+        this.goalService
+          .createGoal({
+            name: String(p['name']),
+            goalType: String(p['goalType']) as GoalType,
+            targetAmount: Number(p['targetAmount']),
+            targetDate: p['targetDate'] ? String(p['targetDate']) : undefined,
+            linkedAccountId: p['linkedAccountId'] ? Number(p['linkedAccountId']) : undefined,
+            monthlyContribution: p['monthlyContribution']
+              ? Number(p['monthlyContribution'])
+              : undefined,
+          })
+          .subscribe({
+            next: () => done(this.lang.instant('assistant.actionGoalCreated')),
+            error: () => done(this.lang.instant('assistant.actionGoalFailed'), true),
           });
         break;
     }

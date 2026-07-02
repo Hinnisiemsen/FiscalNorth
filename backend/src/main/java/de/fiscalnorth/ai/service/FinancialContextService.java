@@ -7,6 +7,8 @@ import de.fiscalnorth.budget.dto.BudgetWithUsage;
 import de.fiscalnorth.budget.service.BudgetService;
 import de.fiscalnorth.contract.model.Contract;
 import de.fiscalnorth.contract.repository.ContractRepository;
+import de.fiscalnorth.goal.repository.FinancialGoalRepository;
+import de.fiscalnorth.goal.service.GoalProgressService;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,8 @@ public class FinancialContextService {
     private final BudgetService budgetService;
     private final ContractRepository contractRepository;
     private final CurrentUserService currentUserService;
+    private final FinancialGoalRepository financialGoalRepository;
+    private final GoalProgressService goalProgressService;
 
     public String buildContextSnapshot() {
         return buildContextSnapshotForOwner(currentUserService.getCurrentUserId());
@@ -76,6 +80,22 @@ public class FinancialContextService {
         for (Contract c : contracts) {
             sb.append("- ").append(c.getName()).append(": ").append(c.getAmount()).append(" EUR/Monat\n");
         }
+
+        sb.append("\nFinanzziele:\n");
+        financialGoalRepository.findAllByOwnerId(ownerId).stream()
+                .map(goalProgressService::toGoalWithProgress)
+                .limit(8)
+                .forEach(g -> sb.append("- ")
+                        .append(g.name())
+                        .append(": ")
+                        .append(g.progressAmount())
+                        .append(" / ")
+                        .append(g.targetAmount())
+                        .append(" EUR (")
+                        .append(g.progressPercent())
+                        .append(" %)")
+                        .append(g.onTrack() ? " — im Plan" : " — hinter dem Plan")
+                        .append("\n"));
 
         sb.append("\nLetzte Transaktionen:\n");
         for (PaymentTransaction tx : recent) {

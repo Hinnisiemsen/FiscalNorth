@@ -49,6 +49,7 @@ public class FollowUpRecommendationService {
             boolean hasBudget = actions.stream().anyMatch(a -> a.type() == ProposedActionType.CREATE_BUDGET);
             boolean hasCategory = actions.stream().anyMatch(a -> a.type() == ProposedActionType.CREATE_CATEGORY);
             boolean hasTransaction = actions.stream().anyMatch(a -> a.type() == ProposedActionType.CREATE_TRANSACTION);
+            boolean hasGoal = actions.stream().anyMatch(a -> a.type() == ProposedActionType.CREATE_GOAL);
             List<String> followUps = new ArrayList<>();
             if (hasBudget) {
                 followUps.add("Welches Budget ist diesen Monat am stärksten ausgelastet?");
@@ -59,12 +60,15 @@ public class FollowUpRecommendationService {
             if (hasTransaction) {
                 followUps.add("Wie hat sich mein Kontostand in den letzten Wochen entwickelt?");
             }
+            if (hasGoal) {
+                followUps.add("Bin ich mit meinen Finanzzielen im Plan?");
+            }
             followUps.add("Gibt es noch etwas, das ich für dich vorbereiten soll?");
             return sanitize(followUps);
         }
         return List.of(
                 "Wo gebe ich diesen Monat am meisten aus?",
                 "Welche Budgets sind fast aufgebraucht?",
-                "Was war meine letzte größere Ausgabe?");
+                "Wie stehe ich bei meinen Finanzzielen?");
     }
 }

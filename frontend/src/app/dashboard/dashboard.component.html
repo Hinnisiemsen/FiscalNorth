@@ -305,6 +305,54 @@
             </div>
           }
 
+          <div class="panel-wrap">
+            <button
+              type="button"
+              class="panel-toggle card-glass"
+              (click)="toggle('goals')"
+              [attr.aria-expanded]="isExpanded('goals')"
+            >
+              <span class="material-symbols-outlined panel-icon">savings</span>
+
+              <span class="panel-text">
+                <span class="panel-title">{{ 'dashboard.panelGoals' | translate }}</span>
+
+                <span class="panel-teaser">{{ goalsTeaser() }}</span>
+              </span>
+
+              <span class="material-symbols-outlined chevron" [class.open]="isExpanded('goals')"
+                >expand_more</span
+              >
+            </button>
+
+            @if (isExpanded('goals')) {
+              <div class="panel-body">
+                <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'goals' }" />
+
+                @if (topGoals().length > 0) {
+                  @for (g of topGoals(); track g.id) {
+                    <div class="budget-row" [class]="goalStatusClass(g)">
+                      <div class="budget-row-head">
+                        <a [routerLink]="['/goals', g.id]" class="goal-link">{{ g.name }}</a>
+                        <span>{{ goalProgressPercent(g) | number: '1.0-0' }} %</span>
+                      </div>
+                      <div class="bar-track">
+                        <div class="bar-fill" [style.width.%]="goalProgressPercent(g)"></div>
+                      </div>
+                    </div>
+                  }
+                } @else {
+                  <p class="panel-empty">{{ 'dashboard.teaserNoGoals' | translate }}</p>
+                }
+
+                <div class="panel-links">
+                  <a routerLink="/goals" class="text-link">{{ 'dashboard.allGoals' | translate }}</a>
+                  <a routerLink="/goals/new" class="text-link">{{ 'goals.planGoals' | translate }}</a>
+                </div>
+              </div>
+            }
+          </div>
+
           @if (recentNotifications.length > 0) {
             <div class="panel-wrap">
               <button

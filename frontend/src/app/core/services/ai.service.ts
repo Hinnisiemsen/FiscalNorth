@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 
-export type ProposedActionType = 'CREATE_BUDGET' | 'CREATE_CATEGORY' | 'CREATE_TRANSACTION';
+export type ProposedActionType = 'CREATE_BUDGET' | 'CREATE_CATEGORY' | 'CREATE_TRANSACTION' | 'CREATE_GOAL';
 
 export interface ProposedAction {
   type: ProposedActionType;

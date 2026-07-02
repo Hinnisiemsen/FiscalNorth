@@ -9,6 +9,7 @@ const ACTION_CARD_EN = {
     titleBudget: 'New budget',
     titleCategory: 'New category',
     titleTransaction: 'New transaction',
+    titleGoal: 'New financial goal',
     titleDefault: 'Suggestion',
     labelName: 'Name',
     labelLimit: 'Limit',
@@ -18,6 +19,19 @@ const ACTION_CARD_EN = {
     labelAmount: 'Amount',
     labelDate: 'Date',
     labelType: 'Type',
+  },
+  goals: {
+    type: 'Type',
+    targetAmount: 'Target amount',
+    targetDate: 'Target date',
+    monthlyContribution: 'Monthly savings',
+    types: {
+      EMERGENCY_FUND: 'Emergency fund',
+    },
+  },
+  transactions: {
+    income: 'Income',
+    expense: 'Expense',
   },
 };
 
@@ -63,5 +77,26 @@ describe('ActionCardComponent', () => {
   it('should format limit with amount', () => {
     const limitRow = fixture.componentInstance.detailRows().find((r) => r.label === 'Limit');
     expect(limitRow?.value).toMatch(/120/);
+  });
+
+  it('should show goal title and detail rows', () => {
+    const goalAction: ProposedAction = {
+      type: 'CREATE_GOAL',
+      summary: 'Goal anlegen',
+      payload: {
+        name: 'Notgroschen',
+        goalType: 'EMERGENCY_FUND',
+        targetAmount: 5000,
+        targetDate: '2027-06-01',
+        monthlyContribution: 200,
+      },
+    };
+    fixture.componentRef.setInput('action', goalAction);
+    fixture.detectChanges();
+    expect(fixture.componentInstance.actionTitle()).toBe('New financial goal');
+    expect(fixture.componentInstance.actionIcon()).toBe('savings');
+    expect(fixture.componentInstance.detailRows().map((r) => r.label)).toEqual(
+      jasmine.arrayContaining(['Name', 'Type', 'Target amount']),
+    );
   });
 });
