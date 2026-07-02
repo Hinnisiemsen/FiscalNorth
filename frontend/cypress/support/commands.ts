@@ -1,9 +1,8 @@
 /// <reference types="cypress" />
 
-function readBrowserCsrfToken(win: Window): string {
+function readBrowserCsrfToken(win: Window): string | null {
   const match = win.document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
-  expect(match?.[1], 'browser CSRF cookie').to.be.a('string');
-  return decodeURIComponent(match![1]);
+  return match?.[1] ? decodeURIComponent(match[1]) : null;
 }
 
 Cypress.Commands.add('login', (email = 'alex@fiscalnorth.local', password = 'demo1234') => {
@@ -15,13 +14,16 @@ Cypress.Commands.add('login', (email = 'alex@fiscalnorth.local', password = 'dem
         const csrfResponse = await win.fetch('/api/auth/csrf', { credentials: 'include' });
         expect(csrfResponse.status).to.eq(204);
 
-        const csrfToken = readBrowserCsrfToken(win);
+        const csrfToken =
+          csrfResponse.headers.get('X-XSRF-TOKEN') ?? readBrowserCsrfToken(win);
+        expect(csrfToken, 'CSRF token').to.be.a('string');
+
         const loginResponse = await win.fetch('/api/auth/login', {
           method: 'POST',
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            'X-XSRF-TOKEN': csrfToken,
+            'X-XSRF-TOKEN': csrfToken!,
           },
           body: JSON.stringify({ email, password }),
         });

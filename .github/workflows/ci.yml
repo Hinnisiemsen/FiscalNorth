@@ -206,6 +206,7 @@ jobs:
           curl -sf http://localhost:3000/ | grep -qi '<html'
           curl -sf http://localhost:3000/login | grep -qi '<html'
           curl -sf http://localhost:3000/assets/i18n/en.json | grep -qi '"routes"'
+          curl -sfI http://localhost:3000/api/auth/csrf | grep -qi 'set-cookie:.*XSRF-TOKEN'
           curl -sf http://localhost:8080/api/auth/status | grep -q '"authenticated":false'
           curl -sf http://localhost:3000/api/auth/status | grep -q '"authenticated":false'
 
