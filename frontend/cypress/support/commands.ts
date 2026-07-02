@@ -4,6 +4,7 @@ Cypress.Commands.add('login', (email = 'alex@fiscalnorth.local', password = 'dem
   cy.session(
     [email, password],
     () => {
+      cy.request('/api/auth/csrf');
       cy.visit('/login');
       cy.get('#login-email', { timeout: 15000 }).should('be.visible').clear().type(email);
       cy.get('#login-password').clear().type(password, { log: false });
