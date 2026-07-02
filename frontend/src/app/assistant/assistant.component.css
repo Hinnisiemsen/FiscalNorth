@@ -35,6 +35,7 @@
 }
 
 .chat-welcome h2 {
+  font-family: var(--font-family-heading);
   font-size: 1.35rem;
   font-weight: 500;
   color: var(--color-primary);
@@ -69,6 +70,7 @@
   border: 1px solid var(--color-border);
   background: var(--color-surface-glass);
   backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
   color: var(--color-primary);
   font-size: 0.8125rem;
   line-height: 1.35;
@@ -79,13 +81,15 @@
   transition:
     border-color var(--transition-fast),
     background var(--transition-fast),
-    transform var(--transition-fast);
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .follow-up-chip:hover:not(:disabled) {
   border-color: var(--color-accent);
   background: var(--color-accent-soft);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .follow-up-chip:disabled {
@@ -140,15 +144,29 @@
 }
 
 .message-row.assistant .message-bubble {
+  position: relative;
   background: var(--color-surface-glass);
   backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
   border: 1px solid var(--color-border);
   border-bottom-left-radius: 6px;
+  padding-left: calc(1.125rem + 3px);
+}
+
+.message-row.assistant .message-bubble::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.875rem;
+  bottom: 0.875rem;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--gradient-accent);
 }
 
 .user-bubble {
-  background: linear-gradient(135deg, var(--color-accent), #1557b0);
-  color: #fff;
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
   border-bottom-right-radius: 6px;
   box-shadow: var(--shadow-sm);
 }
@@ -211,16 +229,18 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--color-accent);
+  background: var(--gradient-teal);
   animation: typingBounce 1.2s ease-in-out infinite;
 }
 
 .typing-indicator span:nth-child(2) {
   animation-delay: 0.15s;
+  background: var(--color-accent);
 }
 
 .typing-indicator span:nth-child(3) {
   animation-delay: 0.3s;
+  background: var(--gradient-violet);
 }
 
 .chat-input-bar {
@@ -229,10 +249,17 @@
   padding: 0.75rem 1rem;
   background: var(--color-surface-glass);
   backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
   margin-top: auto;
   box-shadow: var(--shadow-glass);
+  transition: box-shadow var(--transition-fast);
+}
+
+.chat-input-bar:focus-within {
+  box-shadow: var(--glow-accent);
+  border-color: var(--color-accent-border);
 }
 
 .chat-input {
@@ -249,17 +276,21 @@
   height: 44px;
   border-radius: 50%;
   border: none;
-  background: var(--color-accent);
-  color: #fff;
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .send-btn:hover:not(:disabled) {
   transform: scale(1.04);
+  box-shadow: var(--glow-accent);
 }
 
 .send-btn:disabled {

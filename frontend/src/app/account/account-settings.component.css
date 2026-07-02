@@ -34,11 +34,11 @@
 }
 
 .success-text {
-  color: #15803d;
+  color: var(--color-success);
   margin: 0;
 }
 
 .error-text {
-  color: #b91c1c;
+  color: var(--color-danger);
   margin: 0;
 }

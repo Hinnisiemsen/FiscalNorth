@@ -1,33 +1,66 @@
-/* Gemini Neural Expressive — light theme tokens */
+/* Nordic Gemini — light theme tokens */
 :root {
-  --color-primary: #1f1f1f;
-  --color-secondary: #5f6368;
-  --color-accent: #1a73e8;
-  --color-accent-hover: #1557b0;
-  --color-accent-soft: rgba(26, 115, 232, 0.12);
-  --color-background: #f6f8fc;
+  /* Nordic neutrals */
+  --color-primary: #1a2332;
+  --color-secondary: #5b6472;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-soft: rgba(37, 99, 235, 0.1);
+  --color-accent-border: rgba(37, 99, 235, 0.2);
+  --color-background: #eef2f6;
   --color-surface: #ffffff;
-  --color-surface-glass: rgba(255, 255, 255, 0.72);
-  --color-text: #1f1f1f;
-  --color-text-light: #5f6368;
-  --color-border: rgba(60, 64, 67, 0.12);
-  --color-success: #1e8e3e;
-  --color-danger: #d93025;
-  --color-warning: #f9ab00;
+  --color-surface-glass: rgba(255, 255, 255, 0.68);
+  --color-surface-muted: rgba(255, 255, 255, 0.5);
+  --color-surface-subtle: rgba(255, 255, 255, 0.4);
+  --color-text: #1a2332;
+  --color-text-light: #6b7280;
+  --color-text-muted: #6b7280;
+  --color-primary-soft: rgba(26, 35, 50, 0.06);
+  --color-border: rgba(26, 35, 50, 0.1);
+  --color-success: #15803d;
+  --color-success-soft: rgba(21, 128, 61, 0.1);
+  --color-success-border: rgba(21, 128, 61, 0.3);
+  --color-danger: #b91c1c;
+  --color-danger-soft: rgba(185, 28, 28, 0.1);
+  --color-danger-border: rgba(185, 28, 28, 0.2);
+  --color-warning: #ca8a04;
+  --color-warning-soft: rgba(202, 138, 4, 0.12);
+  --color-on-accent: #ffffff;
+  --color-surface-rail: rgba(255, 255, 255, 0.78);
+  --color-surface-topbar: rgba(255, 255, 255, 0.55);
+  --color-surface-drawer: rgba(255, 255, 255, 0.92);
+  --color-border-subtle: rgba(26, 35, 50, 0.06);
+  --color-grid-line: rgba(26, 35, 50, 0.025);
+  --color-backdrop: rgba(26, 35, 50, 0.32);
 
-  --gradient-blue: #a8c7fa;
+  /* Aurora accents */
+  --gradient-blue: #93c5fd;
+  --gradient-teal: #5eead4;
   --gradient-violet: #c4b5fd;
+  --gradient-accent: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    var(--gradient-teal) 55%,
+    var(--gradient-violet) 100%
+  );
+  --gradient-hero: linear-gradient(135deg, var(--color-accent), var(--gradient-violet));
+  --gradient-danger: linear-gradient(135deg, var(--color-danger), #991b1b);
+  --gradient-success: linear-gradient(90deg, var(--color-success), #4ade80);
+  --gradient-warning: linear-gradient(90deg, var(--color-warning), #facc15);
+  --gradient-danger-bar: linear-gradient(90deg, var(--color-danger), #f87171);
 
   --font-family: 'Roboto Flex', system-ui, -apple-system, sans-serif;
+  --font-family-heading: 'IBM Plex Sans', var(--font-family);
   --spacing-unit: 1rem;
   --radius-pill: 9999px;
-  --radius-card: 24px;
-  --radius-control: 16px;
+  --radius-card: 20px;
+  --radius-control: 14px;
   --border-radius: var(--radius-card);
 
-  --shadow-sm: 0 1px 3px rgba(60, 64, 67, 0.08);
-  --shadow-md: 0 4px 16px rgba(60, 64, 67, 0.1);
-  --shadow-glass: 0 2px 12px rgba(60, 64, 67, 0.06);
+  --shadow-sm: 0 1px 3px rgba(26, 35, 50, 0.06);
+  --shadow-md: 0 4px 16px rgba(26, 35, 50, 0.08);
+  --shadow-glass: 0 2px 12px rgba(26, 35, 50, 0.05);
+  --glow-accent: 0 0 0 3px rgba(37, 99, 235, 0.15), 0 0 24px rgba(147, 197, 253, 0.25);
 
   --ease-spring: cubic-bezier(0.2, 0, 0, 1);
   --transition-fast: 150ms var(--ease-spring);
@@ -36,7 +69,7 @@
   --rail-width: 72px;
   --topbar-height: 56px;
   --content-max-width: 960px;
-  --blur-glass: 12px;
+  --blur-glass: 16px;
 }
 
 * {
@@ -65,6 +98,7 @@ h3,
 h4,
 h5,
 h6 {
+  font-family: var(--font-family-heading);
   font-weight: 500;
   color: var(--color-primary);
   letter-spacing: -0.02em;
@@ -85,8 +119,15 @@ button {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--gradient-blue), var(--gradient-violet));
-  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.25);
+  background: linear-gradient(
+    135deg,
+    var(--gradient-blue) 0%,
+    var(--gradient-teal) 45%,
+    var(--gradient-violet) 100%
+  );
+  box-shadow:
+    0 2px 12px rgba(37, 99, 235, 0.22),
+    0 0 20px rgba(94, 234, 212, 0.15);
 }
 
 .spark-sm {
@@ -102,7 +143,7 @@ button {
 .material-symbols-outlined {
   font-variation-settings:
     'FILL' 0,
-    'wght' 400,
+    'wght' 300,
     'GRAD' 0,
     'opsz' 24;
   font-size: 1.25rem;

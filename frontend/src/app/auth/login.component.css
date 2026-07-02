@@ -58,8 +58,8 @@
 }
 
 .error-banner {
-  background: rgba(220, 38, 38, 0.1);
-  color: #b91c1c;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
   border-radius: var(--radius-control);
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
