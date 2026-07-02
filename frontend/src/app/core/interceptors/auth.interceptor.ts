@@ -12,8 +12,7 @@ function readCookie(name: string): string | null {
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const router = inject(Router);
-  const authService = inject(AuthService);
+  const isAsset = req.url.includes('/assets/');
 
   let headers = req.headers;
   const csrf = readCookie('XSRF-TOKEN');
@@ -21,16 +20,24 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     headers = headers.set('X-XSRF-TOKEN', csrf);
   }
 
-  const locale = authService.currentUser?.locale;
-  if (locale) {
-    headers = headers.set('Accept-Language', locale);
+  if (!isAsset) {
+    const authService = inject(AuthService);
+    const locale = authService.currentUser?.locale;
+    if (locale) {
+      headers = headers.set('Accept-Language', locale);
+    }
   }
 
   const cloned = req.clone({
-    withCredentials: true,
+    withCredentials: !isAsset,
     headers,
   });
 
+  if (isAsset) {
+    return next(cloned);
+  }
+
+  const router = inject(Router);
   return next(cloned).pipe(
     catchError((err) => {
       if (err.status === 401 && !req.url.includes('/api/auth/')) {

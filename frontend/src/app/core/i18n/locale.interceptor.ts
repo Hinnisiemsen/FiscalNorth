@@ -1,13 +1,15 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { LanguageService } from './language.service';
+import { resolveInitialLocale } from './supported-locales';
 
 export const localeInterceptor: HttpInterceptorFn = (req, next) => {
-  const language = inject(LanguageService);
+  if (req.url.includes('/assets/')) {
+    return next(req);
+  }
+
   return next(
     req.clone({
       setHeaders: {
-        'Accept-Language': language.current(),
+        'Accept-Language': resolveInitialLocale(),
       },
     }),
   );
