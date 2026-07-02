@@ -1,11 +1,22 @@
 /// <reference types="cypress" />
 
+function csrfHeaderFromCookie(): Cypress.Chainable<{ 'X-XSRF-TOKEN': string }> {
+  return cy.getCookie('XSRF-TOKEN').then((cookie) => {
+    expect(cookie?.value, 'CSRF cookie').to.be.a('string');
+    return { 'X-XSRF-TOKEN': decodeURIComponent(cookie!.value) };
+  });
+}
+
 Cypress.Commands.add('login', (email = 'alex@fiscalnorth.local', password = 'demo1234') => {
   cy.session([email, password], () => {
-    cy.visit('/login');
-    cy.get('#login-email').clear().type(email);
-    cy.get('#login-password').clear().type(password, { log: false });
-    cy.get('form.auth-form button[type="submit"]').click();
-    cy.url({ timeout: 10000 }).should('not.include', '/login');
+    cy.request('/api/auth/status');
+    csrfHeaderFromCookie().then((headers) => {
+      cy.request({
+        method: 'POST',
+        url: '/api/auth/login',
+        body: { email, password },
+        headers,
+      }).its('status').should('eq', 200);
+    });
   });
 });

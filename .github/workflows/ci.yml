@@ -117,6 +117,13 @@ jobs:
         run: npm ci
         working-directory: frontend
 
+      - name: Install Cypress binary
+        run: npx cypress install
+        working-directory: frontend
+
+      - name: Install Chrome
+        run: sudo apt-get update && sudo apt-get install -y google-chrome-stable
+
       - name: Run Cypress E2E tests
         run: npm run e2e:ci
         working-directory: frontend
@@ -197,6 +204,7 @@ jobs:
       - name: Smoke test frontend and API proxy
         run: |
           curl -sf http://localhost:3000/ | grep -qi '<html'
+          curl -sf http://localhost:3000/login | grep -qi '<html'
           curl -sf http://localhost:8080/api/auth/status | grep -q '"authenticated":false'
           curl -sf http://localhost:3000/api/auth/status | grep -q '"authenticated":false'
 
