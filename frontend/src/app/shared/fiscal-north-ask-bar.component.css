@@ -5,9 +5,10 @@
 }
 
 .ask-bar.hero {
-  padding: 1.25rem 1.5rem;
+  padding: 1.5rem 1.75rem;
   background: var(--color-surface-glass);
   backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-glass);
@@ -31,9 +32,13 @@
 
 .ask-brand-title {
   display: block;
-  font-size: 1rem;
+  font-family: var(--font-family-heading);
+  font-size: 1.0625rem;
   font-weight: 600;
-  color: var(--color-primary);
+  background: var(--gradient-hero);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .ask-brand-sub {
@@ -47,18 +52,25 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.35rem 0.35rem 0.35rem 0.75rem;
-  background: rgba(255, 255, 255, 0.6);
+  padding: 0.4rem 0.4rem 0.4rem 1rem;
+  background: var(--color-surface-muted);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
   transition:
     border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.ask-bar.hero .ask-input-row {
+  min-height: 52px;
+  padding: 0.5rem 0.5rem 0.5rem 1.125rem;
 }
 
 .ask-input-row:focus-within {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px var(--color-accent-soft);
+  background: var(--color-surface);
+  box-shadow: var(--glow-accent);
 }
 
 .ask-input-icon {
@@ -89,19 +101,27 @@
   height: 40px;
   border: none;
   border-radius: 50%;
-  background: var(--color-accent);
-  color: #fff;
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
   transition:
     transform var(--transition-fast),
-    opacity var(--transition-fast);
+    opacity var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.ask-bar.hero .ask-send {
+  width: 44px;
+  height: 44px;
 }
 
 .ask-send:hover:not(:disabled) {
   transform: scale(1.04);
+  box-shadow: var(--glow-accent);
 }
 
 .ask-send:disabled {
@@ -123,17 +143,19 @@
   font-size: 0.8125rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--color-surface-muted);
   color: var(--color-primary);
   cursor: pointer;
   transition:
     border-color var(--transition-fast),
-    background var(--transition-fast);
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .ask-chip:hover {
   border-color: var(--color-accent);
   background: var(--color-accent-soft);
+  box-shadow: var(--shadow-sm);
 }
 
 .ask-chip-primary {

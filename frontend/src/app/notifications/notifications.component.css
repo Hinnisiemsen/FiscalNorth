@@ -51,7 +51,7 @@
 }
 
 .notification-card.warning {
-  border-left-color: #e6a700;
+  border-left-color: var(--color-warning);
 }
 
 .notification-card.critical {

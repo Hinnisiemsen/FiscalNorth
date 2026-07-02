@@ -1,4 +1,4 @@
-/* Shared UI primitives — Gemini light */
+/* Shared UI primitives — Nordic Gemini */
 
 /* Page structure */
 .page-header {
@@ -11,6 +11,7 @@
 }
 
 .page-title {
+  font-family: var(--font-family-heading);
   font-size: 1.75rem;
   font-weight: 500;
   color: var(--color-primary);
@@ -57,24 +58,31 @@
 
 .btn-primary {
   background-color: var(--color-accent);
-  color: #fff;
+  color: var(--color-on-accent);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
   background-color: var(--color-accent-hover);
-  color: #fff;
+  color: var(--color-on-accent);
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .btn-secondary {
-  background-color: var(--color-surface);
+  background: var(--color-surface-glass);
+  backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
   color: var(--color-primary);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-background);
+  background: var(--color-surface);
   color: var(--color-primary);
+  border-color: rgba(37, 99, 235, 0.2);
 }
 
 .btn-ghost {
@@ -102,7 +110,7 @@
   -webkit-backdrop-filter: blur(var(--blur-glass));
   border-radius: var(--radius-card);
   padding: 1.25rem 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.55);
   box-shadow: var(--shadow-glass);
 }
 
@@ -149,11 +157,14 @@
   border-radius: var(--radius-control);
   font-family: inherit;
   font-size: 0.9375rem;
-  background: var(--color-surface);
+  background: var(--color-surface-glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--color-text);
   transition:
     border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .form-group input:focus,
@@ -163,7 +174,8 @@
 .select:focus {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px var(--color-accent-soft);
+  background: var(--color-surface);
+  box-shadow: var(--glow-accent);
 }
 
 .form-actions {
@@ -187,12 +199,14 @@
   margin-bottom: 0.5rem;
   transition:
     box-shadow var(--transition-fast),
-    transform var(--transition-fast);
+    transform var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .list-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--glow-accent);
   transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, 0.18);
 }
 
 .list-card-icon {
@@ -251,6 +265,16 @@
   border-radius: var(--radius-pill);
   font-size: 0.75rem;
   font-weight: 500;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.chip:hover {
+  border-color: var(--color-accent);
   background: var(--color-accent-soft);
   color: var(--color-accent);
 }
@@ -268,7 +292,7 @@
 .btn-danger {
   background: transparent;
   color: var(--color-danger);
-  border: 1px solid rgba(217, 48, 37, 0.3);
+  border: 1px solid rgba(185, 28, 28, 0.3);
   min-height: 36px;
   padding: 0 1rem;
   border-radius: var(--radius-pill);
@@ -277,7 +301,7 @@
 }
 
 .btn-danger:hover {
-  background: rgba(217, 48, 37, 0.08);
+  background: var(--color-danger-soft);
 }
 
 .type-badge {
@@ -289,12 +313,12 @@
 }
 
 .type-badge.expense {
-  background: rgba(217, 48, 37, 0.1);
+  background: var(--color-danger-soft);
   color: var(--color-danger);
 }
 
 .type-badge.income {
-  background: rgba(30, 142, 62, 0.1);
+  background: var(--color-success-soft);
   color: var(--color-success);
 }
 
@@ -323,15 +347,15 @@
 }
 
 .progress-fill.ok {
-  background: linear-gradient(90deg, #34a853, #81c995);
+  background: var(--gradient-success);
 }
 
 .progress-fill.warning {
-  background: linear-gradient(90deg, #f9ab00, #fdd663);
+  background: var(--gradient-warning);
 }
 
 .progress-fill.over {
-  background: linear-gradient(90deg, #d93025, #f28b82);
+  background: var(--gradient-danger-bar);
 }
 
 /* Import / upload */
@@ -340,11 +364,14 @@
   border-radius: var(--radius-card);
   padding: 2rem;
   text-align: center;
-  transition: border-color var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .upload-zone:hover {
   border-color: var(--color-accent);
+  box-shadow: var(--glow-accent);
 }
 
 /* Callback / centered message */
