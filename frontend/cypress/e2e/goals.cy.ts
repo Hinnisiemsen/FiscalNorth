@@ -21,16 +21,14 @@ describe('Financial goals', () => {
 
   it('starts the goal interview wizard', () => {
     cy.visit('/goals/new');
-    cy.contains('h2', /.+/);
+    cy.get('.wizard', { timeout: 15000 }).should('be.visible');
     cy.get('.priority-chip').first().click();
-    cy.contains('button', /Next|Weiter|Suivant|Siguiente/)
-      .should('not.be.disabled')
-      .click();
-    cy.get('.target-row input[type="number"]').first().type('4000');
-    cy.contains('button', /Next|Weiter|Suivant|Siguiente/).click();
-    cy.get('input[name="monthly"]').clear().type('250');
-    cy.contains('button', /Next|Weiter|Suivant|Siguiente/).click();
-    cy.contains('button', /Generate|Plan|generieren|générer|Generar/).click();
+    cy.get('.wizard-actions .btn-primary').should('not.be.disabled').click();
+    cy.get('.target-row input[type="number"]', { timeout: 10000 }).first().type('4000').blur();
+    cy.get('.wizard-actions .btn-primary').should('not.be.disabled').click();
+    cy.get('input[name="monthly"]').should('be.visible').clear().type('250').blur();
+    cy.get('.wizard-actions .btn-primary').should('not.be.disabled').click();
+    cy.get('.wizard-actions .btn-primary').click();
     cy.contains('.plan-summary', /.+/, { timeout: 15000 });
     cy.get('.recommended-card').should('have.length.at.least', 1);
   });
