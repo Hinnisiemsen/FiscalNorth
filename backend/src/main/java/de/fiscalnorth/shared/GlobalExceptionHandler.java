@@ -1,6 +1,7 @@
 package de.fiscalnorth.shared;
 
-import de.fiscalnorth.ai.AiDisabledException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.BadCredentialsException;
 import de.fiscalnorth.auth.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -40,6 +41,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ApiError> handleUnauthorized(
             UnauthorizedException ex,
+            HttpServletRequest request
+    ) {
+        return apiError(HttpStatus.UNAUTHORIZED, messages.get("error.unauthorized"), request);
+    }
+
+    @ExceptionHandler({AuthenticationException.class, BadCredentialsException.class})
+    public ResponseEntity<ApiError> handleAuthentication(
+            AuthenticationException ex,
             HttpServletRequest request
     ) {
         return apiError(HttpStatus.UNAUTHORIZED, messages.get("error.unauthorized"), request);

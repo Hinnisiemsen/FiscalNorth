@@ -1,7 +1,6 @@
 -- Rich demo data (Jun 2026) for Fiscal North
 
-INSERT INTO app_user (id, user_name, email, password_hash, user_role, auth_provider) VALUES
-(1, 'Alex', 'alex@fiscalnorth.local', '{noop}demo1234', 'User', 'LOCAL');
+INSERT INTO app_user (id, user_name, email, password_hash, user_role, auth_provider) VALUES (1, 'Alex', 'alex@fiscalnorth.local', '{bcrypt}$2a$10$KsWSWIJ3k8pMjAn88PwWPeNtP7Y8teHWWXag7l/kHrkf6fXGSgAgi', 'User', 'LOCAL');
 
 -- Categories (1-12)
 INSERT INTO category (id, name, transaction_type, owner_id) VALUES (1, 'Groceries', 'Expense', 1);
