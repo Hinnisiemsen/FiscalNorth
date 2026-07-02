@@ -1,4 +1,5 @@
-export type DashboardPanel = 'fazit' | 'monat' | 'kategorien' | 'verlauf' | 'budgets' | 'goals' | 'hinweise';
+export type DashboardPanel =
+  'fazit' | 'monat' | 'kategorien' | 'verlauf' | 'budgets' | 'goals' | 'hinweise';
 
 export type AskContext = DashboardPanel | 'general' | 'analysis';
 

@@ -23,13 +23,15 @@ describe('Financial goals', () => {
     cy.visit('/goals/new');
     cy.contains('h2', /.+/);
     cy.get('.priority-chip').first().click();
-    cy.contains('button', /Next|Weiter|Suivant|Siguiente/).should('not.be.disabled').click();
+    cy.contains('button', /Next|Weiter|Suivant|Siguiente/)
+      .should('not.be.disabled')
+      .click();
     cy.get('.target-row input[type="number"]').first().type('4000');
     cy.contains('button', /Next|Weiter|Suivant|Siguiente/).click();
     cy.get('input[name="monthly"]').clear().type('250');
     cy.contains('button', /Next|Weiter|Suivant|Siguiente/).click();
     cy.contains('button', /Generate|Plan|generieren|générer|Generar/).click();
-    cy.contains('.plan-summary', /.+/ , { timeout: 15000 });
+    cy.contains('.plan-summary', /.+/, { timeout: 15000 });
     cy.get('.recommended-card').should('have.length.at.least', 1);
   });
 });

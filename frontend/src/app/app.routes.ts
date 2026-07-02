@@ -86,8 +86,16 @@ export const routes: Routes = [
         data: { titleKey: 'routes.newBudget' },
       },
       { path: 'goals', component: GoalListComponent, data: { titleKey: 'routes.goals' } },
-      { path: 'goals/new', component: GoalInterviewComponent, data: { titleKey: 'routes.newGoal' } },
-      { path: 'goals/:id', component: GoalDetailComponent, data: { titleKey: 'routes.goalDetail' } },
+      {
+        path: 'goals/new',
+        component: GoalInterviewComponent,
+        data: { titleKey: 'routes.newGoal' },
+      },
+      {
+        path: 'goals/:id',
+        component: GoalDetailComponent,
+        data: { titleKey: 'routes.goalDetail' },
+      },
       { path: 'bank-sync', component: BankSyncComponent, data: { titleKey: 'routes.bankSync' } },
       {
         path: 'bank-sync/callback',

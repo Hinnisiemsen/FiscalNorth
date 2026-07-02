@@ -89,9 +89,7 @@ export class GoalInterviewComponent implements OnInit {
       case 1:
         return this.selectedPriorities.length > 0;
       case 2:
-        return this.selectedPriorities.every(
-          (t) => this.targets[t] != null && this.targets[t] > 0,
-        );
+        return this.selectedPriorities.every((t) => this.targets[t] != null && this.targets[t] > 0);
       case 3:
         return this.monthlyWillingToSave > 0;
       default:
@@ -153,8 +151,7 @@ export class GoalInterviewComponent implements OnInit {
       .filter((_, i) => this.selectedGoals.has(i))
       .map((g) => ({
         ...g,
-        linkedAccountId:
-          g.linkedAccountId ?? this.accountLinks[g.goalType] ?? undefined,
+        linkedAccountId: g.linkedAccountId ?? this.accountLinks[g.goalType] ?? undefined,
       }));
     this.goalService.applyPlan(this.sessionId, goals).subscribe({
       next: () => this.router.navigate(['/goals']),

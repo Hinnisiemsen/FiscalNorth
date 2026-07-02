@@ -6,7 +6,9 @@
   } @else {
     <div class="wizard card-glass">
       <div class="wizard-progress">
-        <span>{{ 'goals.interview.progress' | translate: { current: step, total: totalSteps } }}</span>
+        <span>{{
+          'goals.interview.progress' | translate: { current: step, total: totalSteps }
+        }}</span>
         <div class="step-dots">
           @for (s of [1, 2, 3, 4, 5, 6]; track s) {
             <span class="dot" [class.active]="s <= step" [class.current]="s === step"></span>
@@ -70,7 +72,13 @@
           </label>
           <label class="field">
             {{ 'goals.interview.monthlyWilling' | translate }}
-            <input type="number" [(ngModel)]="monthlyWillingToSave" name="monthly" min="0" step="50" />
+            <input
+              type="number"
+              [(ngModel)]="monthlyWillingToSave"
+              name="monthly"
+              min="0"
+              step="50"
+            />
           </label>
         }
         @case (4) {
@@ -110,10 +118,19 @@
               @for (goal of editableGoals; track $index; let i = $index) {
                 <div class="recommended-card" [class.selected]="selectedGoals.has(i)">
                   <label class="select-row">
-                    <input type="checkbox" [checked]="selectedGoals.has(i)" (change)="toggleGoalSelection(i)" />
+                    <input
+                      type="checkbox"
+                      [checked]="selectedGoals.has(i)"
+                      (change)="toggleGoalSelection(i)"
+                    />
                     <strong>{{ goal.name }}</strong>
                   </label>
-                  <input type="number" [(ngModel)]="goal.targetAmount" [name]="'amt-' + i" min="0" />
+                  <input
+                    type="number"
+                    [(ngModel)]="goal.targetAmount"
+                    [name]="'amt-' + i"
+                    min="0"
+                  />
                   <input type="date" [(ngModel)]="goal.targetDate" [name]="'td-' + i" />
                   <p class="rationale">{{ goal.rationale }}</p>
                 </div>
@@ -142,7 +159,12 @@
             {{ 'goals.interview.generatePlan' | translate }}
           </button>
         } @else if (step === 5 && plan) {
-          <button type="button" class="btn btn-primary" (click)="next()" [disabled]="selectedGoals.size === 0">
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="next()"
+            [disabled]="selectedGoals.size === 0"
+          >
             {{ 'goals.interview.next' | translate }}
           </button>
         } @else if (step === 6) {

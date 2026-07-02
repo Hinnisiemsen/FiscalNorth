@@ -3,12 +3,7 @@ import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 
 export type GoalType =
-  | 'EMERGENCY_FUND'
-  | 'VACATION'
-  | 'HOME'
-  | 'DEBT_PAYOFF'
-  | 'RETIREMENT'
-  | 'OTHER';
+  'EMERGENCY_FUND' | 'VACATION' | 'HOME' | 'DEBT_PAYOFF' | 'RETIREMENT' | 'OTHER';
 
 export type GoalStatus = 'ACTIVE' | 'COMPLETED' | 'PAUSED';
 
@@ -115,8 +110,13 @@ export class GoalService {
     return this.api.post<InterviewSessionResponse>('/goals/interview/start', {});
   }
 
-  saveInterviewAnswers(sessionId: number, answers: Record<string, unknown>): Observable<InterviewSessionResponse> {
-    return this.api.put<InterviewSessionResponse>(`/goals/interview/${sessionId}/answers`, { answers });
+  saveInterviewAnswers(
+    sessionId: number,
+    answers: Record<string, unknown>,
+  ): Observable<InterviewSessionResponse> {
+    return this.api.put<InterviewSessionResponse>(`/goals/interview/${sessionId}/answers`, {
+      answers,
+    });
   }
 
   generatePlan(sessionId: number): Observable<GoalPlanResponse> {

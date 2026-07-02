@@ -27,7 +27,9 @@ describe('GoalListComponent helpers', () => {
   });
 
   it('returns warning class near completion', () => {
-    expect(component.getProgressBarClass(sampleGoal({ progressPercent: 85, onTrack: true }))).toBe('warning');
+    expect(component.getProgressBarClass(sampleGoal({ progressPercent: 85, onTrack: true }))).toBe(
+      'warning',
+    );
   });
 
   it('returns over class when behind schedule', () => {

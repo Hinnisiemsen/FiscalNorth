@@ -46,8 +46,10 @@
           </div>
           <div class="goal-footer">
             <span>
-              {{ goal.progressAmount | currency: 'EUR' }} / {{ goal.targetAmount | currency: 'EUR' }}
-              ({{ getProgressPercent(goal) | number: '1.0-1' }}%)
+              {{ goal.progressAmount | currency: 'EUR' }} /
+              {{ goal.targetAmount | currency: 'EUR' }} ({{
+                getProgressPercent(goal) | number: '1.0-1'
+              }}%)
             </span>
             @if (goal.targetDate) {
               <span>{{ goal.targetDate | date: 'MMM y' }}</span>
@@ -69,7 +71,9 @@
     @if (goals.length === 0) {
       <div class="empty-state card-glass">
         <p>{{ 'goals.empty' | translate }}</p>
-        <a routerLink="/goals/new" class="btn btn-primary">{{ 'goals.startInterview' | translate }}</a>
+        <a routerLink="/goals/new" class="btn btn-primary">{{
+          'goals.startInterview' | translate
+        }}</a>
       </div>
     }
   }

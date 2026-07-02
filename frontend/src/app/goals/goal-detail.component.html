@@ -83,11 +83,23 @@
             </label>
             <label>
               {{ 'goals.targetAmount' | translate }}
-              <input type="number" [(ngModel)]="form.targetAmount" name="targetAmount" min="0" step="0.01" />
+              <input
+                type="number"
+                [(ngModel)]="form.targetAmount"
+                name="targetAmount"
+                min="0"
+                step="0.01"
+              />
             </label>
             <label>
               {{ 'goals.currentAmount' | translate }}
-              <input type="number" [(ngModel)]="form.currentAmount" name="currentAmount" min="0" step="0.01" />
+              <input
+                type="number"
+                [(ngModel)]="form.currentAmount"
+                name="currentAmount"
+                min="0"
+                step="0.01"
+              />
             </label>
             <label>
               {{ 'goals.targetDate' | translate }}
@@ -98,13 +110,21 @@
               <select [(ngModel)]="form.linkedAccountId" name="linkedAccountId">
                 <option [ngValue]="null">{{ 'goals.noLinkedAccount' | translate }}</option>
                 @for (acc of accounts; track acc.id) {
-                  <option [ngValue]="acc.id">{{ acc.name }} ({{ acc.balance | currency: 'EUR' }})</option>
+                  <option [ngValue]="acc.id">
+                    {{ acc.name }} ({{ acc.balance | currency: 'EUR' }})
+                  </option>
                 }
               </select>
             </label>
             <label>
               {{ 'goals.monthlyContribution' | translate }}
-              <input type="number" [(ngModel)]="form.monthlyContribution" name="monthlyContribution" min="0" step="0.01" />
+              <input
+                type="number"
+                [(ngModel)]="form.monthlyContribution"
+                name="monthlyContribution"
+                min="0"
+                step="0.01"
+              />
             </label>
             <label>
               {{ 'goals.status' | translate }}
