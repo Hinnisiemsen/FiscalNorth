@@ -1,26 +1,19 @@
 /// <reference types="cypress" />
 
-function csrfTokenFromResponse(response: Cypress.Response<unknown>): string {
-  const setCookie = response.headers['set-cookie'];
-  const cookies = Array.isArray(setCookie) ? setCookie : setCookie ? [setCookie] : [];
-  const raw = cookies.find((entry) => entry.startsWith('XSRF-TOKEN='))?.split(';')[0]?.split('=')[1];
-  expect(raw, 'XSRF-TOKEN cookie').to.be.a('string');
-  return decodeURIComponent(raw!);
-}
-
 Cypress.Commands.add('login', (email = 'alex@fiscalnorth.local', password = 'demo1234') => {
   cy.session(
     [email, password],
     () => {
-      cy.request('GET', '/api/auth/csrf').then((csrfResponse) => {
-        const csrfToken = csrfTokenFromResponse(csrfResponse);
-        cy.request({
-          method: 'POST',
-          url: '/api/auth/login',
-          body: { email, password },
-          headers: { 'X-XSRF-TOKEN': csrfToken },
-        }).its('status').should('eq', 200);
-      });
+      cy.visit('/login');
+      cy.window().then((win) =>
+        win.fetch('/api/auth/csrf', { credentials: 'include' }).then((response) => {
+          expect(response.status).to.eq(204);
+        }),
+      );
+      cy.get('#login-email', { timeout: 15000 }).should('be.visible').clear().type(email);
+      cy.get('#login-password').clear().type(password, { log: false });
+      cy.get('form.auth-form button[type="submit"]').click();
+      cy.url({ timeout: 15000 }).should('not.include', '/login');
     },
     {
       validate() {
