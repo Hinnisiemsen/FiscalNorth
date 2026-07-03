@@ -1,0 +1,1 @@
+-- Test profile: no demo seed (see application-test.properties)

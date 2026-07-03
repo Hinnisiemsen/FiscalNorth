@@ -23,7 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.security.web.csrf.CsrfToken;
+import de.fiscalnorth.auth.dto.CsrfTokenResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -98,8 +98,8 @@ public class AuthController {
     }
 
     @GetMapping("/csrf")
-    public ResponseEntity<Void> csrf(CsrfToken token) {
-        return ResponseEntity.noContent().build();
+    public CsrfTokenResponse csrf(org.springframework.security.web.csrf.CsrfToken token) {
+        return new CsrfTokenResponse(token.getToken(), token.getHeaderName());
     }
 
     private void authenticateSession(String email, String password,

@@ -12,8 +12,7 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { localeInterceptor } from './core/i18n/locale.interceptor';
-import { LanguageService } from './core/i18n/language.service';
-import { intlLocaleTag } from './core/i18n/supported-locales';
+import { intlLocaleTag, resolveInitialLocale } from './core/i18n/supported-locales';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,7 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor, localeInterceptor])),
     provideTranslateHttpLoader({
-      prefix: './assets/i18n/',
+      prefix: '/assets/i18n/',
       suffix: '.json',
     }),
     importProvidersFrom(
@@ -30,11 +29,9 @@ export const appConfig: ApplicationConfig = {
         defaultLanguage: 'en',
       }),
     ),
-    LanguageService,
     {
       provide: LOCALE_ID,
-      useFactory: (language: LanguageService) => intlLocaleTag(language.current()),
-      deps: [LanguageService],
+      useFactory: () => intlLocaleTag(resolveInitialLocale()),
     },
   ],
 };

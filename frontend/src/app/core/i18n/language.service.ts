@@ -1,4 +1,4 @@
-import { Injectable, LOCALE_ID, inject, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import {
   AppLocale,
@@ -12,7 +12,6 @@ import {
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
   private readonly translate = inject(TranslateService);
-  private readonly localeId = inject(LOCALE_ID, { optional: true });
 
   readonly current = signal<AppLocale>(resolveInitialLocale());
 
@@ -31,9 +30,6 @@ export class LanguageService {
     localStorage.setItem(LOCALE_STORAGE_KEY, code);
     this.translate.use(code);
     this.syncDocument(code);
-    if (this.localeId && typeof this.localeId === 'string') {
-      // LOCALE_ID is provided via factory in app.config
-    }
   }
 
   intlLocale(): string {

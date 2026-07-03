@@ -83,4 +83,34 @@ class ActionPayloadValidatorTest {
     void nullActions_returnsEmptyList() {
         assertThat(validator.validateAndNormalize(null)).isEmpty();
     }
+
+    @Test
+    void validateGoal_normalizesPayload() {
+        ProposedAction input = new ProposedAction(
+                ProposedActionType.CREATE_GOAL,
+                "short",
+                Map.of(
+                        "name", " Notgroschen ",
+                        "goalType", "emergency_fund",
+                        "targetAmount", 5000,
+                        "targetDate", "2027-06-01",
+                        "monthlyContribution", 200));
+
+        List<ProposedAction> result = validator.validateAndNormalize(List.of(input));
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).payload().get("name")).isEqualTo("Notgroschen");
+        assertThat(result.get(0).payload().get("goalType")).isEqualTo("EMERGENCY_FUND");
+        assertThat(result.get(0).payload().get("targetAmount")).isEqualTo(new BigDecimal("5000"));
+    }
+
+    @Test
+    void validateGoal_rejectsInvalidType() {
+        ProposedAction input = new ProposedAction(
+                ProposedActionType.CREATE_GOAL,
+                "goal",
+                Map.of("name", "Test", "goalType", "INVALID", "targetAmount", 100));
+
+        assertThat(validator.validateAndNormalize(List.of(input))).isEmpty();
+    }
 }

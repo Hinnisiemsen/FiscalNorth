@@ -1,4 +1,5 @@
-export type DashboardPanel = 'fazit' | 'monat' | 'kategorien' | 'verlauf' | 'budgets' | 'hinweise';
+export type DashboardPanel =
+  'fazit' | 'monat' | 'kategorien' | 'verlauf' | 'budgets' | 'goals' | 'hinweise';
 
 export type AskContext = DashboardPanel | 'general' | 'analysis';
 
@@ -62,6 +63,12 @@ export const ASK_CONTEXTS: Record<AskContext, AskContextConfig> = {
     buildQuery: (period) =>
       `Prüfe meine aktiven Budgets in ${period} und sage mir, wo Handlungsbedarf ist.`,
     buildAnalysisQuery: (period) => panelAnalysis('Budgets', period),
+  },
+  goals: {
+    placeholder: 'Frage zu Finanzzielen…',
+    suggestions: ['Bin ich im Plan?', 'Wie viel soll ich monatlich sparen?'],
+    buildQuery: () => `Wie stehe ich bei meinen Finanzzielen und was soll ich als Nächstes tun?`,
+    buildAnalysisQuery: (period) => panelAnalysis('Finanzziele', period),
   },
   hinweise: {
     placeholder: 'Frage zu Hinweisen…',

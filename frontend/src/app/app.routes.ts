@@ -17,6 +17,9 @@ import { BankSyncComponent } from './bank-sync/bank-sync.component';
 import { BankSyncCallbackComponent } from './bank-sync/bank-sync-callback.component';
 import { AssistantComponent } from './assistant/assistant.component';
 import { NotificationsComponent } from './notifications/notifications.component';
+import { GoalListComponent } from './goals/goal-list.component';
+import { GoalInterviewComponent } from './goals/goal-interview.component';
+import { GoalDetailComponent } from './goals/goal-detail.component';
 import { LoginComponent } from './auth/login.component';
 import { AccountSettingsComponent } from './account/account-settings.component';
 import { authGuard } from './core/guards/auth.guard';
@@ -81,6 +84,17 @@ export const routes: Routes = [
         path: 'budgets/new',
         component: BudgetCreateComponent,
         data: { titleKey: 'routes.newBudget' },
+      },
+      { path: 'goals', component: GoalListComponent, data: { titleKey: 'routes.goals' } },
+      {
+        path: 'goals/new',
+        component: GoalInterviewComponent,
+        data: { titleKey: 'routes.newGoal' },
+      },
+      {
+        path: 'goals/:id',
+        component: GoalDetailComponent,
+        data: { titleKey: 'routes.goalDetail' },
       },
       { path: 'bank-sync', component: BankSyncComponent, data: { titleKey: 'routes.bankSync' } },
       {

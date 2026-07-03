@@ -66,7 +66,85 @@ jobs:
             -Dpackaging=jar
 
       - name: Integration tests
-        run: ./mvnw -B verify -DskipTests
+        run: ./mvnw -B verify -Dsurefire.skip=true
+
+  e2e-integration:
+    name: E2E integration (Cypress)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start stack
+        run: docker compose up -d --build
+
+      - name: Wait for backend API
+        run: |
+          for attempt in $(seq 1 60); do
+            if curl -sf http://localhost:8080/api/auth/status | grep -q '"authenticated"'; then
+              echo "Backend is ready."
+              exit 0
+            fi
+            echo "Waiting for backend (attempt ${attempt}/60)..."
+            sleep 5
+          done
+          echo "Backend did not become ready in time."
+          docker compose ps
+          docker compose logs backend
+          exit 1
+
+      - name: Wait for frontend
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl -sf http://localhost:3000/ | grep -qi '<html'; then
+              echo "Frontend is ready."
+              exit 0
+            fi
+            echo "Waiting for frontend (attempt ${attempt}/30)..."
+            sleep 3
+          done
+          docker compose logs frontend
+          exit 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Install Cypress binary
+        run: npx cypress install
+        working-directory: frontend
+
+      - name: Install Chrome
+        run: sudo apt-get update && sudo apt-get install -y google-chrome-stable
+
+      - name: Run Cypress E2E tests
+        run: npm run e2e:ci
+        working-directory: frontend
+        env:
+          CYPRESS_BASE_URL: http://localhost:3000
+
+      - name: Upload Cypress screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: frontend/cypress/screenshots
+          if-no-files-found: ignore
+
+      - name: Dump logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Tear down stack
+        if: always()
+        run: docker compose down -v
 
   frontend:
     name: Frontend (Angular)
@@ -126,6 +204,13 @@ jobs:
       - name: Smoke test frontend and API proxy
         run: |
           curl -sf http://localhost:3000/ | grep -qi '<html'
+          curl -sf http://localhost:3000/login | grep -qi '<html'
+          curl -sf http://localhost:3000/assets/i18n/en.json | grep -qi '"routes"'
+          curl -sf http://localhost:3000/api/auth/csrf | grep -q '"token"'
+          CSRF=$(curl -sf -c /tmp/fn-cookies http://localhost:3000/api/auth/csrf)
+          TOKEN=$(python3 -c "import json,sys; print(json.load(sys.stdin)['token'])" <<< "$CSRF")
+          HEADER=$(python3 -c "import json,sys; print(json.load(sys.stdin)['headerName'])" <<< "$CSRF")
+          curl -sf -b /tmp/fn-cookies -H "Content-Type: application/json" -H "${HEADER}: ${TOKEN}" -d '{"email":"alex@fiscalnorth.local","password":"demo1234"}' http://localhost:3000/api/auth/login | grep -q 'alex@fiscalnorth.local'
           curl -sf http://localhost:8080/api/auth/status | grep -q '"authenticated":false'
           curl -sf http://localhost:3000/api/auth/status | grep -q '"authenticated":false'
 

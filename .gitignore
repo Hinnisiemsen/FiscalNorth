@@ -32,6 +32,11 @@ build/
 ### VS Code ###
 .vscode/
 
+### Cypress ###
+frontend/cypress/screenshots/
+frontend/cypress/videos/
+frontend/cypress/downloads/
+
 ### Local secrets (never commit) ###
 backend/src/main/resources/application-local.properties
 .env

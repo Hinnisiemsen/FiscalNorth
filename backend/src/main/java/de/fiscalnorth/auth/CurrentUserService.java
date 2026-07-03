@@ -19,7 +19,7 @@ public class CurrentUserService {
                 || !(authentication.getPrincipal() instanceof AppUserPrincipal principal)) {
             throw new UnauthorizedException();
         }
-        return userRepository.findById(principal.getUser().getId())
+        return userRepository.findById(principal.getUserId())
                 .orElseThrow(UnauthorizedException::new);
     }
 

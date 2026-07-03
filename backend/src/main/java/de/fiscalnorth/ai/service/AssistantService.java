@@ -68,7 +68,7 @@ public class AssistantService {
                   "reply": "...",
                   "actions": [
                     {
-                      "type": "CREATE_BUDGET|CREATE_CATEGORY|CREATE_TRANSACTION",
+                      "type": "CREATE_BUDGET|CREATE_CATEGORY|CREATE_TRANSACTION|CREATE_GOAL",
                       "summary": "Vollständiger Satz auf Deutsch",
                       "payload": { }
                     }
@@ -86,6 +86,7 @@ public class AssistantService {
                 CREATE_BUDGET: name, limit (number), startDate (YYYY-MM-DD), endDate, optional categoryId
                 CREATE_CATEGORY: name, transactionType (Expense|Income)
                 CREATE_TRANSACTION: amount, description, transactionDate, transactionType, optional categoryId
+                CREATE_GOAL: name, goalType (EMERGENCY_FUND|VACATION|HOME|DEBT_PAYOFF|RETIREMENT|OTHER), targetAmount (number), optional targetDate (YYYY-MM-DD), optional linkedAccountId, optional monthlyContribution
 
                 Finanzdaten:
                 """ + context;
