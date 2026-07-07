@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.fiscalnorth.ai.client.GeminiClient;
 import de.fiscalnorth.ai.config.AiProperties;
+import de.fiscalnorth.billing.model.PremiumFeature;
+import de.fiscalnorth.billing.service.EntitlementService;
 import de.fiscalnorth.notification.model.NotificationSeverity;
 import de.fiscalnorth.notification.model.NotificationType;
 import de.fiscalnorth.notification.service.NotificationService;
@@ -33,6 +35,7 @@ public class FinancialOptimizationService {
     private final UserRepository userRepository;
     private final AiProperties aiProperties;
     private final ObjectMapper objectMapper;
+    private final EntitlementService entitlementService;
 
     @Value("${spring.ai.google.genai.api-key:}")
     private String apiKey;
@@ -48,6 +51,9 @@ public class FinancialOptimizationService {
         }
         int totalCreated = 0;
         for (var user : userRepository.findAll()) {
+            if (!entitlementService.hasFeature(user, PremiumFeature.AI_NOTIFICATIONS)) {
+                continue;
+            }
             totalCreated += runOptimizationPassForOwner(user.getId());
         }
         return totalCreated;

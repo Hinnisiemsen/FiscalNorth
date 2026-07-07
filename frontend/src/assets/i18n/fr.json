@@ -33,7 +33,54 @@
     "bankSyncCallback": "Synchronisation bancaire",
     "categories": "Catégories",
     "newCategory": "Nouvelle catégorie",
-    "accountSettings": "Compte"
+    "accountSettings": "Compte",
+    "upgrade": "Passer à Premium"
+  },
+  "billing": {
+    "subscriptionSection": "Abonnement",
+    "currentPlan": "Forfait actuel",
+    "status": "Statut",
+    "trialEnds": "Fin de l'essai",
+    "renewsOn": "Renouvellement le",
+    "cancelScheduled": "Votre abonnement sera annulé à la fin de la période en cours.",
+    "upgradeCta": "Passer à Premium",
+    "manageBilling": "Gérer la facturation",
+    "upgradeTitle": "Passer à Premium",
+    "freePlan": "Gratuit",
+    "premiumPlan": "Premium",
+    "freePrice": "0 €",
+    "premiumBadge": "Premium",
+    "monthly": "Mensuel",
+    "yearly": "Annuel",
+    "trialNote": "Essai gratuit de {{days}} jours",
+    "checkoutSuccess": "Bienvenue dans Premium ! Votre abonnement est en cours d'activation.",
+    "checkoutCanceled": "Paiement annulé. Vous pouvez upgrader à tout moment.",
+    "checkoutFailed": "Impossible de démarrer le paiement.",
+    "checkoutUnavailable": "Aucun forfait de facturation configuré.",
+    "portalFailed": "Impossible d'ouvrir le portail de facturation.",
+    "notConfigured": "La facturation n'est pas configurée dans cet environnement.",
+    "redirecting": "Redirection…",
+    "alreadyPremium": "Vous avez déjà Premium",
+    "alreadyPremiumHint": "Gérez votre abonnement depuis le compte.",
+    "backToAccount": "Retour au compte",
+    "freeFeature": {
+      "core": "Comptes, transactions, budgets et objectifs",
+      "manual": "Saisie manuelle des données",
+      "csv": "Import CSV"
+    },
+    "features": {
+      "aiAssistant": "Assistant IA pour questions et actions financières",
+      "aiGoalPlanner": "Planificateur d'épargne IA",
+      "bankSync": "Synchronisation bancaire en direct (PSD2)",
+      "aiNotifications": "Alertes budget et insights IA proactifs"
+    },
+    "paywall": {
+      "title": "Fonction Premium",
+      "default": "Passez à Premium pour débloquer cette fonction.",
+      "assistant": "Obtenez des réponses personnalisées, des recommandations et des actions rapides.",
+      "bankSync": "Connectez vos comptes bancaires via PSD2 et synchronisez les transactions.",
+      "goalPlanner": "Laissez l'IA créer un plan d'épargne adapté à vos objectifs."
+    }
   },
   "auth": {
     "title": "Bienvenue sur Fiscal North",

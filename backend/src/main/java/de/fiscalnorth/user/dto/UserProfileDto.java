@@ -1,5 +1,6 @@
 package de.fiscalnorth.user.dto;
 
+import de.fiscalnorth.billing.dto.SubscriptionSummaryDto;
 import de.fiscalnorth.user.model.AuthProvider;
 
 public record UserProfileDto(
@@ -8,6 +9,7 @@ public record UserProfileDto(
         String email,
         String avatarUrl,
         AuthProvider authProvider,
-        String locale
+        String locale,
+        SubscriptionSummaryDto subscription
 ) {
 }

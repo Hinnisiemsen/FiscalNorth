@@ -2,6 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BankSyncService } from '../core/services/bank-sync.service';
+import { EntitlementService } from '../core/services/entitlement.service';
+import { PaywallBannerComponent } from '../shared/paywall-banner.component';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
 import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 import { LanguageService } from '../core/i18n/language.service';
@@ -9,18 +11,23 @@ import { LanguageService } from '../core/i18n/language.service';
 @Component({
   selector: 'app-bank-sync',
   standalone: true,
-  imports: [CommonModule, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
+  imports: [CommonModule, PaywallBannerComponent, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './bank-sync.component.html',
   styleUrl: './bank-sync.component.css',
 })
 export class BankSyncComponent implements OnInit {
   private readonly lang = inject(LanguageService);
+  private readonly entitlementService = inject(EntitlementService);
 
   status: { available: boolean; message: string } | null = null;
   consents: Array<{ id: number; consentId: string; status: string; validUntil: string }> = [];
   loading = false;
   error = '';
   redirectUrl = '';
+
+  get showPaywall(): boolean {
+    return !this.entitlementService.hasFeature('BANK_SYNC');
+  }
 
   constructor(
     private bankSyncService: BankSyncService,

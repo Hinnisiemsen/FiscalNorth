@@ -19,7 +19,7 @@ describe('Financial goals', () => {
     cy.contains('.progress-percent', /%$/);
   });
 
-  it('starts the goal interview wizard', () => {
+  it('starts the goal interview wizard and shows premium paywall for AI plan', () => {
     cy.visit('/goals/new');
     cy.get('.wizard', { timeout: 15000 }).should('be.visible');
     cy.get('.priority-chip').first().click();
@@ -29,7 +29,7 @@ describe('Financial goals', () => {
     cy.get('input[name="monthly"]').should('be.visible').clear().type('250').blur();
     cy.get('.wizard-actions .btn-primary').should('not.be.disabled').click();
     cy.get('.wizard-actions .btn-primary').click();
-    cy.contains('.plan-summary', /.+/, { timeout: 15000 });
-    cy.get('.recommended-card').should('have.length.at.least', 1);
+    cy.get('app-paywall-banner', { timeout: 15000 }).should('be.visible');
+    cy.contains('app-paywall-banner', /Premium/i);
   });
 });

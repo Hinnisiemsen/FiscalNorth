@@ -35,4 +35,7 @@ public class User extends BaseEntity {
     protected String avatarUrl;
 
     protected String locale = "en";
+
+    @Column(unique = true)
+    protected String stripeCustomerId;
 }

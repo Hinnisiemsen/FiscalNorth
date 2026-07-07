@@ -4,6 +4,9 @@ import de.fiscalnorth.ai.dto.AssistantStatusDto;
 import de.fiscalnorth.ai.dto.ChatRequest;
 import de.fiscalnorth.ai.dto.ChatResponse;
 import de.fiscalnorth.ai.service.AssistantService;
+import de.fiscalnorth.auth.CurrentUserService;
+import de.fiscalnorth.billing.model.PremiumFeature;
+import de.fiscalnorth.billing.service.EntitlementService;
 import de.fiscalnorth.shared.Messages;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +24,22 @@ public class AssistantController {
 
     private final AssistantService assistantService;
     private final Messages messages;
+    private final CurrentUserService currentUserService;
+    private final EntitlementService entitlementService;
 
     @GetMapping("/status")
     public ResponseEntity<AssistantStatusDto> status() {
-        boolean available = assistantService.isAvailable();
-        String message = available
-                ? messages.get("assistant.status.ready")
-                : messages.get("assistant.status.unavailable");
-        return ResponseEntity.ok(new AssistantStatusDto(available, message));
+        if (!assistantService.isAvailable()) {
+            return ResponseEntity.ok(new AssistantStatusDto(
+                    false, messages.get("assistant.status.unavailable")));
+        }
+        if (!entitlementService.hasFeature(
+                currentUserService.getCurrentUser(), PremiumFeature.AI_ASSISTANT)) {
+            return ResponseEntity.ok(new AssistantStatusDto(
+                    false, messages.get("assistant.status.premiumRequired")));
+        }
+        return ResponseEntity.ok(new AssistantStatusDto(
+                true, messages.get("assistant.status.ready")));
     }
 
     @PostMapping("/chat")

@@ -42,16 +42,16 @@ export class LayoutComponent implements OnInit, OnDestroy {
   private countSub?: Subscription;
 
   menuItems = [
-    { labelKey: 'nav.dashboard', path: '/', icon: 'dashboard' },
-    { labelKey: 'nav.assistant', path: '/assistant', icon: 'auto_awesome' },
-    { labelKey: 'nav.transactions', path: '/transactions', icon: 'receipt_long' },
-    { labelKey: 'nav.import', path: '/transactions/import', icon: 'upload' },
-    { labelKey: 'nav.contracts', path: '/contracts', icon: 'description' },
-    { labelKey: 'nav.budgets', path: '/budgets', icon: 'pie_chart' },
-    { labelKey: 'nav.goals', path: '/goals', icon: 'savings' },
-    { labelKey: 'nav.accounts', path: '/accounts', icon: 'account_balance' },
-    { labelKey: 'nav.bankSync', path: '/bank-sync', icon: 'link' },
-    { labelKey: 'nav.categories', path: '/categories', icon: 'category' },
+    { labelKey: 'nav.dashboard', path: '/', icon: 'dashboard', premium: false },
+    { labelKey: 'nav.assistant', path: '/assistant', icon: 'auto_awesome', premium: true },
+    { labelKey: 'nav.transactions', path: '/transactions', icon: 'receipt_long', premium: false },
+    { labelKey: 'nav.import', path: '/transactions/import', icon: 'upload', premium: false },
+    { labelKey: 'nav.contracts', path: '/contracts', icon: 'description', premium: false },
+    { labelKey: 'nav.budgets', path: '/budgets', icon: 'pie_chart', premium: false },
+    { labelKey: 'nav.goals', path: '/goals', icon: 'savings', premium: false },
+    { labelKey: 'nav.accounts', path: '/accounts', icon: 'account_balance', premium: false },
+    { labelKey: 'nav.bankSync', path: '/bank-sync', icon: 'link', premium: true },
+    { labelKey: 'nav.categories', path: '/categories', icon: 'category', premium: false },
   ];
 
   constructor(private notificationService: NotificationService) {}

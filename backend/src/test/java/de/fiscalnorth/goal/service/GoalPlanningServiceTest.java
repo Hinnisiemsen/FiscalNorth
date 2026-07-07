@@ -36,7 +36,12 @@ class GoalPlanningServiceTest {
     @BeforeEach
     void setUp() {
         service = new GoalPlanningService(
-                geminiClient, financialContextService, aiProperties, new ObjectMapper());
+                geminiClient,
+                financialContextService,
+                aiProperties,
+                new ObjectMapper(),
+                org.mockito.Mockito.mock(de.fiscalnorth.auth.CurrentUserService.class),
+                org.mockito.Mockito.mock(de.fiscalnorth.billing.service.EntitlementService.class));
     }
 
     @Test

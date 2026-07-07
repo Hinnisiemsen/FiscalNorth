@@ -4,6 +4,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import de.fiscalnorth.ai.AiDisabledException;
 import de.fiscalnorth.auth.UnauthorizedException;
+import de.fiscalnorth.billing.BillingUnavailableException;
+import de.fiscalnorth.billing.PremiumRequiredException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +63,22 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return apiError(HttpStatus.SERVICE_UNAVAILABLE, messages.get("error.ai.disabled"), request);
+    }
+
+    @ExceptionHandler(PremiumRequiredException.class)
+    public ResponseEntity<ApiError> handlePremiumRequired(
+            PremiumRequiredException ex,
+            HttpServletRequest request
+    ) {
+        return apiError(HttpStatus.FORBIDDEN, messages.get("error.premium.required"), request);
+    }
+
+    @ExceptionHandler(BillingUnavailableException.class)
+    public ResponseEntity<ApiError> handleBillingUnavailable(
+            BillingUnavailableException ex,
+            HttpServletRequest request
+    ) {
+        return apiError(HttpStatus.SERVICE_UNAVAILABLE, messages.get("error.billing.unavailable"), request);
     }
 
     @ExceptionHandler(LocalizedException.class)

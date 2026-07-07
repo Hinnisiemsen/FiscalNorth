@@ -383,3 +383,32 @@
     display: none !important;
   }
 }
+
+.premium-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent, #6366f1);
+}
+
+.rail-link {
+  position: relative;
+}
+
+.premium-tag {
+  margin-left: auto;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-accent, #6366f1);
+}
+
+.drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

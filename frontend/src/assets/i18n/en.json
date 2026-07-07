@@ -33,7 +33,54 @@
     "bankSyncCallback": "Bank sync",
     "categories": "Categories",
     "newCategory": "New category",
-    "accountSettings": "Account"
+    "accountSettings": "Account",
+    "upgrade": "Upgrade to Premium"
+  },
+  "billing": {
+    "subscriptionSection": "Subscription",
+    "currentPlan": "Current plan",
+    "status": "Status",
+    "trialEnds": "Trial ends",
+    "renewsOn": "Renews on",
+    "cancelScheduled": "Your subscription will cancel at the end of the current period.",
+    "upgradeCta": "Upgrade to Premium",
+    "manageBilling": "Manage billing",
+    "upgradeTitle": "Upgrade to Premium",
+    "freePlan": "Free",
+    "premiumPlan": "Premium",
+    "freePrice": "€0",
+    "premiumBadge": "Premium",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "trialNote": "{{days}}-day free trial included",
+    "checkoutSuccess": "Welcome to Premium! Your subscription is being activated.",
+    "checkoutCanceled": "Checkout was canceled. You can upgrade anytime.",
+    "checkoutFailed": "Could not start checkout. Please try again.",
+    "checkoutUnavailable": "No billing plan is configured.",
+    "portalFailed": "Could not open billing portal.",
+    "notConfigured": "Billing is not configured in this environment.",
+    "redirecting": "Redirecting…",
+    "alreadyPremium": "You already have Premium",
+    "alreadyPremiumHint": "Manage your subscription from account settings.",
+    "backToAccount": "Back to account",
+    "freeFeature": {
+      "core": "Accounts, transactions, budgets, and goals",
+      "manual": "Manual data entry and tracking",
+      "csv": "CSV import"
+    },
+    "features": {
+      "aiAssistant": "AI assistant for financial questions and actions",
+      "aiGoalPlanner": "AI-powered savings goal planner",
+      "bankSync": "Live bank sync (PSD2)",
+      "aiNotifications": "Proactive AI budget alerts and insights"
+    },
+    "paywall": {
+      "title": "Premium feature",
+      "default": "Upgrade to Premium to unlock this feature.",
+      "assistant": "Get personalized AI answers, recommendations, and quick actions for your finances.",
+      "bankSync": "Connect your bank accounts securely via PSD2 and sync transactions automatically.",
+      "goalPlanner": "Let AI build a tailored savings plan based on your goals and financial data."
+    }
   },
   "auth": {
     "title": "Welcome to Fiscal North",

@@ -51,6 +51,13 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-local-dev-placeholder}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-local-dev-placeholder}
       APP_AUTH_FRONTEND_URL: http://localhost:3000
+      STRIPE_ENABLED: ${STRIPE_ENABLED:-false}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_ID_MONTHLY: ${STRIPE_PRICE_ID_MONTHLY:-}
+      STRIPE_PRICE_ID_YEARLY: ${STRIPE_PRICE_ID_YEARLY:-}
+      STRIPE_TRIAL_DAYS: ${STRIPE_TRIAL_DAYS:-14}
+      STRIPE_PAST_DUE_GRACE_DAYS: ${STRIPE_PAST_DUE_GRACE_DAYS:-3}
       SPRING_AUTOCONFIGURE_EXCLUDE: org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
     depends_on:
       postgres:
