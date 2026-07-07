@@ -1,6 +1,8 @@
 package de.fiscalnorth.ai.job;
 
 import de.fiscalnorth.ai.config.AiCronProperties;
+import de.fiscalnorth.billing.model.PremiumFeature;
+import de.fiscalnorth.billing.service.EntitlementService;
 import de.fiscalnorth.budget.dto.BudgetWithUsage;
 import de.fiscalnorth.budget.service.BudgetService;
 import de.fiscalnorth.notification.dto.NotificationDto;
@@ -41,6 +43,9 @@ class BudgetAlertCronJobTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private EntitlementService entitlementService;
+
     private BudgetAlertCronJob budgetAlertCronJob;
 
     @BeforeEach
@@ -48,7 +53,7 @@ class BudgetAlertCronJobTest {
         System.setProperty("fiscalnorth.default-locale", "en");
         AiCronProperties cronProperties = new AiCronProperties(true, null, null, null, null, 30);
         budgetAlertCronJob = new BudgetAlertCronJob(
-                cronProperties, budgetService, notificationService, TestMessages.create(), userRepository);
+                cronProperties, budgetService, notificationService, TestMessages.create(), userRepository, entitlementService);
     }
 
     @AfterEach
@@ -68,6 +73,7 @@ class BudgetAlertCronJobTest {
         LocalDate start = LocalDate.now().withDayOfMonth(1);
         LocalDate end = start.plusMonths(1).minusDays(1);
         when(userRepository.findAll()).thenReturn(List.of(user));
+        when(entitlementService.hasFeature(user, PremiumFeature.AI_NOTIFICATIONS)).thenReturn(true);
         when(budgetService.getBudgetsWithUsageForOwner(1L)).thenReturn(List.of(
                 new BudgetWithUsage(
                         1L,

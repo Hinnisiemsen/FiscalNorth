@@ -33,7 +33,54 @@
     "bankSyncCallback": "Sincronización bancaria",
     "categories": "Categorías",
     "newCategory": "Nueva categoría",
-    "accountSettings": "Cuenta"
+    "accountSettings": "Cuenta",
+    "upgrade": "Mejorar a Premium"
+  },
+  "billing": {
+    "subscriptionSection": "Suscripción",
+    "currentPlan": "Plan actual",
+    "status": "Estado",
+    "trialEnds": "Fin de prueba",
+    "renewsOn": "Renueva el",
+    "cancelScheduled": "Tu suscripción se cancelará al final del periodo actual.",
+    "upgradeCta": "Mejorar a Premium",
+    "manageBilling": "Gestionar facturación",
+    "upgradeTitle": "Mejorar a Premium",
+    "freePlan": "Gratis",
+    "premiumPlan": "Premium",
+    "freePrice": "0 €",
+    "premiumBadge": "Premium",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "trialNote": "Prueba gratuita de {{days}} días",
+    "checkoutSuccess": "¡Bienvenido a Premium! Tu suscripción se está activando.",
+    "checkoutCanceled": "Pago cancelado. Puedes mejorar cuando quieras.",
+    "checkoutFailed": "No se pudo iniciar el pago.",
+    "checkoutUnavailable": "No hay plan de facturación configurado.",
+    "portalFailed": "No se pudo abrir el portal de facturación.",
+    "notConfigured": "La facturación no está configurada en este entorno.",
+    "redirecting": "Redirigiendo…",
+    "alreadyPremium": "Ya tienes Premium",
+    "alreadyPremiumHint": "Gestiona tu suscripción desde la cuenta.",
+    "backToAccount": "Volver a la cuenta",
+    "freeFeature": {
+      "core": "Cuentas, transacciones, presupuestos y metas",
+      "manual": "Entrada manual de datos",
+      "csv": "Importación CSV"
+    },
+    "features": {
+      "aiAssistant": "Asistente IA para preguntas y acciones financieras",
+      "aiGoalPlanner": "Planificador de ahorro con IA",
+      "bankSync": "Sincronización bancaria en vivo (PSD2)",
+      "aiNotifications": "Alertas e insights proactivos con IA"
+    },
+    "paywall": {
+      "title": "Función Premium",
+      "default": "Mejora a Premium para desbloquear esta función.",
+      "assistant": "Obtén respuestas personalizadas, recomendaciones y acciones rápidas.",
+      "bankSync": "Conecta cuentas bancarias vía PSD2 y sincroniza transacciones.",
+      "goalPlanner": "Deja que la IA cree un plan de ahorro adaptado a tus metas."
+    }
   },
   "auth": {
     "title": "Bienvenido a Fiscal North",

@@ -1,0 +1,12 @@
+<div class="paywall-banner">
+  <div class="paywall-content">
+    <span class="material-symbols-outlined paywall-icon" aria-hidden="true">workspace_premium</span>
+    <div>
+      <h3>{{ 'billing.paywall.title' | translate }}</h3>
+      <p>{{ messageKey | translate }}</p>
+    </div>
+  </div>
+  <a routerLink="/account/upgrade" class="btn-primary paywall-cta">
+    {{ 'billing.upgradeCta' | translate }}
+  </a>
+</div>

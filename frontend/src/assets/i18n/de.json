@@ -33,7 +33,54 @@
     "bankSyncCallback": "Bank-Sync",
     "categories": "Kategorien",
     "newCategory": "Neue Kategorie",
-    "accountSettings": "Konto"
+    "accountSettings": "Konto",
+    "upgrade": "Premium freischalten"
+  },
+  "billing": {
+    "subscriptionSection": "Abonnement",
+    "currentPlan": "Aktueller Plan",
+    "status": "Status",
+    "trialEnds": "Testphase endet",
+    "renewsOn": "Verlängert am",
+    "cancelScheduled": "Dein Abonnement endet am Ende der aktuellen Periode.",
+    "upgradeCta": "Premium freischalten",
+    "manageBilling": "Abrechnung verwalten",
+    "upgradeTitle": "Premium freischalten",
+    "freePlan": "Kostenlos",
+    "premiumPlan": "Premium",
+    "freePrice": "0 €",
+    "premiumBadge": "Premium",
+    "monthly": "Monatlich",
+    "yearly": "Jährlich",
+    "trialNote": "{{days}} Tage kostenlos testen",
+    "checkoutSuccess": "Willkommen bei Premium! Dein Abonnement wird aktiviert.",
+    "checkoutCanceled": "Checkout abgebrochen. Du kannst jederzeit upgraden.",
+    "checkoutFailed": "Checkout konnte nicht gestartet werden.",
+    "checkoutUnavailable": "Kein Abrechnungsplan konfiguriert.",
+    "portalFailed": "Abrechnungsportal konnte nicht geöffnet werden.",
+    "notConfigured": "Abrechnung ist in dieser Umgebung nicht konfiguriert.",
+    "redirecting": "Weiterleitung…",
+    "alreadyPremium": "Du hast bereits Premium",
+    "alreadyPremiumHint": "Verwalte dein Abonnement in den Kontoeinstellungen.",
+    "backToAccount": "Zurück zum Konto",
+    "freeFeature": {
+      "core": "Konten, Transaktionen, Budgets und Ziele",
+      "manual": "Manuelle Datenerfassung",
+      "csv": "CSV-Import"
+    },
+    "features": {
+      "aiAssistant": "KI-Assistent für Finanzfragen und Aktionen",
+      "aiGoalPlanner": "KI-Sparplaner für Finanzziele",
+      "bankSync": "Live Bank-Sync (PSD2)",
+      "aiNotifications": "Proaktive KI-Budgetwarnungen und Insights"
+    },
+    "paywall": {
+      "title": "Premium-Funktion",
+      "default": "Upgrade auf Premium, um diese Funktion freizuschalten.",
+      "assistant": "Erhalte personalisierte KI-Antworten, Empfehlungen und Schnellaktionen.",
+      "bankSync": "Verbinde Bankkonten per PSD2 und synchronisiere Transaktionen automatisch.",
+      "goalPlanner": "Lass die KI einen Sparplan basierend auf deinen Zielen erstellen."
+    }
   },
   "auth": {
     "title": "Willkommen bei Fiscal North",

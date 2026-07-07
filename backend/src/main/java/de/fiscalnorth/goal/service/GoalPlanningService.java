@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.fiscalnorth.ai.client.GeminiClient;
 import de.fiscalnorth.ai.config.AiProperties;
 import de.fiscalnorth.ai.service.FinancialContextService;
+import de.fiscalnorth.auth.CurrentUserService;
+import de.fiscalnorth.billing.model.PremiumFeature;
+import de.fiscalnorth.billing.service.EntitlementService;
 import de.fiscalnorth.goal.dto.GoalPlanResponse;
 import de.fiscalnorth.goal.dto.RecommendedGoalDto;
 import de.fiscalnorth.goal.model.GoalType;
@@ -32,6 +35,8 @@ public class GoalPlanningService {
     private final FinancialContextService financialContextService;
     private final AiProperties aiProperties;
     private final ObjectMapper objectMapper;
+    private final CurrentUserService currentUserService;
+    private final EntitlementService entitlementService;
 
     @Value("${spring.ai.google.genai.api-key:}")
     private String apiKey;
@@ -40,6 +45,8 @@ public class GoalPlanningService {
         if (!isAvailable()) {
             return buildFallbackPlan(answers);
         }
+        entitlementService.requireFeature(
+                currentUserService.getCurrentUser(), PremiumFeature.AI_GOAL_PLANNER);
 
         String context = financialContextService.buildContextSnapshot();
         String systemPrompt = """

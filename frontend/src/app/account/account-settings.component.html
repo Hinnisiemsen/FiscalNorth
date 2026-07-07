@@ -2,6 +2,58 @@
   <app-page-header [heading]="'auth.accountSettings' | translate" />
 
   <div class="settings-grid">
+    <section class="card-glass settings-card subscription-card">
+      <h2>{{ 'billing.subscriptionSection' | translate }}</h2>
+      @if (checkoutSuccess) {
+        <p class="success-text">{{ 'billing.checkoutSuccess' | translate }}</p>
+      }
+      <p class="readonly-field">
+        <strong>{{ 'billing.currentPlan' | translate }}:</strong>
+        {{
+          isPremium ? ('billing.premiumPlan' | translate) : ('billing.freePlan' | translate)
+        }}
+      </p>
+      @if (subscription.status !== 'NONE') {
+        <p class="readonly-field">
+          <strong>{{ 'billing.status' | translate }}:</strong> {{ subscription.status }}
+        </p>
+      }
+      @if (subscription.trialEnd) {
+        <p class="readonly-field">
+          <strong>{{ 'billing.trialEnds' | translate }}:</strong>
+          {{ subscription.trialEnd | date: 'mediumDate' }}
+        </p>
+      }
+      @if (subscription.currentPeriodEnd) {
+        <p class="readonly-field">
+          <strong>{{ 'billing.renewsOn' | translate }}:</strong>
+          {{ subscription.currentPeriodEnd | date: 'mediumDate' }}
+        </p>
+      }
+      @if (subscription.cancelAtPeriodEnd) {
+        <p class="notice-text">{{ 'billing.cancelScheduled' | translate }}</p>
+      }
+      <div class="subscription-actions">
+        @if (!isPremium) {
+          <a routerLink="/account/upgrade" class="btn-primary">{{
+            'billing.upgradeCta' | translate
+          }}</a>
+        } @else if (billingEnabled) {
+          <button
+            type="button"
+            class="btn-secondary"
+            [disabled]="billingLoading"
+            (click)="openPortal()"
+          >
+            {{ 'billing.manageBilling' | translate }}
+          </button>
+        }
+      </div>
+      @if (billingError) {
+        <p class="error-text">{{ billingError | translate }}</p>
+      }
+    </section>
+
     <section class="card-glass settings-card">
       <h2>{{ 'auth.profileSection' | translate }}</h2>
       @if (user?.avatarUrl) {

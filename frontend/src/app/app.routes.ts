@@ -22,6 +22,7 @@ import { GoalInterviewComponent } from './goals/goal-interview.component';
 import { GoalDetailComponent } from './goals/goal-detail.component';
 import { LoginComponent } from './auth/login.component';
 import { AccountSettingsComponent } from './account/account-settings.component';
+import { UpgradeComponent } from './account/upgrade.component';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -42,6 +43,11 @@ export const routes: Routes = [
         path: 'account',
         component: AccountSettingsComponent,
         data: { titleKey: 'routes.account' },
+      },
+      {
+        path: 'account/upgrade',
+        component: UpgradeComponent,
+        data: { titleKey: 'routes.upgrade' },
       },
       { path: 'accounts', component: AccountListComponent, data: { titleKey: 'routes.accounts' } },
       {

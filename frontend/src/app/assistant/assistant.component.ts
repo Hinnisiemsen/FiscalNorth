@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AiService, ChatResponse, ProposedAction } from '../core/services/ai.service';
+import { EntitlementService } from '../core/services/entitlement.service';
 import { BudgetService } from '../core/services/budget.service';
 import { CategoryService } from '../core/services/category.service';
 import { TransactionService } from '../core/services/transaction.service';
 import { GoalService, GoalType } from '../core/services/goal.service';
 import { ActionCardComponent } from './action-card.component';
+import { PaywallBannerComponent } from '../shared/paywall-banner.component';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
 import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 import { LanguageService } from '../core/i18n/language.service';
@@ -32,6 +34,7 @@ interface MessageBlock {
     CommonModule,
     FormsModule,
     ActionCardComponent,
+    PaywallBannerComponent,
     ...PAGE_HEADER_IMPORTS,
     ...TRANSLATE_IMPORTS,
   ],
@@ -40,6 +43,7 @@ interface MessageBlock {
 })
 export class AssistantComponent implements OnInit {
   private readonly lang = inject(LanguageService);
+  private readonly entitlementService = inject(EntitlementService);
 
   readonly welcomeFollowUpKeys = [
     'assistant.welcomeExample1',
@@ -58,6 +62,10 @@ export class AssistantComponent implements OnInit {
 
   private pendingQuery: string | null = null;
   private pendingAnalysis = false;
+
+  get showPaywall(): boolean {
+    return !this.entitlementService.hasFeature('AI_ASSISTANT');
+  }
 
   constructor(
     private ai: AiService,

@@ -3,6 +3,8 @@ package de.fiscalnorth.xs2a.service;
 import de.fiscalnorth.account.model.DepositAccount;
 import de.fiscalnorth.account.repository.DepositAccountRepository;
 import de.fiscalnorth.auth.CurrentUserService;
+import de.fiscalnorth.billing.model.PremiumFeature;
+import de.fiscalnorth.billing.service.EntitlementService;
 import de.fiscalnorth.shared.Messages;
 import de.fiscalnorth.shared.SupportedCurrency;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
@@ -44,6 +46,7 @@ public class BankSyncService {
     private final PaymentTransactionRepository paymentTransactionRepository;
     private final Messages messages;
     private final CurrentUserService currentUserService;
+    private final EntitlementService entitlementService;
 
     @Autowired(required = false)
     private io.finapi.xs2a.api.AccountInformationServiceAisApi aisApi;
@@ -53,13 +56,15 @@ public class BankSyncService {
                            DepositAccountRepository depositAccountRepository,
                            PaymentTransactionRepository paymentTransactionRepository,
                            Messages messages,
-                           CurrentUserService currentUserService) {
+                           CurrentUserService currentUserService,
+                           EntitlementService entitlementService) {
         this.properties = properties;
         this.bankConsentRepository = bankConsentRepository;
         this.depositAccountRepository = depositAccountRepository;
         this.paymentTransactionRepository = paymentTransactionRepository;
         this.messages = messages;
         this.currentUserService = currentUserService;
+        this.entitlementService = entitlementService;
     }
 
     public BankSyncStatusDto getStatus() {
@@ -71,6 +76,8 @@ public class BankSyncService {
 
     @Transactional
     public CreateConsentResponseDto createConsent() {
+        entitlementService.requireFeature(
+                currentUserService.getCurrentUser(), PremiumFeature.BANK_SYNC);
         if (!properties.isEnabled() || aisApi == null) {
             return new CreateConsentResponseDto(null, null, messages.get("bankSync.notConfigured"));
         }
@@ -142,6 +149,8 @@ public class BankSyncService {
 
     @Transactional
     public String handleCallback(String consentId) {
+        entitlementService.requireFeature(
+                currentUserService.getCurrentUser(), PremiumFeature.BANK_SYNC);
         if (!properties.isEnabled() || aisApi == null) {
             return "/bank-sync?error=not_configured";
         }
@@ -170,6 +179,8 @@ public class BankSyncService {
 
     @Transactional
     public SyncResultDto sync(String consentId) {
+        entitlementService.requireFeature(
+                currentUserService.getCurrentUser(), PremiumFeature.BANK_SYNC);
         if (!properties.isEnabled() || aisApi == null) {
             return new SyncResultDto(false, 0, 0, messages.get("bankSync.notConfigured"));
         }

@@ -1,7 +1,9 @@
 <div class="assistant page-content-inner">
   <app-page-header [heading]="'routes.assistant' | translate" />
 
-  @if (setupHint && !aiAvailable) {
+  @if (showPaywall) {
+    <app-paywall-banner feature="AI_ASSISTANT" messageKey="billing.paywall.assistant" />
+  } @else if (setupHint && !aiAvailable) {
     <div class="setup-hint card-glass">
       <span class="material-symbols-outlined">info</span>
       <p>{{ setupHint }}</p>
@@ -96,14 +98,14 @@
       [(ngModel)]="inputText"
       (keydown)="onKeydown($event)"
       [placeholder]="'assistant.inputPlaceholder' | translate"
-      [disabled]="loading"
+      [disabled]="loading || showPaywall"
       [attr.aria-label]="'assistant.inputPlaceholder' | translate"
     />
     <button
       type="button"
       class="send-btn"
       (click)="send()"
-      [disabled]="loading || !inputText.trim()"
+      [disabled]="loading || !inputText.trim() || showPaywall"
       [attr.aria-label]="'askBar.send' | translate"
     >
       <span class="material-symbols-outlined">send</span>

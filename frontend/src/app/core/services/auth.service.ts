@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { UserProfile, UserService } from './user.service';
+import { EntitlementService } from './entitlement.service';
 
 export interface AuthStatus {
   authenticated: boolean;
@@ -14,6 +15,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
+  private readonly entitlementService = inject(EntitlementService);
 
   private readonly currentUserSubject = new BehaviorSubject<UserProfile | null>(null);
   readonly currentUser$ = this.currentUserSubject.asObservable();
@@ -50,7 +52,10 @@ export class AuthService {
   loadCurrentUser(): Observable<UserProfile> {
     return this.userService
       .getCurrentUser()
-      .pipe(tap((profile) => this.currentUserSubject.next(profile)));
+      .pipe(tap((profile) => {
+        this.currentUserSubject.next(profile);
+        this.entitlementService.syncFromProfile(profile);
+      }));
   }
 
   refreshSession(): Observable<UserProfile | null> {

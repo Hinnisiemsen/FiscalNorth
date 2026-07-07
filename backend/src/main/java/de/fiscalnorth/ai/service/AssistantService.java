@@ -3,6 +3,9 @@ package de.fiscalnorth.ai.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.fiscalnorth.ai.AiDisabledException;
+import de.fiscalnorth.auth.CurrentUserService;
+import de.fiscalnorth.billing.model.PremiumFeature;
+import de.fiscalnorth.billing.service.EntitlementService;
 import de.fiscalnorth.shared.Messages;
 import de.fiscalnorth.ai.client.GeminiClient;
 import de.fiscalnorth.ai.config.AiProperties;
@@ -33,6 +36,8 @@ public class AssistantService {
     private final AiProperties aiProperties;
     private final ObjectMapper objectMapper;
     private final Messages messages;
+    private final CurrentUserService currentUserService;
+    private final EntitlementService entitlementService;
 
     @Value("${spring.ai.google.genai.api-key:}")
     private String apiKey;
@@ -45,6 +50,8 @@ public class AssistantService {
         if (!isAvailable()) {
             throw new AiDisabledException();
         }
+        entitlementService.requireFeature(
+                currentUserService.getCurrentUser(), PremiumFeature.AI_ASSISTANT);
 
         String context = financialContextService.buildContextSnapshot();
         String systemPrompt = """

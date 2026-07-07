@@ -1,0 +1,72 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'billing.upgradeTitle' | translate" />
+
+  @if (checkoutCanceled) {
+    <p class="notice-text">{{ 'billing.checkoutCanceled' | translate }}</p>
+  }
+
+  @if (isPremium) {
+    <section class="card-glass upgrade-card">
+      <h2>{{ 'billing.alreadyPremium' | translate }}</h2>
+      <p>{{ 'billing.alreadyPremiumHint' | translate }}</p>
+      <a routerLink="/account" class="btn-secondary">{{ 'billing.backToAccount' | translate }}</a>
+    </section>
+  } @else {
+    <div class="upgrade-grid">
+      <section class="card-glass upgrade-card">
+        <h2>{{ 'billing.freePlan' | translate }}</h2>
+        <p class="plan-price">{{ 'billing.freePrice' | translate }}</p>
+        <ul class="feature-list">
+          <li>{{ 'billing.freeFeature.core' | translate }}</li>
+          <li>{{ 'billing.freeFeature.manual' | translate }}</li>
+          <li>{{ 'billing.freeFeature.csv' | translate }}</li>
+        </ul>
+      </section>
+
+      <section class="card-glass upgrade-card premium-card">
+        <div class="premium-badge">{{ 'billing.premiumBadge' | translate }}</div>
+        <h2>{{ 'billing.premiumPlan' | translate }}</h2>
+        <div class="interval-toggle">
+          <button
+            type="button"
+            [class.active]="selectedInterval === 'month'"
+            (click)="selectedInterval = 'month'"
+          >
+            {{ 'billing.monthly' | translate }}
+          </button>
+          <button
+            type="button"
+            [class.active]="selectedInterval === 'year'"
+            (click)="selectedInterval = 'year'"
+          >
+            {{ 'billing.yearly' | translate }}
+          </button>
+        </div>
+        @if (selectedPlan?.trialDays) {
+          <p class="trial-note">
+            {{ 'billing.trialNote' | translate: { days: selectedPlan!.trialDays } }}
+          </p>
+        }
+        <ul class="feature-list">
+          @for (featureKey of premiumFeatures; track featureKey) {
+            <li>{{ featureKey | translate }}</li>
+          }
+        </ul>
+        @if (error) {
+          <p class="error-text">{{ error | translate }}</p>
+        }
+        <button
+          type="button"
+          class="btn-primary upgrade-btn"
+          [disabled]="loading || !billingEnabled || !selectedPlan"
+          (click)="startCheckout()"
+        >
+          {{ loading ? ('billing.redirecting' | translate) : ('billing.upgradeCta' | translate) }}
+        </button>
+        @if (!billingEnabled) {
+          <p class="hint-text">{{ 'billing.notConfigured' | translate }}</p>
+        }
+      </section>
+    </div>
+  }
+</div>

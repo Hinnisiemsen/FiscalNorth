@@ -9,6 +9,8 @@ import {
   GoalType,
   RecommendedGoal,
 } from '../core/services/goal.service';
+import { EntitlementService } from '../core/services/entitlement.service';
+import { PaywallBannerComponent } from '../shared/paywall-banner.component';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
 import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 
@@ -24,7 +26,7 @@ const GOAL_TYPES: GoalType[] = [
 @Component({
   selector: 'app-goal-interview',
   standalone: true,
-  imports: [CommonModule, FormsModule, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
+  imports: [CommonModule, FormsModule, PaywallBannerComponent, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
   templateUrl: './goal-interview.component.html',
   styleUrl: './goal-interview.component.css',
 })
@@ -57,7 +59,12 @@ export class GoalInterviewComponent implements OnInit {
     private goalService: GoalService,
     private accountService: AccountService,
     private router: Router,
+    private entitlementService: EntitlementService,
   ) {}
+
+  get showPaywall(): boolean {
+    return !this.entitlementService.hasFeature('AI_GOAL_PLANNER');
+  }
 
   ngOnInit(): void {
     this.loading = true;
@@ -117,6 +124,11 @@ export class GoalInterviewComponent implements OnInit {
 
   generatePlan(): void {
     if (!this.sessionId) return;
+    if (this.showPaywall) {
+      this.planError = 'billing.paywall.goalPlanner';
+      this.step = 5;
+      return;
+    }
     this.planLoading = true;
     this.planError = '';
     this.saveAnswers(() => {
@@ -128,8 +140,10 @@ export class GoalInterviewComponent implements OnInit {
           this.planLoading = false;
           this.step = 5;
         },
-        error: () => {
-          this.planError = 'goals.planError';
+        error: (err) => {
+          this.planError = this.entitlementService.isPremiumRequiredError(err)
+            ? 'billing.paywall.goalPlanner'
+            : 'goals.planError';
           this.planLoading = false;
         },
       });

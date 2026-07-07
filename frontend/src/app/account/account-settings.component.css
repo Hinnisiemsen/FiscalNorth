@@ -42,3 +42,18 @@
   color: var(--color-danger);
   margin: 0;
 }
+
+.subscription-card {
+  grid-column: 1 / -1;
+}
+
+.subscription-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.notice-text {
+  color: var(--color-text-muted);
+  margin: 0.5rem 0 0;
+}

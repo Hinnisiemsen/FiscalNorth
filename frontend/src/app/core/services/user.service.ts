@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ApiService } from './api.service';
+import { SubscriptionSummary } from '../models/billing.model';
 
 export type AuthProvider = 'LOCAL' | 'GOOGLE' | 'BOTH';
 
@@ -18,6 +19,8 @@ export interface UserProfile {
   authProvider: AuthProvider;
 
   locale: string;
+
+  subscription: SubscriptionSummary;
 }
 
 export interface UpdateUserProfileRequest {

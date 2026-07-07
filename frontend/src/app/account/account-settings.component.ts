@@ -1,7 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
+import { BillingService } from '../core/services/billing.service';
+import { EntitlementService } from '../core/services/entitlement.service';
 import { UserProfile, UserService } from '../core/services/user.service';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
 import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
@@ -11,7 +14,13 @@ import { AppLocale } from '../core/i18n/supported-locales';
 @Component({
   selector: 'app-account-settings',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    ...PAGE_HEADER_IMPORTS,
+    ...TRANSLATE_IMPORTS,
+  ],
   templateUrl: './account-settings.component.html',
   styleUrl: './account-settings.component.css',
 })
@@ -20,12 +29,19 @@ export class AccountSettingsComponent implements OnInit {
   private readonly userService = inject(UserService);
   private readonly authService = inject(AuthService);
   private readonly languageService = inject(LanguageService);
+  private readonly billingService = inject(BillingService);
+  private readonly entitlementService = inject(EntitlementService);
+  private readonly route = inject(ActivatedRoute);
 
   user: UserProfile | null = null;
   profileMessage = '';
   passwordMessage = '';
   profileError = '';
   passwordError = '';
+  billingLoading = false;
+  billingError = '';
+  checkoutSuccess = false;
+  billingEnabled = false;
 
   profileForm = this.fb.group({
     userName: ['', [Validators.required, Validators.minLength(2)]],
@@ -38,6 +54,11 @@ export class AccountSettingsComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.checkoutSuccess = this.route.snapshot.queryParamMap.get('checkout') === 'success';
+    if (this.checkoutSuccess) {
+      this.entitlementService.refresh().subscribe();
+    }
+
     this.userService.getCurrentUser().subscribe({
       next: (user) => {
         this.user = user;
@@ -47,10 +68,38 @@ export class AccountSettingsComponent implements OnInit {
         });
       },
     });
+
+    this.billingService.getSubscription().subscribe({
+      next: (sub) => {
+        this.billingEnabled = sub.billingEnabled;
+      },
+    });
   }
 
   get canChangePassword(): boolean {
     return this.user?.authProvider === 'LOCAL' || this.user?.authProvider === 'BOTH';
+  }
+
+  get subscription() {
+    return this.entitlementService.subscription;
+  }
+
+  get isPremium(): boolean {
+    return this.entitlementService.isPremium;
+  }
+
+  openPortal(): void {
+    this.billingLoading = true;
+    this.billingError = '';
+    this.billingService.createPortalSession().subscribe({
+      next: (session) => {
+        window.location.href = session.url;
+      },
+      error: () => {
+        this.billingLoading = false;
+        this.billingError = 'billing.portalFailed';
+      },
+    });
   }
 
   saveProfile(): void {
