@@ -9,6 +9,7 @@ import de.fiscalnorth.billing.repository.UserSubscriptionRepository;
 import de.fiscalnorth.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -22,12 +23,16 @@ public class SubscriptionService {
     private final UserSubscriptionRepository userSubscriptionRepository;
     private final StripeProperties stripeProperties;
 
+    public Optional<UserSubscription> findSubscription(User user) {
+        return userSubscriptionRepository.findByUserId(user.getId());
+    }
+
     public UserSubscription getOrCreateSubscription(User user) {
         return userSubscriptionRepository.findByUserId(user.getId())
                 .orElseGet(() -> createFreeSubscription(user));
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public UserSubscription createFreeSubscription(User user) {
         UserSubscription subscription = new UserSubscription();
         subscription.setUser(user);
