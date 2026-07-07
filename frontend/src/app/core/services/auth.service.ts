@@ -50,12 +50,12 @@ export class AuthService {
   }
 
   loadCurrentUser(): Observable<UserProfile> {
-    return this.userService
-      .getCurrentUser()
-      .pipe(tap((profile) => {
+    return this.userService.getCurrentUser().pipe(
+      tap((profile) => {
         this.currentUserSubject.next(profile);
         this.entitlementService.syncFromProfile(profile);
-      }));
+      }),
+    );
   }
 
   refreshSession(): Observable<UserProfile | null> {

@@ -10,11 +10,7 @@ export type SubscriptionStatus =
   | 'INCOMPLETE_EXPIRED'
   | 'NONE';
 
-export type PremiumFeature =
-  | 'AI_ASSISTANT'
-  | 'AI_GOAL_PLANNER'
-  | 'BANK_SYNC'
-  | 'AI_NOTIFICATIONS';
+export type PremiumFeature = 'AI_ASSISTANT' | 'AI_GOAL_PLANNER' | 'BANK_SYNC' | 'AI_NOTIFICATIONS';
 
 export interface SubscriptionSummary {
   plan: SubscriptionPlan;

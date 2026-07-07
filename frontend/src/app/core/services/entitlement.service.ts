@@ -19,7 +19,9 @@ const EMPTY_SUBSCRIPTION: SubscriptionSummary = {
 export class EntitlementService {
   private readonly billingService = inject(BillingService);
 
-  private readonly subscriptionSubject = new BehaviorSubject<SubscriptionSummary>(EMPTY_SUBSCRIPTION);
+  private readonly subscriptionSubject = new BehaviorSubject<SubscriptionSummary>(
+    EMPTY_SUBSCRIPTION,
+  );
   readonly subscription$ = this.subscriptionSubject.asObservable();
 
   syncFromProfile(profile: UserProfile): void {

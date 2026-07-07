@@ -91,10 +91,9 @@ class EntitlementServiceTest {
     @Test
     void adminUser_bypassesSubscriptionChecks() {
         User admin = user(6L, UserRole.Admin);
-        when(userSubscriptionRepository.findByUserId(6L)).thenReturn(Optional.empty());
-        when(userSubscriptionRepository.save(any(UserSubscription.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         assertThat(entitlementService.hasFeature(admin, PremiumFeature.BANK_SYNC)).isTrue();
+        assertThat(entitlementService.getEntitlements(admin)).contains(PremiumFeature.AI_ASSISTANT);
     }
 
     private static User user(Long id, UserRole role) {

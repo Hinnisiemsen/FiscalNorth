@@ -97,7 +97,10 @@
         }
         @case (5) {
           @if (showPaywall && !plan && !planLoading) {
-            <app-paywall-banner feature="AI_GOAL_PLANNER" messageKey="billing.paywall.goalPlanner" />
+            <app-paywall-banner
+              feature="AI_GOAL_PLANNER"
+              messageKey="billing.paywall.goalPlanner"
+            />
           } @else if (planLoading) {
             <p class="plan-loading">{{ 'goals.interview.generatingPlan' | translate }}</p>
           } @else if (planError) {

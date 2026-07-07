@@ -26,7 +26,13 @@ const GOAL_TYPES: GoalType[] = [
 @Component({
   selector: 'app-goal-interview',
   standalone: true,
-  imports: [CommonModule, FormsModule, PaywallBannerComponent, ...PAGE_HEADER_IMPORTS, ...TRANSLATE_IMPORTS],
+  imports: [
+    CommonModule,
+    FormsModule,
+    PaywallBannerComponent,
+    ...PAGE_HEADER_IMPORTS,
+    ...TRANSLATE_IMPORTS,
+  ],
   templateUrl: './goal-interview.component.html',
   styleUrl: './goal-interview.component.css',
 })

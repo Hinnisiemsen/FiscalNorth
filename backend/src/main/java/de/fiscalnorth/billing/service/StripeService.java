@@ -4,8 +4,6 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.param.CustomerCreateParams;
-import com.stripe.param.billingportal.SessionCreateParams;
-import com.stripe.param.checkout.SessionCreateParams;
 import de.fiscalnorth.billing.BillingUnavailableException;
 import de.fiscalnorth.billing.config.StripeProperties;
 import de.fiscalnorth.user.model.User;
@@ -60,22 +58,24 @@ public class StripeService {
 
         String customerId = getOrCreateCustomer(user);
 
-        SessionCreateParams.Builder builder = SessionCreateParams.builder()
-                .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
-                .setCustomer(customerId)
-                .setClientReferenceId(user.getId().toString())
-                .setSuccessUrl(stripeProperties.getCheckoutSuccessUrl())
-                .setCancelUrl(stripeProperties.getCheckoutCancelUrl())
-                .addLineItem(SessionCreateParams.LineItem.builder()
-                        .setPrice(priceId)
-                        .setQuantity(1L)
-                        .build());
+        com.stripe.param.checkout.SessionCreateParams.Builder builder =
+                com.stripe.param.checkout.SessionCreateParams.builder()
+                        .setMode(com.stripe.param.checkout.SessionCreateParams.Mode.SUBSCRIPTION)
+                        .setCustomer(customerId)
+                        .setClientReferenceId(user.getId().toString())
+                        .setSuccessUrl(stripeProperties.getCheckoutSuccessUrl())
+                        .setCancelUrl(stripeProperties.getCheckoutCancelUrl())
+                        .addLineItem(com.stripe.param.checkout.SessionCreateParams.LineItem.builder()
+                                .setPrice(priceId)
+                                .setQuantity(1L)
+                                .build());
 
         if (stripeProperties.getTrialDays() > 0) {
-            builder.setSubscriptionData(SessionCreateParams.SubscriptionData.builder()
-                    .setTrialPeriodDays((long) stripeProperties.getTrialDays())
-                    .putMetadata("userId", user.getId().toString())
-                    .build());
+            builder.setSubscriptionData(
+                    com.stripe.param.checkout.SessionCreateParams.SubscriptionData.builder()
+                            .setTrialPeriodDays((long) stripeProperties.getTrialDays())
+                            .putMetadata("userId", user.getId().toString())
+                            .build());
         }
 
         return com.stripe.model.checkout.Session.create(builder.build());
@@ -85,10 +85,11 @@ public class StripeService {
         requireBillingEnabled();
         String customerId = getOrCreateCustomer(user);
 
-        SessionCreateParams params = SessionCreateParams.builder()
-                .setCustomer(customerId)
-                .setReturnUrl(stripeProperties.getPortalReturnUrl())
-                .build();
+        com.stripe.param.billingportal.SessionCreateParams params =
+                com.stripe.param.billingportal.SessionCreateParams.builder()
+                        .setCustomer(customerId)
+                        .setReturnUrl(stripeProperties.getPortalReturnUrl())
+                        .build();
         return com.stripe.model.billingportal.Session.create(params);
     }
 

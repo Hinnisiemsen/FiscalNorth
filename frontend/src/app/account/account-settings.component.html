@@ -9,9 +9,7 @@
       }
       <p class="readonly-field">
         <strong>{{ 'billing.currentPlan' | translate }}:</strong>
-        {{
-          isPremium ? ('billing.premiumPlan' | translate) : ('billing.freePlan' | translate)
-        }}
+        {{ isPremium ? ('billing.premiumPlan' | translate) : ('billing.freePlan' | translate) }}
       </p>
       @if (subscription.status !== 'NONE') {
         <p class="readonly-field">
