@@ -39,16 +39,15 @@ Cypress.Commands.add('login', (email = 'alex@fiscalnorth.local', password = 'dem
   );
 });
 
-/** Visit a route after login with English locale and translations loaded. */
+/** Visit a route after login with English locale. Does not wait on i18n fetches (cached after first load). */
 Cypress.Commands.add('visitApp', (path: string) => {
-  cy.intercept('GET', '/assets/i18n/en.json').as('i18nEn');
   cy.visit(path, {
     onBeforeLoad(win) {
       win.localStorage.setItem('fn.locale', 'en');
       win.sessionStorage.removeItem('fiscalnorth.demoPaywallDismissed');
     },
   });
-  cy.wait('@i18nEn', { timeout: 15000 });
+  cy.get('.page-content-inner, .login-card, .wizard', { timeout: 15000 }).should('exist');
 });
 
 /** Wait for a successful API response with a JSON array body. */
