@@ -1,5 +1,6 @@
 package de.fiscalnorth.account.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.fiscalnorth.household.model.Household;
 import de.fiscalnorth.shared.BaseEntity;
 import de.fiscalnorth.shared.SupportedCurrency;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 @Setter
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@JsonIgnoreProperties({"owner", "household", "hibernateLazyInitializer", "handler"})
 public abstract class Account extends BaseEntity {
     protected String name;
     @Enumerated(EnumType.STRING)

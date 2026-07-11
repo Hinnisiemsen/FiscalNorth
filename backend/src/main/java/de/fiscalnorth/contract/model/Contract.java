@@ -1,5 +1,6 @@
 package de.fiscalnorth.contract.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.fiscalnorth.household.model.Household;
 import de.fiscalnorth.shared.BaseEntity;
 import de.fiscalnorth.user.model.User;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
+@JsonIgnoreProperties({"owner", "household", "hibernateLazyInitializer", "handler"})
 public class Contract extends BaseEntity {
     private String name;
     private LocalDate startDate;
