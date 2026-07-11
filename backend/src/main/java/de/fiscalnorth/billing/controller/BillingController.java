@@ -46,9 +46,9 @@ public class BillingController {
                 summary.trialEnd(),
                 summary.cancelAtPeriodEnd(),
                 summary.premiumActive(),
-                stripeProperties.isEnabled(),
-                entitlementService.isPremiumPreviewEnabled(),
-                entitlementService.isPaidSubscriber(user)));
+                summary.billingEnabled(),
+                summary.premiumPreviewEnabled(),
+                summary.paidSubscriptionActive()));
     }
 
     @GetMapping("/plans")
