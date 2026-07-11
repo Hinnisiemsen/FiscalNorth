@@ -1,5 +1,6 @@
 package de.fiscalnorth.transaction.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.fiscalnorth.household.model.Household;
 import de.fiscalnorth.shared.BaseEntity;
 import de.fiscalnorth.user.model.User;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 @Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"owner_id", "import_hash"})
 })
+@JsonIgnoreProperties({"owner", "household", "hibernateLazyInitializer", "handler"})
 public abstract class Transaction extends BaseEntity {
     private BigDecimal amount;
     private String description;
