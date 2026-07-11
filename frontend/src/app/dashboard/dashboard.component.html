@@ -54,7 +54,10 @@
       <div class="overview-item">
         <span class="overview-label">{{ 'dashboard.householdBudgets' | translate }}</span>
         <span class="overview-value">{{ householdBudgetSpent | currency: 'EUR' }}</span>
-        <span class="overview-hint">{{ householdBudgetSpent | currency: 'EUR' }} / {{ householdBudgetLimit | currency: 'EUR' }}</span>
+        <span class="overview-hint"
+          >{{ householdBudgetSpent | currency: 'EUR' }} /
+          {{ householdBudgetLimit | currency: 'EUR' }}</span
+        >
       </div>
 
       <div class="overview-item">
@@ -218,7 +221,11 @@
                       class="category-bar"
                       style="text-decoration: none; color: inherit"
                       [routerLink]="['/transactions']"
-                      [queryParams]="{ category: c.categoryName, year: currentYear, month: currentMonth }"
+                      [queryParams]="{
+                        category: c.categoryName,
+                        year: currentYear,
+                        month: currentMonth,
+                      }"
                     >
                       <span class="cat-name">{{ c.categoryName }}</span>
 
@@ -305,9 +312,17 @@
                   <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'budgets' }" />
 
                   @for (b of activeBudgets(); track b.id) {
-                    <a class="budget-row" [class]="budgetStatusClass(b)" style="text-decoration: none; color: inherit" [routerLink]="['/budgets']">
+                    <a
+                      class="budget-row"
+                      [class]="budgetStatusClass(b)"
+                      style="text-decoration: none; color: inherit"
+                      [routerLink]="['/budgets']"
+                    >
                       <div class="budget-row-head">
-                        <span>{{ b.name }} · {{ b.remaining | currency: 'EUR' }} {{ 'budgets.remaining' | translate }}</span>
+                        <span
+                          >{{ b.name }} · {{ b.remaining | currency: 'EUR' }}
+                          {{ 'budgets.remaining' | translate }}</span
+                        >
                         <span>{{ budgetUsagePercent(b) | number: '1.0-0' }} %</span>
                       </div>
                       <div class="bar-track">

@@ -4,7 +4,11 @@ Cypress.Commands.add('login', (email = 'alex@fiscalnorth.local', password = 'dem
   cy.session(
     [email, password],
     () => {
-      cy.visit('/login');
+      cy.visit('/login', {
+        onBeforeLoad(win) {
+          win.localStorage.setItem('fn.locale', 'en');
+        },
+      });
       cy.window().then(async (win) => {
         const csrfResponse = await win.fetch('/api/auth/csrf', { credentials: 'include' });
         expect(csrfResponse.status).to.eq(200);
@@ -24,21 +28,33 @@ Cypress.Commands.add('login', (email = 'alex@fiscalnorth.local', password = 'dem
     },
     {
       validate() {
-        cy.visit('/');
+        cy.visit('/', {
+          onBeforeLoad(win) {
+            win.localStorage.setItem('fn.locale', 'en');
+          },
+        });
         cy.url({ timeout: 10000 }).should('not.include', '/login');
       },
     },
   );
 });
 
-/** Wait for ngx-translate to load the active locale file before asserting on UI copy. */
-Cypress.Commands.add('waitForTranslations', () => {
-  cy.intercept('GET', '/assets/i18n/*.json').as('i18n');
-  cy.wait('@i18n', { timeout: 15000 });
+/** Visit a route after login with English locale and translations loaded. */
+Cypress.Commands.add('visitApp', (path: string) => {
+  cy.intercept('GET', '/assets/i18n/en.json').as('i18nEn');
+  cy.visit(path, {
+    onBeforeLoad(win) {
+      win.localStorage.setItem('fn.locale', 'en');
+      win.sessionStorage.removeItem('fiscalnorth.demoPaywallDismissed');
+    },
+  });
+  cy.wait('@i18nEn', { timeout: 15000 });
 });
 
-/** Visit a route after login and wait for the shell to render. */
-Cypress.Commands.add('visitApp', (path: string) => {
-  cy.visit(path);
-  cy.get('body').should('be.visible');
+/** Wait for a successful API response with a JSON array body. */
+Cypress.Commands.add('waitForListApi', (alias: string, minLength = 1) => {
+  cy.wait(`@${alias}`, { timeout: 20000 }).then(({ response }) => {
+    expect(response?.statusCode).to.eq(200);
+    expect(response?.body).to.be.an('array').and.have.length.at.least(minLength);
+  });
 });

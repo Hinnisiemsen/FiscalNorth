@@ -6,7 +6,7 @@ describe('Transactions', () => {
   it('lists transactions and opens create form', () => {
     cy.intercept('GET', '/api/transaction/payment').as('transactions');
     cy.visitApp('/transactions');
-    cy.wait('@transactions');
+    cy.waitForListApi('transactions', 1);
     cy.contains('a', /transaction|transaktion/i).should('exist');
     cy.visitApp('/transactions/new');
     cy.get('#description').should('be.visible');
@@ -22,7 +22,7 @@ describe('Transactions', () => {
     cy.get('button[type="submit"]').click();
     cy.wait('@createTransaction').its('response.statusCode').should('eq', 201);
     cy.url({ timeout: 15000 }).should('include', '/transactions');
-    cy.wait('@transactions');
-    cy.contains('E2E Test Coffee', { timeout: 15000 });
+    cy.waitForListApi('transactions', 1);
+    cy.contains('.list-card-title', 'E2E Test Coffee', { timeout: 15000 });
   });
 });

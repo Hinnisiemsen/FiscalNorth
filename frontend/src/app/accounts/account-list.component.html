@@ -14,13 +14,13 @@
     <div class="list-card-body">
       <div class="list-card-title">{{ account.name }}</div>
       <div class="list-card-meta" *ngIf="account.kind === 'DEPOSIT'">
-        {{ getCurrencyCode(account.currency) }} · {{ account.interestRate }}%
-        · {{ 'accounts.kindDeposit' | translate }}
+        {{ getCurrencyCode(account.currency) }} · {{ account.interestRate }}% ·
+        {{ 'accounts.kindDeposit' | translate }}
       </div>
       <div class="list-card-meta" *ngIf="account.kind === 'BANK'">
         {{ getCurrencyCode(account.currency) }}
-        · {{ 'accounts.types.' + (account.accountType || 'other').toLowerCase() | translate }}
-        · {{ 'accounts.kindBank' | translate }}
+        · {{ 'accounts.types.' + (account.accountType || 'other').toLowerCase() | translate }} ·
+        {{ 'accounts.kindBank' | translate }}
       </div>
       <div class="list-card-meta" *ngIf="account.kind === 'CRYPTO'">
         {{ getCurrencyCode(account.currency) }} · {{ 'accounts.kindCrypto' | translate }}

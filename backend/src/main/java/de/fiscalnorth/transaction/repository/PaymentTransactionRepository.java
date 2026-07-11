@@ -21,6 +21,15 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
 
     List<PaymentTransaction> findAllByHouseholdId(Long householdId);
 
+    @Query("""
+            SELECT DISTINCT pt FROM PaymentTransaction pt
+            LEFT JOIN FETCH pt.splits s
+            LEFT JOIN FETCH s.category
+            WHERE pt.household.id = :householdId
+            ORDER BY pt.transactionDate DESC
+            """)
+    List<PaymentTransaction> findAllByHouseholdIdWithSplits(@Param("householdId") Long householdId);
+
     Optional<PaymentTransaction> findByIdAndOwnerId(Long id, Long ownerId);
 
     Optional<PaymentTransaction> findByIdAndHouseholdId(Long id, Long householdId);
