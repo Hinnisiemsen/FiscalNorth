@@ -1,5 +1,6 @@
 package de.fiscalnorth.category.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.fiscalnorth.household.model.Household;
 import de.fiscalnorth.shared.BaseEntity;
 import de.fiscalnorth.transaction.model.TransactionType;
@@ -16,6 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@JsonIgnoreProperties({"owner", "household", "hibernateLazyInitializer", "handler"})
 public class Category extends BaseEntity {
     private String name;
     @Enumerated(EnumType.STRING)

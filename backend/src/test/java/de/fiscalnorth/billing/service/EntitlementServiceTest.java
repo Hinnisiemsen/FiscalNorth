@@ -40,7 +40,7 @@ class EntitlementServiceTest {
         demoProperties = new DemoProperties();
         demoProperties.setPremiumPreviewEnabled(false);
         SubscriptionService subscriptionService = new SubscriptionService(userSubscriptionRepository, stripeProperties);
-        entitlementService = new EntitlementService(subscriptionService, demoProperties);
+        entitlementService = new EntitlementService(subscriptionService, demoProperties, stripeProperties);
     }
 
     @Test
@@ -108,6 +108,19 @@ class EntitlementServiceTest {
 
         assertThat(entitlementService.hasFeature(user, PremiumFeature.AI_ASSISTANT)).isTrue();
         assertThat(entitlementService.isPaidSubscriber(user)).isFalse();
+    }
+
+    @Test
+    void toSummary_includesDemoPreviewFlags() {
+        demoProperties.setPremiumPreviewEnabled(true);
+        User user = user(8L, UserRole.User);
+        when(userSubscriptionRepository.findByUserId(8L)).thenReturn(Optional.empty());
+
+        var summary = entitlementService.toSummary(user);
+
+        assertThat(summary.premiumPreviewEnabled()).isTrue();
+        assertThat(summary.premiumActive()).isTrue();
+        assertThat(summary.paidSubscriptionActive()).isFalse();
     }
 
     private static User user(Long id, UserRole role) {

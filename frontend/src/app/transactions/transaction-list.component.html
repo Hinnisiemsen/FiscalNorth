@@ -35,6 +35,12 @@
   </div>
 
   <div class="empty-state" *ngIf="filteredTransactions.length === 0">
-    <p>{{ categoryFilter || monthFilter ? ('transactions.noFilterResults' | translate) : ('transactions.empty' | translate) }}</p>
+    <p>
+      {{
+        categoryFilter || monthFilter
+          ? ('transactions.noFilterResults' | translate)
+          : ('transactions.empty' | translate)
+      }}
+    </p>
   </div>
 </div>

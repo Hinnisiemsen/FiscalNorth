@@ -73,11 +73,77 @@ flowchart TD
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| 1 — Core PF + demo paywall | **Done** | PR #11 |
-| 2 — Household foundation | **Done** | PR #12 |
+| 1 — Core PF + demo paywall | **Done** | Split tx, budget polish, demo preview |
+| 2 — Household foundation | **Done** | 2 adults, fully shared, invite + join |
 | 3 — Household budgets | **Done** | Member breakdown, household cron alerts |
 | 4 — Shared portfolio | **Done** | Allocation chart, net-worth KPI, price cron |
 | 5 — Showcase polish | **Done** | Demo seed, E2E, docs |
+
+---
+
+## Phase details (reference)
+
+<details>
+<summary>Phase 1 — Core personal finance + demo paywall</summary>
+
+### 1.1 Split transactions
+
+- `TransactionSplit` entity: `payment_id`, `amount`, `category_id`, optional `note`
+- Validation: split lines must sum to parent `PaymentTransaction.amount`
+- API: `GET/PUT /api/transaction/payment/{id}/splits`
+- UI: toggle on transaction create/edit; show breakdown in list and insights
+
+### 1.2 Budget & insights polish
+
+- Dashboard budget progress bars with 80%/100% threshold styling
+- Click category on dashboard → filtered transaction view for that month
+- "Remaining" column on budget list (`limit - usage`)
+
+### 1.3 Demo paywall preview
+
+| Layer | Change |
+|-------|--------|
+| **Config** | `app.demo.premium-preview-enabled=true` (default on for local/seed) |
+| **Backend** | `EntitlementService`: grant premium when preview mode enabled |
+| **Frontend** | Paywall banner + **"Try in demo"** button (localStorage dismiss) |
+
+</details>
+
+<details>
+<summary>Phase 2 — Household foundation (MVP)</summary>
+
+- Max 2 members: `OWNER` + `MEMBER`, fully shared data
+- API: `GET /api/household/me`, `POST /api/household/invite`, `POST /api/household/invites/accept?token=`
+- UI: `/household` settings, `/household/join?token=…`
+
+</details>
+
+<details>
+<summary>Phase 3 — Household budgets</summary>
+
+- Household-scoped budgets with per-member breakdown
+- Dashboard KPI: household spent vs limit
+- Budget alerts at 80%/100% notify all premium members
+
+</details>
+
+<details>
+<summary>Phase 4 — Shared portfolio + price API</summary>
+
+- Holdings model: `Portfolio`, `Holding`, `PriceQuote`
+- Alpha Vantage + cached fallback, daily refresh cron
+- UI: `/portfolio` with allocation chart; dashboard net-worth widget
+
+</details>
+
+<details>
+<summary>Phase 5 — Showcase polish</summary>
+
+- [x] Demo seed (Alex + Jamie, splits, portfolio)
+- [x] Cypress E2E
+- [x] README / docs sync
+
+</details>
 
 ---
 
@@ -113,4 +179,6 @@ flowchart TD
 - [README.md](README.md) — project overview and setup
 - [docs/AUTH.md](docs/AUTH.md) — authentication and demo login
 - [docs/BILLING.md](docs/BILLING.md) — Stripe premium setup
+- [docs/STAGING.md](docs/STAGING.md) — staging / demo preview checklist
+- [docs/PLATFORM.md](docs/PLATFORM.md) — crypto, admin API, WebSocket
 - [docs/DEPLOY.md](docs/DEPLOY.md) — production deployment

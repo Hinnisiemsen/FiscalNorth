@@ -98,3 +98,18 @@ INSERT INTO holding (id, portfolio_id, symbol, name, quantity, cost_basis, asset
 INSERT INTO holding (id, portfolio_id, symbol, name, quantity, cost_basis, asset_class, last_updated_by_id) VALUES (2, 1, 'VWCE.DE', 'Vanguard FTSE All-World', 25.0000, 2200.00, 'ETF', 2);
 INSERT INTO price_quote (id, symbol, price, currency, fetched_at) VALUES (1, 'AAPL', 195.50, 'USD', '2026-06-28 12:00:00');
 INSERT INTO price_quote (id, symbol, price, currency, fetched_at) VALUES (2, 'VWCE.DE', 118.40, 'EUR', '2026-06-28 12:00:00');
+
+-- PostgreSQL identity sequences stay at 1 after explicit ID inserts; advance them before runtime writes.
+SELECT setval(pg_get_serial_sequence('app_user', 'id'), COALESCE((SELECT MAX(id) FROM app_user), 1));
+SELECT setval(pg_get_serial_sequence('household', 'id'), COALESCE((SELECT MAX(id) FROM household), 1));
+SELECT setval(pg_get_serial_sequence('household_member', 'id'), COALESCE((SELECT MAX(id) FROM household_member), 1));
+SELECT setval(pg_get_serial_sequence('category', 'id'), COALESCE((SELECT MAX(id) FROM category), 1));
+SELECT setval(pg_get_serial_sequence('account', 'id'), COALESCE((SELECT MAX(id) FROM account), 1));
+SELECT setval(pg_get_serial_sequence('contract', 'id'), COALESCE((SELECT MAX(id) FROM contract), 1));
+SELECT setval(pg_get_serial_sequence('budget', 'id'), COALESCE((SELECT MAX(id) FROM budget), 1));
+SELECT setval(pg_get_serial_sequence('transaction', 'id'), COALESCE((SELECT MAX(id) FROM transaction), 1));
+SELECT setval(pg_get_serial_sequence('transaction_split', 'id'), COALESCE((SELECT MAX(id) FROM transaction_split), 1));
+SELECT setval(pg_get_serial_sequence('financial_goal', 'id'), COALESCE((SELECT MAX(id) FROM financial_goal), 1));
+SELECT setval(pg_get_serial_sequence('portfolio', 'id'), COALESCE((SELECT MAX(id) FROM portfolio), 1));
+SELECT setval(pg_get_serial_sequence('holding', 'id'), COALESCE((SELECT MAX(id) FROM holding), 1));
+SELECT setval(pg_get_serial_sequence('price_quote', 'id'), COALESCE((SELECT MAX(id) FROM price_quote), 1));

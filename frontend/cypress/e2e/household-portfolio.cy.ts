@@ -4,41 +4,48 @@ describe('Household, portfolio, splits, and demo paywall', () => {
   });
 
   it('shows household with Alex and Jamie', () => {
-    cy.visit('/household');
+    cy.visitApp('/household');
     cy.contains('Alex');
     cy.contains('Jamie');
   });
 
   it('displays shared portfolio with holdings and allocation', () => {
-    cy.visit('/portfolio');
-    cy.contains('AAPL');
-    cy.contains('VWCE.DE');
-    cy.contains(/total value|gesamtwert/i);
-    cy.contains(/asset allocation|asset allocation/i);
+    cy.intercept('GET', '/api/portfolio').as('portfolio');
+    cy.visitApp('/portfolio');
+    cy.wait('@portfolio').its('response.statusCode').should('eq', 200);
+    cy.get('.summary-grid').should('be.visible');
+    cy.get('.holding-card').contains('AAPL');
+    cy.get('.holding-card').contains('VWCE.DE');
+    cy.get('.allocation-card').should('be.visible');
   });
 
   it('shows budget remaining and member breakdown', () => {
-    cy.visit('/budgets');
+    cy.visitApp('/budgets');
     cy.contains(/remaining|übrig/i);
     cy.contains('Alex');
     cy.contains('Jamie');
   });
 
   it('shows split transaction in list', () => {
-    cy.visit('/transactions');
-    cy.contains('Kaufland Wocheneinkauf');
+    cy.intercept('GET', '/api/transaction/payment').as('transactions');
+    cy.visitApp('/transactions');
+    cy.waitForListApi('transactions', 1);
+    cy.contains('.list-card-title', 'Kaufland Wocheneinkauf', { timeout: 15000 });
     cy.contains(/split/i);
   });
 
   it('unlocks premium assistant via try in demo', () => {
-    cy.visit('/assistant');
-    cy.contains(/try in demo|in demo testen/i).click();
+    cy.intercept('GET', '/api/user/me').as('profile');
+    cy.visitApp('/assistant');
+    cy.wait('@profile').its('response.body.subscription.premiumPreviewEnabled').should('eq', true);
+    cy.get('app-paywall-banner', { timeout: 15000 }).should('be.visible');
+    cy.get('app-paywall-banner .btn-secondary.paywall-cta').click();
     cy.get('app-paywall-banner').should('not.exist');
   });
 
   it('loads household join page with token query', () => {
-    cy.visit('/household/join?token=demo-token');
-    cy.contains(/join household|haushalt beitreten/i);
-    cy.contains(/accept invitation|einladung annehmen/i);
+    cy.visitApp('/household/join?token=demo-token');
+    cy.get('.join-card').should('be.visible');
+    cy.get('.join-card button.btn-primary').should('be.visible');
   });
 });
