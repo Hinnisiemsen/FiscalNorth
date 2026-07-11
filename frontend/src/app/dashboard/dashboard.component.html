@@ -46,6 +46,18 @@
       </div>
 
       <div class="overview-item">
+        <span class="overview-label">{{ 'dashboard.netWorth' | translate }}</span>
+        <span class="overview-value">{{ netWorth | currency: 'EUR' }}</span>
+        <span class="overview-hint">{{ 'dashboard.netWorthHint' | translate }}</span>
+      </div>
+
+      <div class="overview-item">
+        <span class="overview-label">{{ 'dashboard.householdBudgets' | translate }}</span>
+        <span class="overview-value">{{ householdBudgetSpent | currency: 'EUR' }}</span>
+        <span class="overview-hint">{{ householdBudgetSpent | currency: 'EUR' }} / {{ householdBudgetLimit | currency: 'EUR' }}</span>
+      </div>
+
+      <div class="overview-item">
         <span class="overview-label">{{ 'dashboard.accountBalance' | translate }}</span>
 
         <span class="overview-value">{{ totalBalance | currency: 'EUR' }}</span>

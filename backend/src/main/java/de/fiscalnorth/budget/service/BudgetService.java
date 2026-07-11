@@ -50,6 +50,12 @@ public class BudgetService {
         return getBudgetsWithUsage();
     }
 
+    public List<BudgetWithUsage> getBudgetsWithUsageForHousehold(Long householdId) {
+        return budgetRepository.findAllByHouseholdId(householdId).stream()
+                .map(budget -> toBudgetWithUsage(householdId, budget))
+                .collect(Collectors.toList());
+    }
+
     private BudgetWithUsage toBudgetWithUsage(Long householdId, Budget budget) {
         BigDecimal spent = BigDecimal.ZERO;
         List<MemberSpendingDto> memberBreakdown = List.of();

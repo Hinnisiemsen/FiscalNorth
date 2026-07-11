@@ -39,7 +39,10 @@ public class InsightsService {
     }
 
     public InsightsResponse getInsightsForOwner(Long ownerId, int year, int month) {
-        Long householdId = householdScopeService.requireHouseholdId();
+        return getInsightsForHousehold(householdScopeService.requireHouseholdId(), year, month);
+    }
+
+    public InsightsResponse getInsightsForHousehold(Long householdId, int year, int month) {
         LocalDate start = LocalDate.of(year, month, 1);
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
         return buildInsights(householdId, start, end);

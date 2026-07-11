@@ -79,4 +79,15 @@ export class PortfolioComponent implements OnInit {
     if (gain < 0) return 'gain-negative';
     return '';
   }
+
+  allocationSlices(): { label: string; value: number; share: number }[] {
+    if (!this.portfolio?.holdings.length) return [];
+    const total = this.portfolio.totalValue || 0;
+    if (total <= 0) return [];
+    return this.portfolio.holdings.map((h) => ({
+      label: h.symbol,
+      value: h.marketValue,
+      share: (h.marketValue / total) * 100,
+    }));
+  }
 }

@@ -24,6 +24,7 @@ import { LoginComponent } from './auth/login.component';
 import { AccountSettingsComponent } from './account/account-settings.component';
 import { UpgradeComponent } from './account/upgrade.component';
 import { HouseholdSettingsComponent } from './household/household-settings.component';
+import { HouseholdJoinComponent } from './household/household-join.component';
 import { PortfolioComponent } from './portfolio/portfolio.component';
 import { authGuard } from './core/guards/auth.guard';
 
@@ -45,6 +46,11 @@ export const routes: Routes = [
         path: 'account',
         component: AccountSettingsComponent,
         data: { titleKey: 'routes.account' },
+      },
+      {
+        path: 'household/join',
+        component: HouseholdJoinComponent,
+        data: { titleKey: 'routes.householdJoin' },
       },
       {
         path: 'household',

@@ -85,6 +85,9 @@ INSERT INTO TRANSACTION (id, dtype, amount, description, transaction_date, trans
 INSERT INTO TRANSACTION (id, dtype, amount, description, transaction_date, transaction_type, category_id, contract_id, owner_id, household_id) VALUES (38, 'PaymentTransaction', 59.99, 'Amazon', '2026-03-22', 'Expense', 8, NULL, 1, 1);
 INSERT INTO TRANSACTION (id, dtype, amount, description, transaction_date, transaction_type, category_id, contract_id, owner_id, household_id) VALUES (39, 'PaymentTransaction', 8.50, 'Haftpflicht', '2026-06-01', 'Expense', 7, 5, 1, 1);
 INSERT INTO TRANSACTION (id, dtype, amount, description, transaction_date, transaction_type, category_id, contract_id, owner_id, household_id) VALUES (40, 'PaymentTransaction', 56.70, 'Wochenmarkt', '2026-06-28', 'Expense', 1, NULL, 2, 1);
+INSERT INTO TRANSACTION (id, dtype, amount, description, transaction_date, transaction_type, category_id, contract_id, owner_id, household_id) VALUES (41, 'PaymentTransaction', 95.00, 'Kaufland Wocheneinkauf', '2026-06-15', 'Expense', NULL, NULL, 1, 1);
+INSERT INTO transaction_split (id, payment_id, amount, category_id, note) VALUES (1, 41, 60.00, 1, 'Groceries');
+INSERT INTO transaction_split (id, payment_id, amount, category_id, note) VALUES (2, 41, 35.00, 6, 'Household supplies');
 
 -- Financial goals (1-2)
 INSERT INTO financial_goal (id, name, goal_type, target_amount, current_amount, target_date, linked_account_id, monthly_contribution, status, owner_id, household_id) VALUES (1, 'Notgroschen', 'EMERGENCY_FUND', 10000.00, 0.00, '2027-06-01', 2, 300.00, 'ACTIVE', 1, 1);

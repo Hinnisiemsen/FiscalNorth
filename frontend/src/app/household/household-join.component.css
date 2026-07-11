@@ -1,0 +1,14 @@
+.join-card {
+  max-width: 32rem;
+  padding: 1.25rem;
+}
+
+.member-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.member-list li {
+  padding: 0.35rem 0;
+}

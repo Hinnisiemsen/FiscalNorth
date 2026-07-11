@@ -37,7 +37,8 @@
     "accountSettings": "Konto",
     "upgrade": "Premium freischalten",
     "household": "Haushalt",
-    "portfolio": "Portfolio"
+    "portfolio": "Portfolio",
+    "householdJoin": "Haushalt beitreten"
   },
   "billing": {
     "subscriptionSection": "Abonnement",
@@ -126,6 +127,9 @@
     "income": "Einnahmen",
     "accountBalance": "Kontostand",
     "allAccounts": "alle Konten",
+    "netWorth": "Vermögen",
+    "netWorthHint": "Konten + Portfolio",
+    "householdBudgets": "Haushaltsbudgets",
     "availableAfterFixed": "Verfügbar nach Fixkosten",
     "panelFazit": "Fazit",
     "panelMonth": "Monat im Detail",
@@ -409,6 +413,16 @@
     "inviteSent": "Einladung gesendet",
     "inviteFailed": "Einladung konnte nicht gesendet werden",
     "inviteExpires": "Läuft ab",
+    "joinLink": "Diesen Beitrittslink teilen",
+    "join": {
+      "title": "Haushalt beitreten",
+      "description": "Nimm die Einladung an, um Finanzen mit deinem Partner zu teilen.",
+      "accept": "Einladung annehmen",
+      "success": "Du bist {{name}} beigetreten.",
+      "openHousehold": "Haushalt öffnen",
+      "missingToken": "Einladungslink fehlt oder ist ungültig.",
+      "failed": "Einladung konnte nicht angenommen werden."
+    },
     "role": {
       "OWNER": "Inhaber",
       "MEMBER": "Mitglied"
@@ -431,7 +445,8 @@
     "priceStale": "Gecachter Kurs",
     "updatedBy": "Aktualisiert von",
     "empty": "Noch keine Positionen.",
-    "addFailed": "Position konnte nicht hinzugefügt werden"
+    "addFailed": "Position konnte nicht hinzugefügt werden",
+    "allocation": "Asset-Allokation"
   },
   "goals": {
     "title": "Finanzziele",

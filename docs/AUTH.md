@@ -1,6 +1,6 @@
 # Authentication & user isolation
 
-Fiscal North uses **session-cookie authentication** with a BFF-style setup: the Angular dev server proxies API, OAuth, and login routes to the Spring Boot backend. All financial data is scoped per user via an `owner_id` foreign key.
+Fiscal North uses **session-cookie authentication** with a BFF-style setup: the Angular dev server proxies API, OAuth, and login routes to the Spring Boot backend. Financial data is scoped per **household** (fully shared between up to 2 members) with an `owner_id` on each record for attribution.
 
 ## Sign-in methods
 
@@ -14,15 +14,30 @@ Fiscal North uses **session-cookie authentication** with a BFF-style setup: the 
 
 Protected routes require an authenticated session. The frontend sends cookies (`withCredentials: true`) and the CSRF token header on mutating requests.
 
-## Demo account (seed data)
+## Demo accounts (seed data)
 
 When running with the default H2 seed (`import.sql`):
 
-| Field | Value |
-|-------|--------|
-| Email | `alex@fiscalnorth.local` |
-| Password | `demo1234` |
-| Role | `USER` |
+| User | Email | Password | Role |
+|------|-------|----------|------|
+| Alex | `alex@fiscalnorth.local` | `demo1234` | Household owner |
+| Jamie | `jamie@fiscalnorth.local` | `demo1234` | Household member |
+
+Both users share one household with accounts, budgets, transactions, goals, and portfolio.
+
+## Household invites
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/household/me` | Current household + members |
+| `POST` | `/api/household/invite` | Owner invites partner by email |
+| `POST` | `/api/household/invites/accept?token=` | Accept pending invite |
+
+**Join flow (demo):**
+
+1. Alex opens `/household` and sends an invite.
+2. Copy the join link shown in settings: `/household/join?token=…`
+3. Partner registers or logs in, then opens the join link and accepts.
 
 ## Local development
 
@@ -31,7 +46,7 @@ When running with the default H2 seed (`import.sql`):
 3. Open **http://localhost:4200** (or the port Angular prints).
 4. Sign in at `/login` or register a new account.
 
-New users receive **12 default categories** automatically via `UserOnboardingService`.
+New users receive **12 default categories** and a **one-person household** automatically via `UserOnboardingService`.
 
 ## Google OAuth setup
 
@@ -62,16 +77,15 @@ If credentials are missing, local login still works; Google sign-in will fail at
 | `PUT` | `/api/user/me/password` | Change password (local accounts) |
 | `GET` | `/api/user` | List all users (**ADMIN** only) |
 
-## Data isolation
+## Data scoping
 
-Every user-owned entity stores `owner_id` referencing `app_user`:
+Every entity stores `owner_id` (who created/attributed the record) and, for shared data, `household_id`:
 
-- Accounts, categories, contracts, budgets
+- Accounts, categories, contracts, budgets, transactions, goals, portfolio
 - Payment and transfer transactions
-- Financial notifications
-- Bank consents (XS2A)
+- Financial notifications (delivered per user; cron jobs use household totals)
 
-Services and repositories filter by the authenticated user's ID. Cron jobs iterate users independently so notifications and AI jobs never leak across tenants.
+Services filter list endpoints by the authenticated user's `household_id`. Cron jobs iterate households and notify all premium members.
 
 ## Frontend integration
 
@@ -82,6 +96,8 @@ Services and repositories filter by the authenticated user's ID. Cron jobs itera
 | `authGuard` | Protects all layout routes |
 | `UserMenuComponent` | Topbar/drawer menu with account settings + sign out |
 | `/account` | Profile, locale, password change |
+| `/household` | Members, invite partner |
+| `/household/join?token=` | Accept household invite |
 
 Proxy entries in `frontend/proxy.conf.json` forward `/api`, `/oauth2`, and `/login` to the backend.
 
@@ -97,5 +113,5 @@ Proxy entries in `frontend/proxy.conf.json` forward `/api`, `/oauth2`, and `/log
 Backend tests use dummy OAuth client credentials via `application-test.properties`. Run:
 
 ```bash
-./backend/mvnw -f pom.xml -pl backend test
+cd backend && ./mvnw test
 ```

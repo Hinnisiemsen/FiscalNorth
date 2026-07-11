@@ -5,6 +5,7 @@ import { ContractService } from '../core/services/contract.service';
 import { InsightsService, MonthlyTrend } from '../core/services/insights.service';
 import { BudgetService, BudgetWithUsage } from '../core/services/budget.service';
 import { GoalOverview, GoalService, GoalWithProgress } from '../core/services/goal.service';
+import { PortfolioOverview, PortfolioService } from '../core/services/portfolio.service';
 import { UserService } from '../core/services/user.service';
 import { AiService } from '../core/services/ai.service';
 import { forkJoin } from 'rxjs';
@@ -42,6 +43,10 @@ export interface PanelAiState {
 })
 export class DashboardComponent implements OnInit {
   totalBalance = 0;
+  portfolioValue = 0;
+  netWorth = 0;
+  householdBudgetSpent = 0;
+  householdBudgetLimit = 0;
   fixedCosts = 0;
   disposableIncome = 0;
   userName = '';
@@ -80,6 +85,7 @@ export class DashboardComponent implements OnInit {
     private insightsService: InsightsService,
     private budgetService: BudgetService,
     private goalService: GoalService,
+    private portfolioService: PortfolioService,
     private notificationService: NotificationService,
     private userService: UserService,
     private ai: AiService,
@@ -106,6 +112,7 @@ export class DashboardComponent implements OnInit {
       budgets: this.budgetService.getBudgetsWithUsage(),
       goals: this.goalService.getGoals(),
       goalOverview: this.goalService.getOverview(),
+      portfolio: this.portfolioService.getPortfolio(),
       notifications: this.notificationService.list(true),
     }).subscribe({
       next: ({
@@ -117,6 +124,7 @@ export class DashboardComponent implements OnInit {
         budgets,
         goals,
         goalOverview,
+        portfolio,
         notifications,
       }) => {
         this.userName = user.userName?.trim() || this.language.instant('dashboard.defaultUser');
@@ -124,8 +132,16 @@ export class DashboardComponent implements OnInit {
 
         this.recentNotifications = notifications.slice(0, 5);
         this.totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+        this.portfolioValue = portfolio?.totalValue ?? 0;
+        this.netWorth = this.totalBalance + this.portfolioValue;
         this.fixedCosts = contracts.reduce((sum, c) => sum + c.amount, 0);
         this.disposableIncome = this.totalBalance - this.fixedCosts;
+
+        const active = budgets.filter(
+          (b) => !b.endDate || new Date(b.endDate) >= new Date(new Date().toDateString()),
+        );
+        this.householdBudgetSpent = active.reduce((sum, b) => sum + (b.spent ?? 0), 0);
+        this.householdBudgetLimit = active.reduce((sum, b) => sum + (b.limit ?? 0), 0);
 
         this.categoryBreakdown = categoryShares(currentInsights.spendingByCategory);
         this.monthlyTrends = [...currentInsights.monthlyTrends, ...previousInsights.monthlyTrends];

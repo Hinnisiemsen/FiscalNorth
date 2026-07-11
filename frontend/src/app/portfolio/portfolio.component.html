@@ -25,6 +25,23 @@
       </div>
     </div>
 
+    @if (allocationSlices().length) {
+      <section class="card-glass allocation-card">
+        <h2>{{ 'portfolio.allocation' | translate }}</h2>
+        @for (slice of allocationSlices(); track slice.label) {
+          <div class="allocation-row">
+            <div class="allocation-head">
+              <span>{{ slice.label }}</span>
+              <span>{{ slice.share | number: '1.0-1' }} % · {{ slice.value | currency: 'EUR' }}</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="slice.share"></div>
+            </div>
+          </div>
+        }
+      </section>
+    }
+
     @if (showForm) {
       <section class="card-glass form-card">
         <h2>{{ 'portfolio.addHolding' | translate }}</h2>

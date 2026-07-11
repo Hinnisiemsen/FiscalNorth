@@ -19,7 +19,9 @@ fiscalNorth/
 * **Kontenverwaltung** – Festgeld/Sparkonten (Deposit) und Bankkonten (Giro, PayPal, Depot, Krypto, …) mit 13 Kontotypen
 * **Transaktionsmanagement** – Ausgaben, Einnahmen, Umbuchungen, Kategorisierung, **Split-Buchungen**
 * **Vertragsmanagement** – Wiederkehrende Zahlungen; automatische Erkennung + optionale KI-Analyse
-* **Budgetierung** – Ausgabenlimits pro Zeitraum inkl. Nutzungsanzeige (berücksichtigt Splits)
+* **Budgetierung** – Ausgabenlimits pro Zeitraum inkl. Nutzungsanzeige, Restbetrag und Haushalts-Aufschlüsselung
+* **Haushalt** – 2-Erwachsene-MVP, geteilte Daten, Einladungs- und Beitrittsflow
+* **Portfolio** – Gemeinsame Holdings mit Live-/Cache-Kursen (Alpha Vantage)
 * **Kategorien** – Eigene Kategorien für Transaktionen
 
 ### Erweiterte Funktionen
@@ -96,7 +98,14 @@ npm start
 
 Frontend: http://localhost:4200
 
-**Hinweis:** Lokal nutzt das Backend standardmäßig H2. Demo-Login: `alex@fiscalnorth.local` / `demo1234` (siehe [docs/AUTH.md](docs/AUTH.md)).
+**Hinweis:** Lokal nutzt das Backend standardmäßig H2. Demo-Logins (siehe [docs/AUTH.md](docs/AUTH.md)):
+
+| User | Email | Password |
+|------|-------|----------|
+| Alex (owner) | `alex@fiscalnorth.local` | `demo1234` |
+| Jamie (member) | `jamie@fiscalnorth.local` | `demo1234` |
+
+Portfolio-Kurse: `PORTFOLIO_PRICE_API_KEY` setzen und `PORTFOLIO_PRICE_PROVIDER=alphavantage`, sonst Cached Quotes aus dem Seed.
 
 ## 📚 API Übersicht
 
@@ -109,6 +118,8 @@ Frontend: http://localhost:4200
 | **Insights** | `GET /api/transaction/insights` |
 | **Verträge** | `GET/POST /api/contract`, `POST /api/contract/analyze`, `POST /api/contract/analyze/document` |
 | **Budgets** | `GET/POST /api/budget`, `GET /api/budget/with-usage` |
+| **Haushalt** | `GET /api/household/me`, `POST /api/household/invite`, `POST /api/household/invites/accept?token=` |
+| **Portfolio** | `GET /api/portfolio`, `POST /api/portfolio/holdings` |
 | **Kategorien** | `GET/POST/DELETE /api/category` |
 | **Bank-Sync** | `GET /api/bank-sync/status`, `POST /api/bank-sync/consent`, `POST /api/bank-sync/sync` |
 | **Billing** | `GET /api/billing/subscription`, `GET /api/billing/plans` |
@@ -141,12 +152,14 @@ cd frontend && npm run e2e:ci
 ### Wichtige Einstellungen
 * `GEMINI_API_KEY` – Google Gemini API-Key
 * `DEMO_PREMIUM_PREVIEW` – Premium-Features ohne Stripe (Standard: `true` lokal)
+* `PORTFOLIO_PRICE_API_KEY` / `PORTFOLIO_PRICE_PROVIDER` – Live-Kurse (Standard: `manual-fallback`)
 * `STRIPE_ENABLED` – Stripe Billing aktivieren
 * `XS2A_ENABLED` / `app.xs2a.enabled` – Bank-Sync aktivieren
 * `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` – OAuth
 
 ## 📖 Weitere Dokumentation
 
+* [ROADMAP.md](ROADMAP.md) – Produkt-Roadmap und Status
 * [docs/AUTH.md](docs/AUTH.md) – Authentication, OAuth, demo login
 * [docs/BILLING.md](docs/BILLING.md) – Stripe Premium setup
 * [docs/STAGING.md](docs/STAGING.md) – Staging / premium activation checklist

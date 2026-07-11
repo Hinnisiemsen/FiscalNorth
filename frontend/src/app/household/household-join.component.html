@@ -1,0 +1,28 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'household.join.title' | translate" />
+
+  <section class="card-glass settings-card join-card">
+    @if (household) {
+      <p class="success-text">{{ 'household.join.success' | translate: { name: household.name } }}</p>
+      <ul class="member-list">
+        @for (member of household.members; track member.userId) {
+          <li>{{ member.userName }} ({{ 'household.role.' + member.role | translate }})</li>
+        }
+      </ul>
+      <button type="button" class="btn-primary" (click)="goToHousehold()">
+        {{ 'household.join.openHousehold' | translate }}
+      </button>
+    } @else if (errorKey && !token) {
+      <p class="error-text">{{ errorKey | translate }}</p>
+      <a routerLink="/household" class="btn-secondary">{{ 'household.title' | translate }}</a>
+    } @else {
+      <p>{{ 'household.join.description' | translate }}</p>
+      @if (errorKey) {
+        <p class="error-text">{{ errorKey | translate }}</p>
+      }
+      <button type="button" class="btn-primary" [disabled]="loading || !token" (click)="acceptInvite()">
+        {{ loading ? ('common.loading' | translate) : ('household.join.accept' | translate) }}
+      </button>
+    }
+  </section>
+</div>

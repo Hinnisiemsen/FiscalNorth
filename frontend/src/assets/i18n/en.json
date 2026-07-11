@@ -37,7 +37,8 @@
     "accountSettings": "Account",
     "upgrade": "Upgrade to Premium",
     "household": "Household",
-    "portfolio": "Portfolio"
+    "portfolio": "Portfolio",
+    "householdJoin": "Join household"
   },
   "billing": {
     "subscriptionSection": "Subscription",
@@ -126,6 +127,9 @@
     "income": "Income",
     "accountBalance": "Account balance",
     "allAccounts": "all accounts",
+    "netWorth": "Net worth",
+    "netWorthHint": "accounts + portfolio",
+    "householdBudgets": "Household budgets",
     "availableAfterFixed": "Available after fixed costs",
     "panelFazit": "Summary",
     "panelMonth": "Month in detail",
@@ -410,6 +414,16 @@
     "inviteSent": "Invite sent successfully",
     "inviteFailed": "Could not send invite",
     "inviteExpires": "Expires",
+    "joinLink": "Share this join link",
+    "join": {
+      "title": "Join household",
+      "description": "Accept the invitation to share finances with your partner.",
+      "accept": "Accept invitation",
+      "success": "You joined {{name}}.",
+      "openHousehold": "Open household",
+      "missingToken": "Invite link is invalid or missing.",
+      "failed": "Could not accept invitation."
+    },
     "role": {
       "OWNER": "Owner",
       "MEMBER": "Member"
@@ -432,7 +446,8 @@
     "priceStale": "Cached price",
     "updatedBy": "Updated by",
     "empty": "No holdings yet. Add your first investment.",
-    "addFailed": "Could not add holding"
+    "addFailed": "Could not add holding",
+    "allocation": "Asset allocation"
   },
   "goals": {
     "title": "Financial goals",
