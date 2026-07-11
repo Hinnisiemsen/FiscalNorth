@@ -135,6 +135,7 @@ Integrationstests nutzen Testcontainers (Kafka, RabbitMQ, PostgreSQL).
 
 ## 📖 Weitere Dokumentation
 
+* [ROADMAP.md](ROADMAP.md) – Product roadmap and planned features
 * [docs/AUTH.md](docs/AUTH.md) – Authentication, OAuth, user isolation, demo login
 * [docs/DEPLOY.md](docs/DEPLOY.md) – Production deployment and auto-deploy on merge to master
 * [xs2a-client/README.md](xs2a-client/README.md) – Berlin Group XS2A API Client
