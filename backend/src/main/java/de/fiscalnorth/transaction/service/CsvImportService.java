@@ -3,6 +3,8 @@ package de.fiscalnorth.transaction.service;
 import de.fiscalnorth.auth.CurrentUserService;
 import de.fiscalnorth.category.model.Category;
 import de.fiscalnorth.category.repository.CategoryRepository;
+import de.fiscalnorth.household.model.Household;
+import de.fiscalnorth.household.service.HouseholdScopeService;
 import de.fiscalnorth.transaction.dto.CsvImportResult;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
 import de.fiscalnorth.transaction.model.TransactionType;
@@ -59,20 +61,24 @@ public class CsvImportService {
     private final CategoryRepository categoryRepository;
     private final Messages messages;
     private final CurrentUserService currentUserService;
+    private final HouseholdScopeService householdScopeService;
 
     public CsvImportService(PaymentTransactionRepository paymentTransactionRepository,
                             CategoryRepository categoryRepository,
                             Messages messages,
-                            CurrentUserService currentUserService) {
+                            CurrentUserService currentUserService,
+                            HouseholdScopeService householdScopeService) {
         this.paymentTransactionRepository = paymentTransactionRepository;
         this.categoryRepository = categoryRepository;
         this.messages = messages;
         this.currentUserService = currentUserService;
+        this.householdScopeService = householdScopeService;
     }
 
     @Transactional
     public CsvImportResult importFromCsv(MultipartFile file, BankPreset preset) {
         User owner = currentUserService.getCurrentUser();
+        Household household = householdScopeService.requireHousehold();
         int imported = 0;
         int skippedDuplicates = 0;
         List<String> errors = new ArrayList<>();
@@ -123,8 +129,9 @@ public class CsvImportService {
                         tx.setTransactionType(amount.compareTo(BigDecimal.ZERO) >= 0 ? TransactionType.Income : TransactionType.Expense);
                         tx.setDescription(description);
                         tx.setImportHash(hash);
-                        tx.setCategory(categorizeTransaction(description, owner));
+                        tx.setCategory(categorizeTransaction(description, owner, household.getId()));
                         tx.setOwner(owner);
+                        tx.setHousehold(household);
                         paymentTransactionRepository.save(tx);
                         imported++;
                     } catch (Exception e) {
@@ -212,38 +219,37 @@ public class CsvImportService {
         }
     }
 
-    private Category categorizeTransaction(String description, User owner) {
-        if (description == null) return findOrCreateCategory("General", owner);
+    private Category categorizeTransaction(String description, User owner, Long householdId) {
+        if (description == null) return findOrCreateCategory("General", owner, householdId);
         String lower = description.toLowerCase();
         if (lower.contains("rewe") || lower.contains("lidl") || lower.contains("aldi") || lower.contains("edeka")) {
-            return findOrCreateCategory("Groceries", owner);
+            return findOrCreateCategory("Groceries", owner, householdId);
         }
         if (lower.contains("netflix") || lower.contains("spotify") || lower.contains("prime") || lower.contains("disney")) {
-            return findOrCreateCategory("Entertainment", owner);
+            return findOrCreateCategory("Entertainment", owner, householdId);
         }
         if (lower.contains("shell") || lower.contains("aral") || lower.contains("total") || lower.contains("esso")) {
-            return findOrCreateCategory("Transport", owner);
+            return findOrCreateCategory("Transport", owner, householdId);
         }
         if (lower.contains("miete") || lower.contains("rent") || lower.contains("wohnung")) {
-            return findOrCreateCategory("Rent", owner);
+            return findOrCreateCategory("Rent", owner, householdId);
         }
         if (lower.contains("gehalt") || lower.contains("salary") || lower.contains("lohn")) {
-            return findOrCreateCategory("Salary", owner);
+            return findOrCreateCategory("Salary", owner, householdId);
         }
-        return findOrCreateCategory("General", owner);
+        return findOrCreateCategory("General", owner, householdId);
     }
 
-    private Category findOrCreateCategory(String name, User owner) {
-        return categoryRepository.findByOwnerIdAndNameAndTransactionType(
-                        owner.getId(), name,
-                        "Salary".equalsIgnoreCase(name) || "Income".equalsIgnoreCase(name)
-                                ? TransactionType.Income : TransactionType.Expense)
+    private Category findOrCreateCategory(String name, User owner, Long householdId) {
+        TransactionType type = "Salary".equalsIgnoreCase(name) || "Income".equalsIgnoreCase(name)
+                ? TransactionType.Income : TransactionType.Expense;
+        return categoryRepository.findByHouseholdIdAndNameAndTransactionType(householdId, name, type)
                 .orElseGet(() -> {
                     Category c = new Category();
                     c.setName(name);
-                    c.setTransactionType("Salary".equalsIgnoreCase(name) || "Income".equalsIgnoreCase(name)
-                            ? TransactionType.Income : TransactionType.Expense);
+                    c.setTransactionType(type);
                     c.setOwner(owner);
+                    c.setHousehold(householdScopeService.requireHousehold());
                     return categoryRepository.save(c);
                 });
     }
