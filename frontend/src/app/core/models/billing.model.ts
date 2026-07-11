@@ -20,10 +20,15 @@ export interface SubscriptionSummary {
   trialEnd: string | null;
   cancelAtPeriodEnd: boolean;
   premiumActive: boolean;
+  billingEnabled?: boolean;
+  premiumPreviewEnabled?: boolean;
+  paidSubscriptionActive?: boolean;
 }
 
 export interface SubscriptionStatusResponse extends SubscriptionSummary {
   billingEnabled: boolean;
+  premiumPreviewEnabled: boolean;
+  paidSubscriptionActive: boolean;
 }
 
 export interface BillingPlan {

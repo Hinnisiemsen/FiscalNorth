@@ -18,6 +18,8 @@ export class ContractListComponent implements OnInit {
 
   contracts: Contract[] = [];
   isAnalyzing = false;
+  isAnalyzingDocument = false;
+  documentMessage = '';
 
   constructor(private contractService: ContractService) {}
 
@@ -47,14 +49,36 @@ export class ContractListComponent implements OnInit {
   analyzeContracts() {
     this.isAnalyzing = true;
     this.contractService.analyzeContracts().subscribe({
-      next: (res) => {
-        console.log(res);
+      next: () => {
         this.loadContracts();
         this.isAnalyzing = false;
       },
       error: (err) => {
         console.error('Analysis failed', err);
         this.isAnalyzing = false;
+      },
+    });
+  }
+
+  onDocumentSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+    this.isAnalyzingDocument = true;
+    this.documentMessage = '';
+    this.contractService.analyzeContractDocument(file).subscribe({
+      next: (res) => {
+        this.documentMessage = res.summary;
+        this.loadContracts();
+        this.isAnalyzingDocument = false;
+        input.value = '';
+      },
+      error: () => {
+        this.documentMessage = this.lang.instant('contracts.documentAnalysisFailed');
+        this.isAnalyzingDocument = false;
+        input.value = '';
       },
     });
   }

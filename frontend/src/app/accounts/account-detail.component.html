@@ -15,9 +15,19 @@
       <div class="balance">
         {{ account.balance | currency: getCurrencyCode(account.currency) : 'symbol' : '1.2-2' }}
       </div>
-      <p class="meta">
-        {{ getCurrencyCode(account.currency) }} · {{ account.interestRate }}% · {{ account.term }}
-      </p>
+      @if (account.kind === 'DEPOSIT') {
+        <p class="meta">
+          {{ getCurrencyCode(account.currency) }} · {{ account.interestRate }}% · {{ account.term }}
+          · {{ 'accounts.kindDeposit' | translate }}
+        </p>
+      } @else {
+        <p class="meta">
+          {{ getCurrencyCode(account.currency) }}
+          · {{ 'accounts.types.' + (account.accountType || 'other').toLowerCase() | translate }}
+          · {{ account.bankName }}
+        </p>
+        <p class="meta meta-secondary">{{ account.iban }} · {{ account.bic }}</p>
+      }
     </div>
 
     <section class="section">

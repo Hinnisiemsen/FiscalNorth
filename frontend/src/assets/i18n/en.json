@@ -10,7 +10,8 @@
     "accounts": "Accounts",
     "bankSync": "Connect bank",
     "categories": "Categories",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "portfolio": "Portfolio"
   },
   "routes": {
     "home": "Home",
@@ -34,7 +35,10 @@
     "categories": "Categories",
     "newCategory": "New category",
     "accountSettings": "Account",
-    "upgrade": "Upgrade to Premium"
+    "upgrade": "Upgrade to Premium",
+    "household": "Household",
+    "portfolio": "Portfolio",
+    "householdJoin": "Join household"
   },
   "billing": {
     "subscriptionSection": "Subscription",
@@ -59,6 +63,8 @@
     "checkoutUnavailable": "No billing plan is configured.",
     "portalFailed": "Could not open billing portal.",
     "notConfigured": "Billing is not configured in this environment.",
+    "includedInDemo": "Premium features are included in this demo environment.",
+    "tryInDemo": "Try in demo",
     "redirecting": "Redirecting…",
     "alreadyPremium": "You already have Premium",
     "alreadyPremiumHint": "Manage your subscription from account settings.",
@@ -121,6 +127,9 @@
     "income": "Income",
     "accountBalance": "Account balance",
     "allAccounts": "all accounts",
+    "netWorth": "Net worth",
+    "netWorthHint": "accounts + portfolio",
+    "householdBudgets": "Household budgets",
     "availableAfterFixed": "Available after fixed costs",
     "panelFazit": "Summary",
     "panelMonth": "Month in detail",
@@ -269,12 +278,30 @@
     "add": "Add account",
     "empty": "No accounts yet.",
     "newTitle": "New account",
+    "kindDeposit": "Deposit / savings",
+    "kindBank": "Bank account",
+    "kindCrypto": "Crypto wallet",
     "bankName": "Bank name",
     "iban": "IBAN",
     "bic": "BIC",
     "accountType": "Account type",
     "checking": "Checking",
     "savings": "Savings",
+    "types": {
+      "checking": "Checking (Giro)",
+      "savings": "Savings",
+      "credit_card": "Credit card",
+      "cash": "Cash",
+      "investment": "Investment (Depot)",
+      "loan": "Loan",
+      "paypal": "PayPal",
+      "crypto": "Crypto wallet",
+      "pension": "Pension",
+      "insurance": "Insurance",
+      "business": "Business",
+      "prepaid": "Prepaid",
+      "other": "Other"
+    },
     "cancel": "Cancel",
     "save": "Save account",
     "detailBalance": "Balance",
@@ -307,7 +334,14 @@
     "contractOptional": "Contract (optional)",
     "cancel": "Cancel",
     "save": "Save transaction",
-    "selectCategory": "— Select category (optional) —"
+    "selectCategory": "— Select category (optional) —",
+    "splitEnable": "Split across categories",
+    "splitLines": "Split lines",
+    "splitAddLine": "Add line",
+    "splitNote": "Note (optional)",
+    "splitTotal": "Split total",
+    "splitBadge": "Split",
+    "noFilterResults": "No transactions match this filter."
   },
   "import": {
     "back": "Back to transactions",
@@ -345,6 +379,9 @@
     "cancel": "Cancel",
     "save": "Save contract",
     "analyzing": "Analyzing…",
+    "analyzeDocument": "Analyze document (AI)",
+    "analyzingDocument": "Analyzing document…",
+    "documentAnalysisFailed": "Document analysis failed.",
     "autoDetected": "Auto",
     "interval": "Interval",
     "startDate": "Start date",
@@ -364,7 +401,53 @@
     "endDate": "End date",
     "categoryOptional": "Category (optional)",
     "cancel": "Cancel",
-    "save": "Save budget"
+    "save": "Save budget",
+    "remaining": "remaining"
+  },
+  "household": {
+    "title": "Household",
+    "members": "Members",
+    "pendingInvite": "Pending invite",
+    "invitePartner": "Invite partner",
+    "partnerEmail": "Partner email",
+    "sendInvite": "Send invite",
+    "inviteSent": "Invite sent successfully",
+    "inviteFailed": "Could not send invite",
+    "inviteExpires": "Expires",
+    "joinLink": "Share this join link",
+    "join": {
+      "title": "Join household",
+      "description": "Accept the invitation to share finances with your partner.",
+      "accept": "Accept invitation",
+      "success": "You joined {{name}}.",
+      "openHousehold": "Open household",
+      "missingToken": "Invite link is invalid or missing.",
+      "failed": "Could not accept invitation."
+    },
+    "role": {
+      "OWNER": "Owner",
+      "MEMBER": "Member"
+    }
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "totalValue": "Total value",
+    "totalCost": "Total cost",
+    "unrealizedGain": "Unrealized gain",
+    "addHolding": "Add holding",
+    "saveHolding": "Save holding",
+    "symbol": "Symbol",
+    "name": "Name",
+    "quantity": "Quantity",
+    "costBasis": "Cost basis",
+    "assetClass": "Asset class",
+    "marketValue": "Market value",
+    "currentPrice": "Current price",
+    "priceStale": "Cached price",
+    "updatedBy": "Updated by",
+    "empty": "No holdings yet. Add your first investment.",
+    "addFailed": "Could not add holding",
+    "allocation": "Asset allocation"
   },
   "goals": {
     "title": "Financial goals",

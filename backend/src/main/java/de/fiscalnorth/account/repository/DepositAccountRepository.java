@@ -12,7 +12,11 @@ public interface DepositAccountRepository extends JpaRepository<DepositAccount, 
 
     Optional<DepositAccount> findByIdAndOwnerId(Long id, Long ownerId);
 
+    Optional<DepositAccount> findByIdAndHouseholdId(Long id, Long householdId);
+
     Optional<DepositAccount> findByOwnerIdAndExternalId(Long ownerId, String externalId);
+
+    List<DepositAccount> findAllByHouseholdId(Long householdId);
 
     List<DepositAccount> findByOwnerIdAndBankConsentId(Long ownerId, Long bankConsentId);
 }

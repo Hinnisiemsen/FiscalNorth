@@ -25,7 +25,11 @@ export class BankSyncComponent implements OnInit {
   error = '';
   redirectUrl = '';
 
-  get showPaywall(): boolean {
+  get showPremiumBanner(): boolean {
+    return this.entitlementService.showPremiumBanner;
+  }
+
+  get premiumBlocked(): boolean {
     return !this.entitlementService.hasFeature('BANK_SYNC');
   }
 

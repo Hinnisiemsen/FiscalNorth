@@ -23,8 +23,19 @@
             getProgressPercent(budget) | number: '1.0-1'
           }}%)</span
         >
-        <span>{{ budget.endDate | date: 'MMM y' }}</span>
+        <span class="budget-remaining">{{ budget.remaining | currency: 'EUR' }} {{ 'budgets.remaining' | translate }}</span>
       </div>
+      @if (budget.memberBreakdown?.length) {
+        <div class="member-breakdown">
+          @for (m of budget.memberBreakdown; track m.memberName) {
+            <div class="member-row">
+              <span>{{ m.memberName }}</span>
+              <span>{{ m.spent | currency: 'EUR' }}</span>
+            </div>
+          }
+        </div>
+      }
+      <div class="budget-end-date">{{ budget.endDate | date: 'MMM y' }}</div>
     </div>
   </div>
 

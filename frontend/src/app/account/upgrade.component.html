@@ -63,7 +63,9 @@
         >
           {{ loading ? ('billing.redirecting' | translate) : ('billing.upgradeCta' | translate) }}
         </button>
-        @if (!billingEnabled) {
+        @if (!billingEnabled && subscription.premiumPreviewEnabled) {
+          <p class="hint-text demo-badge">{{ 'billing.includedInDemo' | translate }}</p>
+        } @else if (!billingEnabled) {
           <p class="hint-text">{{ 'billing.notConfigured' | translate }}</p>
         }
       </section>

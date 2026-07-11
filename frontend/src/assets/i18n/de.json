@@ -10,7 +10,8 @@
     "accounts": "Konten",
     "bankSync": "Bank verbinden",
     "categories": "Kategorien",
-    "notifications": "Hinweise"
+    "notifications": "Hinweise",
+    "portfolio": "Portfolio"
   },
   "routes": {
     "home": "Start",
@@ -34,7 +35,10 @@
     "categories": "Kategorien",
     "newCategory": "Neue Kategorie",
     "accountSettings": "Konto",
-    "upgrade": "Premium freischalten"
+    "upgrade": "Premium freischalten",
+    "household": "Haushalt",
+    "portfolio": "Portfolio",
+    "householdJoin": "Haushalt beitreten"
   },
   "billing": {
     "subscriptionSection": "Abonnement",
@@ -59,6 +63,8 @@
     "checkoutUnavailable": "Kein Abrechnungsplan konfiguriert.",
     "portalFailed": "Abrechnungsportal konnte nicht geöffnet werden.",
     "notConfigured": "Abrechnung ist in dieser Umgebung nicht konfiguriert.",
+    "includedInDemo": "Premium-Funktionen sind in dieser Demo-Umgebung enthalten.",
+    "tryInDemo": "In Demo testen",
     "redirecting": "Weiterleitung…",
     "alreadyPremium": "Du hast bereits Premium",
     "alreadyPremiumHint": "Verwalte dein Abonnement in den Kontoeinstellungen.",
@@ -121,6 +127,9 @@
     "income": "Einnahmen",
     "accountBalance": "Kontostand",
     "allAccounts": "alle Konten",
+    "netWorth": "Vermögen",
+    "netWorthHint": "Konten + Portfolio",
+    "householdBudgets": "Haushaltsbudgets",
     "availableAfterFixed": "Verfügbar nach Fixkosten",
     "panelFazit": "Fazit",
     "panelMonth": "Monat im Detail",
@@ -269,12 +278,30 @@
     "add": "Konto hinzufügen",
     "empty": "Noch keine Konten.",
     "newTitle": "Neues Konto",
+    "kindDeposit": "Festgeld / Sparen",
+    "kindBank": "Bankkonto",
+    "kindCrypto": "Krypto-Wallet",
     "bankName": "Bankname",
     "iban": "IBAN",
     "bic": "BIC",
     "accountType": "Kontotyp",
     "checking": "Girokonto",
     "savings": "Sparkonto",
+    "types": {
+      "checking": "Girokonto",
+      "savings": "Sparkonto",
+      "credit_card": "Kreditkarte",
+      "cash": "Bargeld",
+      "investment": "Depot",
+      "loan": "Kreditkonto",
+      "paypal": "PayPal",
+      "crypto": "Krypto-Wallet",
+      "pension": "Altersvorsorge",
+      "insurance": "Versicherung",
+      "business": "Geschäftskonto",
+      "prepaid": "Prepaid",
+      "other": "Sonstige"
+    },
     "cancel": "Abbrechen",
     "save": "Konto speichern",
     "detailBalance": "Kontostand",
@@ -307,7 +334,13 @@
     "contractOptional": "Vertrag (optional)",
     "cancel": "Abbrechen",
     "save": "Transaktion speichern",
-    "selectCategory": "— Kategorie wählen (optional) —"
+    "selectCategory": "— Kategorie wählen (optional) —",
+    "splitEnable": "Auf Kategorien aufteilen",
+    "splitLines": "Split-Zeilen",
+    "splitAddLine": "Zeile hinzufügen",
+    "splitNote": "Notiz (optional)",
+    "splitTotal": "Split-Summe",
+    "splitBadge": "Split"
   },
   "import": {
     "back": "Zurück zu Transaktionen",
@@ -345,6 +378,9 @@
     "cancel": "Abbrechen",
     "save": "Vertrag speichern",
     "analyzing": "Analysiere…",
+    "analyzeDocument": "Dokument analysieren (KI)",
+    "analyzingDocument": "Dokument wird analysiert…",
+    "documentAnalysisFailed": "Dokumentanalyse fehlgeschlagen.",
     "autoDetected": "Auto",
     "interval": "Intervall",
     "startDate": "Startdatum",
@@ -364,7 +400,53 @@
     "endDate": "Enddatum",
     "categoryOptional": "Kategorie (optional)",
     "cancel": "Abbrechen",
-    "save": "Budget speichern"
+    "save": "Budget speichern",
+    "remaining": "übrig"
+  },
+  "household": {
+    "title": "Haushalt",
+    "members": "Mitglieder",
+    "pendingInvite": "Ausstehende Einladung",
+    "invitePartner": "Partner einladen",
+    "partnerEmail": "E-Mail des Partners",
+    "sendInvite": "Einladung senden",
+    "inviteSent": "Einladung gesendet",
+    "inviteFailed": "Einladung konnte nicht gesendet werden",
+    "inviteExpires": "Läuft ab",
+    "joinLink": "Diesen Beitrittslink teilen",
+    "join": {
+      "title": "Haushalt beitreten",
+      "description": "Nimm die Einladung an, um Finanzen mit deinem Partner zu teilen.",
+      "accept": "Einladung annehmen",
+      "success": "Du bist {{name}} beigetreten.",
+      "openHousehold": "Haushalt öffnen",
+      "missingToken": "Einladungslink fehlt oder ist ungültig.",
+      "failed": "Einladung konnte nicht angenommen werden."
+    },
+    "role": {
+      "OWNER": "Inhaber",
+      "MEMBER": "Mitglied"
+    }
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "totalValue": "Gesamtwert",
+    "totalCost": "Anschaffungskosten",
+    "unrealizedGain": "Unrealisierter Gewinn",
+    "addHolding": "Position hinzufügen",
+    "saveHolding": "Position speichern",
+    "symbol": "Symbol",
+    "name": "Name",
+    "quantity": "Stückzahl",
+    "costBasis": "Kostenbasis",
+    "assetClass": "Anlageklasse",
+    "marketValue": "Marktwert",
+    "currentPrice": "Aktueller Kurs",
+    "priceStale": "Gecachter Kurs",
+    "updatedBy": "Aktualisiert von",
+    "empty": "Noch keine Positionen.",
+    "addFailed": "Position konnte nicht hinzugefügt werden",
+    "allocation": "Asset-Allokation"
   },
   "goals": {
     "title": "Finanzziele",

@@ -49,6 +49,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     { labelKey: 'nav.contracts', path: '/contracts', icon: 'description', premium: false },
     { labelKey: 'nav.budgets', path: '/budgets', icon: 'pie_chart', premium: false },
     { labelKey: 'nav.goals', path: '/goals', icon: 'savings', premium: false },
+    { labelKey: 'nav.portfolio', path: '/portfolio', icon: 'trending_up', premium: false },
     { labelKey: 'nav.accounts', path: '/accounts', icon: 'account_balance', premium: false },
     { labelKey: 'nav.bankSync', path: '/bank-sync', icon: 'link', premium: true },
     { labelKey: 'nav.categories', path: '/categories', icon: 'category', premium: false },

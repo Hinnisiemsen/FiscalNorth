@@ -1,58 +1,70 @@
 package de.fiscalnorth.transaction.service;
 
-import de.fiscalnorth.auth.CurrentUserService;
-import de.fiscalnorth.category.model.Category;
-import de.fiscalnorth.category.repository.CategoryRepository;
-import de.fiscalnorth.contract.repository.ContractRepository;
+import de.fiscalnorth.household.service.HouseholdScopeService;
 import de.fiscalnorth.transaction.dto.CategorySpendingDto;
 import de.fiscalnorth.transaction.dto.InsightsResponse;
 import de.fiscalnorth.transaction.dto.MonthlyTrendDto;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
+import de.fiscalnorth.transaction.repository.TransactionSplitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class InsightsService {
 
     private final PaymentTransactionRepository paymentTransactionRepository;
-    private final CurrentUserService currentUserService;
+    private final TransactionSplitRepository transactionSplitRepository;
+    private final HouseholdScopeService householdScopeService;
 
     public InsightsResponse getInsights(int year, int month) {
-        Long ownerId = currentUserService.getCurrentUserId();
+        Long householdId = householdScopeService.requireHouseholdId();
         LocalDate start = LocalDate.of(year, month, 1);
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
-        return buildInsights(ownerId, start, end);
+        return buildInsights(householdId, start, end);
     }
 
     public InsightsResponse getInsightsForYear(int year) {
-        Long ownerId = currentUserService.getCurrentUserId();
+        Long householdId = householdScopeService.requireHouseholdId();
         LocalDate start = LocalDate.of(year, 1, 1);
         LocalDate end = LocalDate.of(year, 12, 31);
-        return buildInsights(ownerId, start, end);
+        return buildInsights(householdId, start, end);
     }
 
     public InsightsResponse getInsightsForOwner(Long ownerId, int year, int month) {
-        LocalDate start = LocalDate.of(year, month, 1);
-        LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
-        return buildInsights(ownerId, start, end);
+        return getInsightsForHousehold(householdScopeService.requireHouseholdId(), year, month);
     }
 
-    private InsightsResponse buildInsights(Long ownerId, LocalDate start, LocalDate end) {
-        List<CategorySpendingDto> byCategory = new ArrayList<>();
-        for (Object[] row : paymentTransactionRepository.sumExpensesByCategoryBetween(ownerId, start, end)) {
-            String categoryName = row[0] != null ? row[0].toString() : "Uncategorized";
-            BigDecimal amount = row[1] != null ? (BigDecimal) row[1] : BigDecimal.ZERO;
-            byCategory.add(new CategorySpendingDto(categoryName, amount));
+    public InsightsResponse getInsightsForHousehold(Long householdId, int year, int month) {
+        LocalDate start = LocalDate.of(year, month, 1);
+        LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
+        return buildInsights(householdId, start, end);
+    }
+
+    private InsightsResponse buildInsights(Long householdId, LocalDate start, LocalDate end) {
+        Map<String, BigDecimal> categoryTotals = new HashMap<>();
+
+        for (Object[] row : paymentTransactionRepository.sumHouseholdExpensesByCategoryBetweenExcludingSplitParents(
+                householdId, start, end)) {
+            addCategoryAmount(categoryTotals, row);
+        }
+        for (Object[] row : transactionSplitRepository.sumHouseholdExpensesByCategoryBetween(householdId, start, end)) {
+            addCategoryAmount(categoryTotals, row);
         }
 
+        List<CategorySpendingDto> byCategory = categoryTotals.entrySet().stream()
+                .map(entry -> new CategorySpendingDto(entry.getKey(), entry.getValue()))
+                .toList();
+
         List<MonthlyTrendDto> trends = new ArrayList<>();
-        for (Object[] row : paymentTransactionRepository.sumByMonthAndTypeBetween(ownerId, start, end)) {
+        for (Object[] row : paymentTransactionRepository.sumHouseholdByMonthAndTypeBetween(householdId, start, end)) {
             int yr = toInt(row[0]);
             int mo = toInt(row[1]);
             String type = row[2] != null ? row[2].toString() : "";
@@ -61,6 +73,12 @@ public class InsightsService {
         }
 
         return new InsightsResponse(byCategory, trends, start.toString(), end.toString());
+    }
+
+    private void addCategoryAmount(Map<String, BigDecimal> categoryTotals, Object[] row) {
+        String categoryName = row[0] != null ? row[0].toString() : "Uncategorized";
+        BigDecimal amount = row[1] != null ? (BigDecimal) row[1] : BigDecimal.ZERO;
+        categoryTotals.merge(categoryName, amount, BigDecimal::add);
     }
 
     private static int toInt(Object o) {

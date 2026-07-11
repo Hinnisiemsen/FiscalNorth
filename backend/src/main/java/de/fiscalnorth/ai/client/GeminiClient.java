@@ -77,4 +77,52 @@ public class GeminiClient {
         }
         return candidates.get(0).path("content").path("parts").get(0).path("text").asText("");
     }
+
+    public String generateWithInlineData(String systemPrompt, String mimeType, byte[] data, String userMessage) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new LocalizedException("error.gemini.apiKeyNotConfigured");
+        }
+
+        ObjectNode body = objectMapper.createObjectNode();
+        ObjectNode systemInstruction = objectMapper.createObjectNode();
+        ArrayNode systemParts = objectMapper.createArrayNode();
+        systemParts.addObject().put("text", systemPrompt);
+        systemInstruction.set("parts", systemParts);
+        body.set("systemInstruction", systemInstruction);
+
+        ArrayNode contents = objectMapper.createArrayNode();
+        ObjectNode userContent = objectMapper.createObjectNode();
+        ArrayNode userParts = objectMapper.createArrayNode();
+
+        ObjectNode inline = objectMapper.createObjectNode();
+        inline.put("mime_type", mimeType);
+        inline.put("data", java.util.Base64.getEncoder().encodeToString(data));
+        userParts.addObject().set("inline_data", inline);
+        userParts.addObject().put("text", userMessage);
+
+        userContent.set("parts", userParts);
+        userContent.put("role", "user");
+        contents.add(userContent);
+        body.set("contents", contents);
+
+        JsonNode response = webClient.post()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/v1beta/models/{model}:generateContent")
+                        .queryParam("key", apiKey)
+                        .build(model))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .block();
+
+        if (response == null) {
+            throw new LocalizedException("error.gemini.emptyResponse");
+        }
+        JsonNode candidates = response.path("candidates");
+        if (!candidates.isArray() || candidates.isEmpty()) {
+            throw new LocalizedException("error.gemini.noCandidates", response);
+        }
+        return candidates.get(0).path("content").path("parts").get(0).path("text").asText("");
+    }
 }

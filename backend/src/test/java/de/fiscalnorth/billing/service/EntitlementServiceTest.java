@@ -2,6 +2,7 @@ package de.fiscalnorth.billing.service;
 
 import de.fiscalnorth.billing.config.StripeProperties;
 import de.fiscalnorth.billing.model.PremiumFeature;
+import de.fiscalnorth.config.DemoProperties;
 import de.fiscalnorth.billing.model.SubscriptionPlan;
 import de.fiscalnorth.billing.model.SubscriptionStatus;
 import de.fiscalnorth.billing.model.UserSubscription;
@@ -30,13 +31,16 @@ class EntitlementServiceTest {
 
     private EntitlementService entitlementService;
     private StripeProperties stripeProperties;
+    private DemoProperties demoProperties;
 
     @BeforeEach
     void setUp() {
         stripeProperties = new StripeProperties();
         stripeProperties.setPastDueGraceDays(3);
+        demoProperties = new DemoProperties();
+        demoProperties.setPremiumPreviewEnabled(false);
         SubscriptionService subscriptionService = new SubscriptionService(userSubscriptionRepository, stripeProperties);
-        entitlementService = new EntitlementService(subscriptionService);
+        entitlementService = new EntitlementService(subscriptionService, demoProperties);
     }
 
     @Test
@@ -94,6 +98,16 @@ class EntitlementServiceTest {
 
         assertThat(entitlementService.hasFeature(admin, PremiumFeature.BANK_SYNC)).isTrue();
         assertThat(entitlementService.getEntitlements(admin)).contains(PremiumFeature.AI_ASSISTANT);
+    }
+
+    @Test
+    void demoPreviewMode_grantsAllPremiumFeatures() {
+        demoProperties.setPremiumPreviewEnabled(true);
+        User user = user(7L, UserRole.User);
+        when(userSubscriptionRepository.findByUserId(7L)).thenReturn(Optional.empty());
+
+        assertThat(entitlementService.hasFeature(user, PremiumFeature.AI_ASSISTANT)).isTrue();
+        assertThat(entitlementService.isPaidSubscriber(user)).isFalse();
     }
 
     private static User user(Long id, UserRole role) {

@@ -8,7 +8,7 @@
     }}</a>
   </app-page-header>
 
-  <div class="list-card" *ngFor="let tx of transactions">
+  <div class="list-card" *ngFor="let tx of filteredTransactions">
     <div class="list-card-icon">
       <span class="material-symbols-outlined">receipt</span>
     </div>
@@ -16,7 +16,13 @@
       <div class="list-card-title">{{ tx.description }}</div>
       <div class="list-card-meta">
         {{ tx.transactionDate | date: 'mediumDate' }}
-        <span *ngIf="tx.category"> · {{ tx.category.name }}</span>
+        <span *ngIf="tx.splits?.length"> · {{ 'transactions.splitBadge' | translate }}</span>
+        <span *ngIf="!tx.splits?.length && tx.category"> · {{ tx.category.name }}</span>
+      </div>
+      <div class="split-preview" *ngIf="tx.splits?.length">
+        <span *ngFor="let split of tx.splits" class="split-chip">
+          {{ split.category?.name }} {{ split.amount | currency: 'EUR' }}
+        </span>
       </div>
     </div>
     <div
@@ -28,7 +34,7 @@
     </div>
   </div>
 
-  <div class="empty-state" *ngIf="transactions.length === 0">
-    <p>{{ 'transactions.empty' | translate }}</p>
+  <div class="empty-state" *ngIf="filteredTransactions.length === 0">
+    <p>{{ categoryFilter || monthFilter ? ('transactions.noFilterResults' | translate) : ('transactions.empty' | translate) }}</p>
   </div>
 </div>

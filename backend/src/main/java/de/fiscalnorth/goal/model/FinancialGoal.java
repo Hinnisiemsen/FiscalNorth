@@ -1,5 +1,6 @@
 package de.fiscalnorth.goal.model;
 
+import de.fiscalnorth.household.model.Household;
 import de.fiscalnorth.shared.BaseEntity;
 import de.fiscalnorth.user.model.User;
 import jakarta.persistence.Column;
@@ -41,4 +42,8 @@ public class FinancialGoal extends BaseEntity {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "household_id")
+    private Household household;
 }

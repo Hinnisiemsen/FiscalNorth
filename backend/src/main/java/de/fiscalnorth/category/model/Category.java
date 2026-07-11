@@ -1,5 +1,6 @@
 package de.fiscalnorth.category.model;
 
+import de.fiscalnorth.household.model.Household;
 import de.fiscalnorth.shared.BaseEntity;
 import de.fiscalnorth.transaction.model.TransactionType;
 import de.fiscalnorth.user.model.User;
@@ -23,4 +24,8 @@ public class Category extends BaseEntity {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "household_id")
+    private Household household;
 }

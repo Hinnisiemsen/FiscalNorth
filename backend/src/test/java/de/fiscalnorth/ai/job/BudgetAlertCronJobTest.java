@@ -5,6 +5,11 @@ import de.fiscalnorth.billing.model.PremiumFeature;
 import de.fiscalnorth.billing.service.EntitlementService;
 import de.fiscalnorth.budget.dto.BudgetWithUsage;
 import de.fiscalnorth.budget.service.BudgetService;
+import de.fiscalnorth.household.model.Household;
+import de.fiscalnorth.household.model.Household;
+import de.fiscalnorth.household.model.HouseholdMember;
+import de.fiscalnorth.household.repository.HouseholdMemberRepository;
+import de.fiscalnorth.household.repository.HouseholdRepository;
 import de.fiscalnorth.notification.dto.NotificationDto;
 import de.fiscalnorth.notification.model.NotificationSeverity;
 import de.fiscalnorth.notification.model.NotificationType;
@@ -13,7 +18,6 @@ import de.fiscalnorth.support.TestMessages;
 import de.fiscalnorth.user.model.AuthProvider;
 import de.fiscalnorth.user.model.User;
 import de.fiscalnorth.user.model.UserRole;
-import de.fiscalnorth.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +45,10 @@ class BudgetAlertCronJobTest {
     private NotificationService notificationService;
 
     @Mock
-    private UserRepository userRepository;
+    private HouseholdRepository householdRepository;
+
+    @Mock
+    private HouseholdMemberRepository householdMemberRepository;
 
     @Mock
     private EntitlementService entitlementService;
@@ -53,7 +60,13 @@ class BudgetAlertCronJobTest {
         System.setProperty("fiscalnorth.default-locale", "en");
         AiCronProperties cronProperties = new AiCronProperties(true, null, null, null, null, 30);
         budgetAlertCronJob = new BudgetAlertCronJob(
-                cronProperties, budgetService, notificationService, TestMessages.create(), userRepository, entitlementService);
+                cronProperties,
+                budgetService,
+                notificationService,
+                TestMessages.create(),
+                householdRepository,
+                householdMemberRepository,
+                entitlementService);
     }
 
     @AfterEach
@@ -62,19 +75,27 @@ class BudgetAlertCronJobTest {
     }
 
     @Test
-    void scanBudgets_createsWarningWhenAboveThreshold() {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("test@example.com");
-        user.setUserName("Test");
-        user.setUserRole(UserRole.User);
-        user.setAuthProvider(AuthProvider.LOCAL);
+    void scanBudgets_createsWarningForEachPremiumHouseholdMember() {
+        User alex = user(1L, "Alex");
+        User jamie = user(2L, "Jamie");
+        Household household = new Household();
+        household.setId(10L);
+        household.setName("Test Household");
+
+        HouseholdMember alexMember = new HouseholdMember();
+        alexMember.setUser(alex);
+        alexMember.setHousehold(household);
+        HouseholdMember jamieMember = new HouseholdMember();
+        jamieMember.setUser(jamie);
+        jamieMember.setHousehold(household);
 
         LocalDate start = LocalDate.now().withDayOfMonth(1);
         LocalDate end = start.plusMonths(1).minusDays(1);
-        when(userRepository.findAll()).thenReturn(List.of(user));
-        when(entitlementService.hasFeature(user, PremiumFeature.AI_NOTIFICATIONS)).thenReturn(true);
-        when(budgetService.getBudgetsWithUsageForOwner(1L)).thenReturn(List.of(
+        when(householdRepository.findAll()).thenReturn(List.of(household));
+        when(householdMemberRepository.findAllByHouseholdId(10L)).thenReturn(List.of(alexMember, jamieMember));
+        when(entitlementService.hasFeature(alex, PremiumFeature.AI_NOTIFICATIONS)).thenReturn(true);
+        when(entitlementService.hasFeature(jamie, PremiumFeature.AI_NOTIFICATIONS)).thenReturn(true);
+        when(budgetService.getBudgetsWithUsageForHousehold(10L)).thenReturn(List.of(
                 new BudgetWithUsage(
                         1L,
                         "Lebensmittel",
@@ -82,10 +103,12 @@ class BudgetAlertCronJobTest {
                         start,
                         end,
                         new BigDecimal("85.00"),
+                        new BigDecimal("15.00"),
                         1L,
-                        "Food")));
+                        "Food",
+                        List.of())));
         when(notificationService.createIfAbsent(
-                        eq(1L),
+                        anyLong(),
                         anyString(),
                         anyString(),
                         anyString(),
@@ -112,5 +135,23 @@ class BudgetAlertCronJobTest {
                 eq(NotificationType.BUDGET_ALERT),
                 eq(NotificationSeverity.WARNING),
                 eq("budget-alert-cron"));
+        verify(notificationService).createIfAbsent(
+                eq(2L),
+                contains("budget-alert:1:warning"),
+                eq("Budget nearly exhausted"),
+                anyString(),
+                eq(NotificationType.BUDGET_ALERT),
+                eq(NotificationSeverity.WARNING),
+                eq("budget-alert-cron"));
+    }
+
+    private static User user(Long id, String name) {
+        User user = new User();
+        user.setId(id);
+        user.setEmail(name.toLowerCase() + "@example.com");
+        user.setUserName(name);
+        user.setUserRole(UserRole.User);
+        user.setAuthProvider(AuthProvider.LOCAL);
+        return user;
     }
 }

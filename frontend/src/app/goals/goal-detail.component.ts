@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { AccountService, DepositAccount } from '../core/services/account.service';
+import { AccountService, UnifiedAccount } from '../core/services/account.service';
 import {
   GoalService,
   GoalStatus,
@@ -22,7 +22,7 @@ import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 })
 export class GoalDetailComponent implements OnInit {
   goal: GoalWithProgress | null = null;
-  accounts: DepositAccount[] = [];
+  accounts: UnifiedAccount[] = [];
   loading = true;
   saving = false;
   editMode = false;
@@ -58,7 +58,7 @@ export class GoalDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.accountService.getDepositAccounts().subscribe((accounts) => (this.accounts = accounts));
+    this.accountService.getAllAccounts().subscribe((accounts) => (this.accounts = accounts));
     this.goalService.getGoal(id).subscribe({
       next: (goal) => {
         this.goal = goal;

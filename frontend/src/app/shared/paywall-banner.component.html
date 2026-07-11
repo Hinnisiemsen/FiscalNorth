@@ -6,7 +6,14 @@
       <p>{{ messageKey | translate }}</p>
     </div>
   </div>
-  <a routerLink="/account/upgrade" class="btn-primary paywall-cta">
-    {{ 'billing.upgradeCta' | translate }}
-  </a>
+  <div class="paywall-actions">
+    @if (showTryDemo) {
+      <button type="button" class="btn-secondary paywall-cta" (click)="tryDemo()">
+        {{ 'billing.tryInDemo' | translate }}
+      </button>
+    }
+    <a routerLink="/account/upgrade" class="btn-primary paywall-cta">
+      {{ 'billing.upgradeCta' | translate }}
+    </a>
+  </div>
 </div>

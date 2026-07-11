@@ -11,6 +11,13 @@ export interface TransferTransaction {
   toAccountId: number;
 }
 
+export interface TransactionSplit {
+  id: number;
+  amount: number;
+  note?: string;
+  category?: { id: number; name: string };
+}
+
 export interface PaymentTransaction {
   id: number;
   amount: number;
@@ -19,6 +26,7 @@ export interface PaymentTransaction {
   transactionType: string;
   category?: { id: number; name: string };
   contract?: { id: number; name: string };
+  splits?: TransactionSplit[];
 }
 
 @Injectable({

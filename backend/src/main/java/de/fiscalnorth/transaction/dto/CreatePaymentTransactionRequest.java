@@ -11,6 +11,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
 public record CreatePaymentTransactionRequest(
         @NotNull @Positive BigDecimal amount,
         @NotBlank String description,
@@ -18,5 +22,6 @@ public record CreatePaymentTransactionRequest(
         @NotNull TransactionType transactionType,
         String tags,
         Category category,
-        Contract contract) {
+        Contract contract,
+        List<SplitLineRequest> splits) {
 }
