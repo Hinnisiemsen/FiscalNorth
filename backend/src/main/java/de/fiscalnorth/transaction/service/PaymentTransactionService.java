@@ -50,7 +50,8 @@ public class PaymentTransactionService {
     }
 
     public List<PaymentTransaction> getAllPaymentTransactions() {
-        return paymentTransactionRepository.findAllByHouseholdIdWithSplits(householdScopeService.requireHouseholdId());
+        return paymentTransactionRepository.findDetailedByHouseholdIdOrderByTransactionDateDesc(
+                householdScopeService.requireHouseholdId());
     }
 
     public PaymentTransaction getPaymentTransactionById(Long id) {

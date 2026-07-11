@@ -3,6 +3,7 @@ package de.fiscalnorth.transaction.repository;
 import de.fiscalnorth.category.model.Category;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,14 +22,8 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
 
     List<PaymentTransaction> findAllByHouseholdId(Long householdId);
 
-    @Query("""
-            SELECT DISTINCT pt FROM PaymentTransaction pt
-            LEFT JOIN FETCH pt.splits s
-            LEFT JOIN FETCH s.category
-            WHERE pt.household.id = :householdId
-            ORDER BY pt.transactionDate DESC
-            """)
-    List<PaymentTransaction> findAllByHouseholdIdWithSplits(@Param("householdId") Long householdId);
+    @EntityGraph(attributePaths = {"splits", "splits.category", "category"})
+    List<PaymentTransaction> findDetailedByHouseholdIdOrderByTransactionDateDesc(Long householdId);
 
     Optional<PaymentTransaction> findByIdAndOwnerId(Long id, Long ownerId);
 

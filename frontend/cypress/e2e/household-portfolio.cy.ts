@@ -39,9 +39,7 @@ describe('Household, portfolio, splits, and demo paywall', () => {
     cy.visitApp('/assistant');
     cy.wait('@profile').its('response.body.subscription.premiumPreviewEnabled').should('eq', true);
     cy.get('app-paywall-banner', { timeout: 15000 }).should('be.visible');
-    cy.get('app-paywall-banner')
-      .contains(/try in demo/i)
-      .click();
+    cy.get('app-paywall-banner .btn-secondary.paywall-cta').click();
     cy.get('app-paywall-banner').should('not.exist');
   });
 
