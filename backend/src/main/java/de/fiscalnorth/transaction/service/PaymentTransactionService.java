@@ -4,14 +4,18 @@ import de.fiscalnorth.auth.CurrentUserService;
 import de.fiscalnorth.category.model.Category;
 import de.fiscalnorth.category.repository.CategoryRepository;
 import de.fiscalnorth.contract.repository.ContractRepository;
+import de.fiscalnorth.shared.LocalizedException;
 import de.fiscalnorth.transaction.dto.CreatePaymentTransactionRequest;
+import de.fiscalnorth.transaction.dto.SplitLineRequest;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
+import de.fiscalnorth.transaction.model.TransactionSplit;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
+import de.fiscalnorth.transaction.repository.TransactionSplitRepository;
 import de.fiscalnorth.user.model.User;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,16 +25,20 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class PaymentTransactionService {
     private final PaymentTransactionRepository paymentTransactionRepository;
+    private final TransactionSplitRepository transactionSplitRepository;
     private final CategoryRepository categoryRepository;
     private final ContractRepository contractRepository;
     private final CurrentUserService currentUserService;
 
     @Autowired
-    public PaymentTransactionService(PaymentTransactionRepository paymentTransactionRepository,
+    public PaymentTransactionService(
+            PaymentTransactionRepository paymentTransactionRepository,
+            TransactionSplitRepository transactionSplitRepository,
             CategoryRepository categoryRepository,
             ContractRepository contractRepository,
             CurrentUserService currentUserService) {
         this.paymentTransactionRepository = paymentTransactionRepository;
+        this.transactionSplitRepository = transactionSplitRepository;
         this.categoryRepository = categoryRepository;
         this.contractRepository = contractRepository;
         this.currentUserService = currentUserService;
@@ -38,6 +46,12 @@ public class PaymentTransactionService {
 
     public List<PaymentTransaction> getAllPaymentTransactions() {
         return paymentTransactionRepository.findAllByOwnerId(currentUserService.getCurrentUserId());
+    }
+
+    public PaymentTransaction getPaymentTransactionById(Long id) {
+        return paymentTransactionRepository
+                .findByIdAndOwnerId(id, currentUserService.getCurrentUserId())
+                .orElseThrow(() -> new LocalizedException("error.transaction.notFound"));
     }
 
     public List<PaymentTransaction> getRecentTransactions(int limit) {
@@ -64,13 +78,18 @@ public class PaymentTransactionService {
                 currentUserService.getCurrentUserId(), value);
     }
 
+    public List<TransactionSplit> getSplits(Long paymentId) {
+        return transactionSplitRepository.findAllByPaymentIdAndPaymentOwnerId(
+                paymentId, currentUserService.getCurrentUserId());
+    }
+
     @Transactional
     public PaymentTransaction createPaymentTransaction(CreatePaymentTransactionRequest paymentTransactionRequest) {
         User owner = currentUserService.getCurrentUser();
         PaymentTransaction paymentTransaction = new PaymentTransaction();
 
         Category category = paymentTransactionRequest.category();
-        if (category == null) {
+        if (category == null && !hasSplits(paymentTransactionRequest.splits())) {
             category = categorizeTransaction(paymentTransactionRequest.description(), owner);
         }
 
@@ -85,7 +104,47 @@ public class PaymentTransactionService {
         paymentTransaction.setTags(paymentTransactionRequest.tags());
         paymentTransaction.setOwner(owner);
 
+        if (hasSplits(paymentTransactionRequest.splits())) {
+            paymentTransaction.setCategory(null);
+            applySplits(paymentTransaction, paymentTransactionRequest.splits(), owner);
+        }
+
         return paymentTransactionRepository.save(paymentTransaction);
+    }
+
+    @Transactional
+    public List<TransactionSplit> replaceSplits(Long paymentId, List<SplitLineRequest> splitLines) {
+        PaymentTransaction payment = getPaymentTransactionById(paymentId);
+        payment.getSplits().clear();
+        if (splitLines == null || splitLines.isEmpty()) {
+            return List.of();
+        }
+        applySplits(payment, splitLines, payment.getOwner());
+        payment.setCategory(null);
+        return paymentTransactionRepository.save(payment).getSplits();
+    }
+
+    private void applySplits(PaymentTransaction payment, List<SplitLineRequest> splitLines, User owner) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (SplitLineRequest line : splitLines) {
+            Category splitCategory = categoryRepository
+                    .findByIdAndOwnerId(line.categoryId(), owner.getId())
+                    .orElseThrow(() -> new LocalizedException("error.category.notFound"));
+            TransactionSplit split = new TransactionSplit();
+            split.setPayment(payment);
+            split.setAmount(line.amount());
+            split.setCategory(splitCategory);
+            split.setNote(line.note());
+            payment.getSplits().add(split);
+            total = total.add(line.amount());
+        }
+        if (total.compareTo(payment.getAmount()) != 0) {
+            throw new LocalizedException("error.transaction.splitSumMismatch");
+        }
+    }
+
+    private boolean hasSplits(List<SplitLineRequest> splits) {
+        return splits != null && !splits.isEmpty();
     }
 
     private Category categorizeTransaction(String description, User owner) {

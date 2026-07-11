@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AccountService, DepositAccount } from '../core/services/account.service';
+import { AccountService, UnifiedAccount } from '../core/services/account.service';
 import {
   GoalPlanResponse,
   GoalService,
@@ -56,7 +56,7 @@ export class GoalInterviewComponent implements OnInit {
   selectedGoals: Set<number> = new Set();
   editableGoals: RecommendedGoal[] = [];
 
-  accounts: DepositAccount[] = [];
+  accounts: UnifiedAccount[] = [];
   readonly goalTypes = GOAL_TYPES;
   readonly riskOptions = ['conservative', 'moderate', 'aggressive'];
   readonly comfortOptions = ['low', 'medium', 'high'];
@@ -68,13 +68,17 @@ export class GoalInterviewComponent implements OnInit {
     private entitlementService: EntitlementService,
   ) {}
 
-  get showPaywall(): boolean {
+  get showPremiumBanner(): boolean {
+    return this.entitlementService.showPremiumBanner;
+  }
+
+  get premiumBlocked(): boolean {
     return !this.entitlementService.hasFeature('AI_GOAL_PLANNER');
   }
 
   ngOnInit(): void {
     this.loading = true;
-    this.accountService.getDepositAccounts().subscribe((accounts) => (this.accounts = accounts));
+    this.accountService.getAllAccounts().subscribe((accounts) => (this.accounts = accounts));
     this.goalService.startInterview().subscribe({
       next: (session) => {
         this.sessionId = session.id;
@@ -130,7 +134,7 @@ export class GoalInterviewComponent implements OnInit {
 
   generatePlan(): void {
     if (!this.sessionId) return;
-    if (this.showPaywall) {
+    if (this.premiumBlocked) {
       this.planError = 'billing.paywall.goalPlanner';
       this.step = 5;
       return;

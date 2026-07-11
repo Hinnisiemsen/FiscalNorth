@@ -10,6 +10,7 @@ import de.fiscalnorth.category.repository.CategoryRepository;
 import de.fiscalnorth.shared.RessourceNotFoundException;
 import de.fiscalnorth.user.model.User;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
+import de.fiscalnorth.transaction.repository.TransactionSplitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class BudgetService {
     private final BudgetRepository budgetRepository;
     private final PaymentTransactionRepository paymentTransactionRepository;
+    private final TransactionSplitRepository transactionSplitRepository;
     private final CategoryRepository categoryRepository;
     private final CurrentUserService currentUserService;
 
@@ -40,11 +42,18 @@ public class BudgetService {
                 .map(budget -> {
                     BigDecimal spent;
                     if (budget.getCategory() != null) {
-                        spent = paymentTransactionRepository.sumExpenseAmountByCategoryIdAndDateRange(
+                        BigDecimal direct = paymentTransactionRepository
+                                .sumExpenseAmountByCategoryIdAndDateRangeExcludingSplitParents(
+                                        ownerId,
+                                        budget.getCategory().getId(),
+                                        budget.getStartDate(),
+                                        budget.getEndDate());
+                        BigDecimal fromSplits = transactionSplitRepository.sumExpenseAmountByCategoryIdAndDateRange(
                                 ownerId,
                                 budget.getCategory().getId(),
                                 budget.getStartDate(),
                                 budget.getEndDate());
+                        spent = direct.add(fromSplits);
                     } else {
                         spent = paymentTransactionRepository.sumExpenseAmountByCategoryNameAndDateRange(
                                 ownerId,

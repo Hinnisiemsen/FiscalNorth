@@ -6,6 +6,7 @@ import de.fiscalnorth.billing.model.PremiumFeature;
 import de.fiscalnorth.billing.model.SubscriptionPlan;
 import de.fiscalnorth.billing.model.SubscriptionStatus;
 import de.fiscalnorth.billing.model.UserSubscription;
+import de.fiscalnorth.config.DemoProperties;
 import de.fiscalnorth.user.model.User;
 import de.fiscalnorth.user.model.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +24,16 @@ public class EntitlementService {
     private static final Set<PremiumFeature> PREMIUM_FEATURES = EnumSet.allOf(PremiumFeature.class);
 
     private final SubscriptionService subscriptionService;
+    private final DemoProperties demoProperties;
+
+    public boolean isPremiumPreviewEnabled() {
+        return demoProperties.isPremiumPreviewEnabled();
+    }
 
     public boolean hasFeature(User user, PremiumFeature feature) {
+        if (demoProperties.isPremiumPreviewEnabled()) {
+            return PREMIUM_FEATURES.contains(feature);
+        }
         if (user.getUserRole() == UserRole.Admin) {
             return true;
         }
@@ -43,6 +52,9 @@ public class EntitlementService {
     }
 
     public Set<PremiumFeature> getEntitlements(User user) {
+        if (demoProperties.isPremiumPreviewEnabled()) {
+            return EnumSet.copyOf(PREMIUM_FEATURES);
+        }
         if (user.getUserRole() == UserRole.Admin) {
             return EnumSet.copyOf(PREMIUM_FEATURES);
         }
@@ -52,8 +64,18 @@ public class EntitlementService {
                 .orElseGet(() -> EnumSet.noneOf(PremiumFeature.class));
     }
 
+    public boolean isPaidSubscriber(User user) {
+        if (user.getUserRole() == UserRole.Admin) {
+            return true;
+        }
+        return subscriptionService.findSubscription(user)
+                .map(subscriptionService::isPremiumActive)
+                .orElse(false);
+    }
+
     public SubscriptionSummaryDto toSummary(User user) {
         boolean premiumActive = hasFeature(user, PremiumFeature.AI_ASSISTANT);
+        boolean paidSubscriptionActive = isPaidSubscriber(user);
         SubscriptionPlan plan = premiumActive ? SubscriptionPlan.PREMIUM : SubscriptionPlan.FREE;
         List<String> entitlements = getEntitlements(user).stream()
                 .map(PremiumFeature::name)

@@ -32,6 +32,13 @@
   color: var(--color-text-muted);
 }
 
+.paywall-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .paywall-cta {
   white-space: nowrap;
 }

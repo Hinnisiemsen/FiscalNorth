@@ -1,11 +1,14 @@
 package de.fiscalnorth.account.dto;
 
 import de.fiscalnorth.account.model.AccountType;
-
+import de.fiscalnorth.shared.SupportedCurrency;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+
+import java.math.BigDecimal;
 
 public record CreateBankAccountRequest(
         @NotNull(message = "{validation.bankAccount.nameRequired}")
@@ -23,5 +26,12 @@ public record CreateBankAccountRequest(
         String bic,
 
         @NotNull(message = "{validation.bankAccount.accountTypeRequired}")
-        AccountType accountType
+        AccountType accountType,
+
+        String name,
+
+        SupportedCurrency currency,
+
+        @PositiveOrZero
+        BigDecimal balance
 ) {}

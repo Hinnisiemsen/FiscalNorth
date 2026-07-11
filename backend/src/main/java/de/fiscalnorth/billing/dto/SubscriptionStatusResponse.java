@@ -14,6 +14,8 @@ public record SubscriptionStatusResponse(
         Instant trialEnd,
         boolean cancelAtPeriodEnd,
         boolean premiumActive,
-        boolean billingEnabled
+        boolean billingEnabled,
+        boolean premiumPreviewEnabled,
+        boolean paidSubscriptionActive
 ) {
 }

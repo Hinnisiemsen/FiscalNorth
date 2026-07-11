@@ -6,38 +6,40 @@ Ein modernes Finanz-Management-System bestehend aus einem Spring-Boot-Backend un
 
 ```
 fiscalNorth/
-├── backend/          # Spring Boot API (Java 21)
-├── frontend/         # Angular 20 SPA
-├── xs2a-client/      # OpenAPI-generierter Berlin Group XS2A Client (finAPI)
-└── compose.yaml      # Docker Compose (PostgreSQL, RabbitMQ, Backend, Frontend)
+├── backend/              # Spring Boot API (Java 21)
+│   └── lib/              # finAPI XS2A client JAR (local Maven artifact)
+├── frontend/             # Angular 20 SPA
+├── docs/                 # AUTH, BILLING, DEPLOY, STAGING
+└── compose.yaml          # Docker Compose (PostgreSQL, RabbitMQ, Backend, Frontend)
 ```
 
 ## 🚀 Features
 
 ### Kernfunktionen
-* **Kontenverwaltung** – Girokonto, Sparkonto, Festgeld (DepositAccount), Krypto, Bargeld, Depot, PayPal
-* **Transaktionsmanagement** – Ausgaben, Einnahmen, Umbuchungen, Kategorisierung, Split-Buchungen
-* **Vertragsmanagement** – Wiederkehrende Zahlungen mit verschiedenen Intervallen
-* **Budgetierung** – Ausgabenlimits pro Zeitraum inkl. Nutzungsanzeige
+* **Kontenverwaltung** – Festgeld/Sparkonten (Deposit) und Bankkonten (Giro, PayPal, Depot, Krypto, …) mit 13 Kontotypen
+* **Transaktionsmanagement** – Ausgaben, Einnahmen, Umbuchungen, Kategorisierung, **Split-Buchungen**
+* **Vertragsmanagement** – Wiederkehrende Zahlungen; automatische Erkennung + optionale KI-Analyse
+* **Budgetierung** – Ausgabenlimits pro Zeitraum inkl. Nutzungsanzeige (berücksichtigt Splits)
 * **Kategorien** – Eigene Kategorien für Transaktionen
 
 ### Erweiterte Funktionen
-* **Bank-Sync (XS2A)** – PSD2-konforme Anbindung an Banken über finAPI Sandbox
+* **Bank-Sync (XS2A)** – PSD2-konforme Anbindung an Banken über finAPI Sandbox (Premium)
 * **CSV-Import** – Transaktionen aus CSV-Dateien importieren
 * **Insights** – Monatliche Trends und Ausgaben nach Kategorien
-* **KI-Integration** – Spring AI (Mistral) für Vertragsanalyse und Dokumentenverarbeitung
+* **KI-Integration** – Google Gemini (Assistent, Zielplaner, Vertragsanalyse aus Text/PDF)
+* **Premium / Stripe** – Abonnement für KI, Bank-Sync und proactive Notifications
 
 ## 🛠 Tech Stack
 
 | Komponente | Technologien |
 |------------|--------------|
 | **Backend** | Java 21, Spring Boot 3.3.5, Spring Data JPA, Spring Security |
-| **API** | Spring WebFlux (Reactive), Spring Data REST |
+| **API** | Spring MVC REST |
 | **Datenbank** | PostgreSQL (Produktion), H2 (lokale Entwicklung) |
-| **Messaging** | RabbitMQ, Apache Kafka |
-| **AI** | Spring AI (Mistral AI), PDF-Dokumentenanalyse |
+| **Messaging** | RabbitMQ, Apache Kafka (infra; optional platform extension) |
+| **AI** | Google Gemini via Spring AI |
 | **Frontend** | Angular 20, TypeScript |
-| **XS2A** | Berlin Group NextGenPSD2 Framework (finAPI Client) |
+| **XS2A** | Berlin Group NextGenPSD2 (finAPI client JAR in `backend/lib/`) |
 
 ## ⚙️ Voraussetzungen
 
@@ -65,27 +67,36 @@ docker compose up -d --build
 
 ### Option 2: Lokale Entwicklung
 
-**1. Infrastruktur starten (PostgreSQL, RabbitMQ):**
+**1. XS2A client JAR installieren (einmalig):**
+```bash
+cd backend
+./mvnw install:install-file \
+  -Dfile=lib/openapi-java-client-1.3.14_2025-01-24.jar \
+  -DgroupId=org.openapitools -DartifactId=openapi-java-client \
+  -Dversion=1.3.14_2025-01-24 -Dpackaging=jar
+```
+
+**2. Infrastruktur starten (optional PostgreSQL, RabbitMQ):**
 ```bash
 docker compose up -d postgres rabbitmq
 ```
 
-**2. Backend starten:**
+**3. Backend starten:**
 ```bash
-# Im Projektroot (baut xs2a-client + backend)
-./backend/mvnw -f pom.xml -pl backend spring-boot:run
+cd backend
+./mvnw spring-boot:run
 ```
 
-**3. Frontend starten:**
+**4. Frontend starten:**
 ```bash
 cd frontend
 npm install
-ng serve
+npm start
 ```
 
 Frontend: http://localhost:4200
 
-**Hinweis:** In der lokalen Entwicklung verwendet das Backend standardmäßig H2 (Speicher-DB). Für PostgreSQL `spring.docker.compose.enabled=true` setzen oder die Datenquelle manuell konfigurieren.
+**Hinweis:** Lokal nutzt das Backend standardmäßig H2. Demo-Login: `alex@fiscalnorth.local` / `demo1234` (siehe [docs/AUTH.md](docs/AUTH.md)).
 
 ## 📚 API Übersicht
 
@@ -93,51 +104,55 @@ Frontend: http://localhost:4200
 |---------|-----------|
 | **Bankkonten** | `GET/POST /api/account/bank`, `GET /api/account/bank/{id}` |
 | **Festgeld** | `GET/POST /api/account/deposit`, `GET/DELETE /api/account/deposit/{id}` |
-| **Transaktionen** | `GET/POST /api/transaction/payment`, `GET /api/transaction/transfer` |
+| **Transaktionen** | `GET/POST /api/transaction/payment`, `GET/PUT /api/transaction/payment/{id}/splits` |
 | **CSV-Import** | `POST /api/transaction/import/csv` |
 | **Insights** | `GET /api/transaction/insights` |
-| **Verträge** | `GET/POST /api/contract`, `POST /api/contract/analyze` |
+| **Verträge** | `GET/POST /api/contract`, `POST /api/contract/analyze`, `POST /api/contract/analyze/document` |
 | **Budgets** | `GET/POST /api/budget`, `GET /api/budget/with-usage` |
 | **Kategorien** | `GET/POST/DELETE /api/category` |
 | **Bank-Sync** | `GET /api/bank-sync/status`, `POST /api/bank-sync/consent`, `POST /api/bank-sync/sync` |
-| **User** | `GET/POST /api/user` |
+| **Billing** | `GET /api/billing/subscription`, `GET /api/billing/plans` |
 
 ## 🧪 Testen
 
 ```bash
-./backend/mvnw -f pom.xml test
+cd backend && ./mvnw test
+cd frontend && npm test
+cd frontend && npm run e2e:ci
 ```
-
-Integrationstests nutzen Testcontainers (Kafka, RabbitMQ, PostgreSQL).
 
 ## 🔄 CI/CD (GitHub Actions)
 
 | Workflow | Trigger | Beschreibung |
 |----------|---------|--------------|
-| **CI** | Push/PR auf main/master | Backend: Maven build + Tests. Frontend: npm build + Karma Tests. Docker Compose smoke test |
+| **CI** | Push/PR auf main/master | Backend tests, frontend build/tests, Cypress E2E, Docker Compose smoke |
 | **Deploy** | Nach Docker Build auf master (wenn `DEPLOY_ENABLED=true`) | SSH-Deploy auf VPS via `compose.prod.yaml` |
-| **Docker Build** | Push/PR, Release | Baut Backend- und Frontend-Images, push zu ghcr.io bei Push/Release |
-| **Lint** | PR (nur bei Änderungen in frontend/) | Prettier-Check für TypeScript, HTML, CSS |
+| **Docker Build** | Push/PR, Release | Baut Backend- und Frontend-Images, push zu ghcr.io |
+| **Lint** | PR (frontend/) | Prettier-Check |
 
 ## 📝 Konfiguration
 
 | Datei | Beschreibung |
 |-------|--------------|
 | `backend/src/main/resources/application.properties` | Hauptkonfiguration |
-| `compose.yaml` | Docker-Services und Umgebungsvariablen |
+| `.env.example` | Docker Compose Umgebungsvariablen |
+| `compose.yaml` | Docker-Services |
 
 ### Wichtige Einstellungen
-* `spring.jackson.mapper.accept-case-insensitive-enums=true` – Flexiblere Enum-Deserialisierung
-* `app.xs2a.enabled` – Bank-Sync aktivieren/deaktivieren
-* `app.xs2a.base-url` – finAPI XS2A Endpoint (z.B. Sandbox)
-* `GEMINI_API_KEY` – Google Gemini API-Key (Compose: via `.env` oder Host-Umgebung)
-* `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` – OAuth für Docker-Stack (Redirect: `http://localhost:8080/login/oauth2/code/google`)
+* `GEMINI_API_KEY` – Google Gemini API-Key
+* `DEMO_PREMIUM_PREVIEW` – Premium-Features ohne Stripe (Standard: `true` lokal)
+* `STRIPE_ENABLED` – Stripe Billing aktivieren
+* `XS2A_ENABLED` / `app.xs2a.enabled` – Bank-Sync aktivieren
+* `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` – OAuth
 
 ## 📖 Weitere Dokumentation
 
-* [docs/AUTH.md](docs/AUTH.md) – Authentication, OAuth, user isolation, demo login
-* [docs/DEPLOY.md](docs/DEPLOY.md) – Production deployment and auto-deploy on merge to master
-* [xs2a-client/README.md](xs2a-client/README.md) – Berlin Group XS2A API Client
+* [docs/AUTH.md](docs/AUTH.md) – Authentication, OAuth, demo login
+* [docs/BILLING.md](docs/BILLING.md) – Stripe Premium setup
+* [docs/STAGING.md](docs/STAGING.md) – Staging / premium activation checklist
+* [docs/PLATFORM.md](docs/PLATFORM.md) – Crypto accounts, admin API, WebSocket/events
+* [docs/DEPLOY.md](docs/DEPLOY.md) – Production deployment
+* [backend/lib/README.md](backend/lib/README.md) – XS2A client JAR
 * [frontend/README.md](frontend/README.md) – Angular-Projekt
 
 ---

@@ -3,6 +3,7 @@ package de.fiscalnorth.transaction.service;
 import de.fiscalnorth.auth.CurrentUserService;
 import de.fiscalnorth.transaction.dto.InsightsResponse;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
+import de.fiscalnorth.transaction.repository.TransactionSplitRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,9 @@ class InsightsServiceTest {
     private PaymentTransactionRepository paymentTransactionRepository;
 
     @Mock
+    private TransactionSplitRepository transactionSplitRepository;
+
+    @Mock
     private CurrentUserService currentUserService;
 
     @InjectMocks
@@ -42,8 +46,11 @@ class InsightsServiceTest {
         LocalDate start = LocalDate.of(2026, 6, 1);
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
 
-        when(paymentTransactionRepository.sumExpensesByCategoryBetween(eq(OWNER_ID), eq(start), eq(end)))
-                .thenReturn(List.<Object[]>of(new Object[]{"Groceries", new BigDecimal("120.50")}));
+        when(paymentTransactionRepository.sumExpensesByCategoryBetweenExcludingSplitParents(
+                        eq(OWNER_ID), eq(start), eq(end)))
+                .thenReturn(List.<Object[]>of(new Object[]{"Groceries", new BigDecimal("100.00")}));
+        when(transactionSplitRepository.sumExpensesByCategoryBetween(eq(OWNER_ID), eq(start), eq(end)))
+                .thenReturn(List.<Object[]>of(new Object[]{"Groceries", new BigDecimal("20.50")}));
         when(paymentTransactionRepository.sumByMonthAndTypeBetween(eq(OWNER_ID), eq(start), eq(end)))
                 .thenReturn(List.<Object[]>of(new Object[]{2026, 6, "Expense", new BigDecimal("200.00")}));
 

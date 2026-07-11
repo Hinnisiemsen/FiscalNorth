@@ -99,7 +99,7 @@ export class DashboardComponent implements OnInit {
 
     forkJoin({
       user: this.userService.getCurrentUser(),
-      accounts: this.accountService.getDepositAccounts(),
+      accounts: this.accountService.getAllAccounts(),
       contracts: this.contractService.getContracts(),
       currentInsights: this.insightsService.getInsights(this.currentYear, this.currentMonth),
       previousInsights: this.insightsService.getInsights(prevYear, prevMonth),

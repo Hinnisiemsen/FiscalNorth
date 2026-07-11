@@ -1,7 +1,7 @@
 <div class="page-content-inner">
   <app-page-header [heading]="'bankSync.title' | translate" />
 
-  @if (showPaywall) {
+  @if (showPremiumBanner) {
     <app-paywall-banner feature="BANK_SYNC" messageKey="billing.paywall.bankSync" />
   }
 
@@ -19,7 +19,7 @@
     {{ error }}
   </div>
 
-  <div class="sync-actions" *ngIf="status?.available && !showPaywall">
+  <div class="sync-actions" *ngIf="status?.available && !premiumBlocked">
     <button class="btn btn-primary" type="button" (click)="connectBank()" [disabled]="loading">
       {{ loading ? ('bankSync.connecting' | translate) : ('bankSync.connect' | translate) }}
     </button>

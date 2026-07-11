@@ -16,7 +16,13 @@
       <div class="list-card-title">{{ tx.description }}</div>
       <div class="list-card-meta">
         {{ tx.transactionDate | date: 'mediumDate' }}
-        <span *ngIf="tx.category"> · {{ tx.category.name }}</span>
+        <span *ngIf="tx.splits?.length"> · {{ 'transactions.splitBadge' | translate }}</span>
+        <span *ngIf="!tx.splits?.length && tx.category"> · {{ tx.category.name }}</span>
+      </div>
+      <div class="split-preview" *ngIf="tx.splits?.length">
+        <span *ngFor="let split of tx.splits" class="split-chip">
+          {{ split.category?.name }} {{ split.amount | currency: 'EUR' }}
+        </span>
       </div>
     </div>
     <div

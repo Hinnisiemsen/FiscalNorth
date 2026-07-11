@@ -1,11 +1,13 @@
 package de.fiscalnorth.contract.controller;
 
+import de.fiscalnorth.contract.dto.ContractDocumentAnalysisResult;
 import de.fiscalnorth.contract.dto.CreateContractRequest;
 import de.fiscalnorth.contract.model.Contract;
 import de.fiscalnorth.contract.service.ContractService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
 import java.util.List;
@@ -46,6 +48,12 @@ public class ContractController {
     public ResponseEntity<String> analyzeContracts() {
         int count = contractAnalysisService.analyzeAndCreateContracts();
         return ResponseEntity.ok(messages.get("contract.analysisComplete", count));
+    }
+
+    @PostMapping("/analyze/document")
+    public ResponseEntity<ContractDocumentAnalysisResult> analyzeContractDocument(
+            @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(contractAnalysisService.analyzeDocument(file));
     }
 
     @DeleteMapping("/{id}")

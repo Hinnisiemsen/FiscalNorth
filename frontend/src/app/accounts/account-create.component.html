@@ -1,47 +1,49 @@
 <div class="page-content-inner">
   <app-page-header [heading]="'accounts.newTitle' | translate" />
 
-  <div class="form-container card-glass">
-    <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+  <div class="account-kind-tabs">
+    <button
+      type="button"
+      class="kind-tab"
+      [class.active]="accountKind === 'DEPOSIT'"
+      (click)="setAccountKind('DEPOSIT')"
+    >
+      {{ 'accounts.kindDeposit' | translate }}
+    </button>
+    <button
+      type="button"
+      class="kind-tab"
+      [class.active]="accountKind === 'BANK'"
+      (click)="setAccountKind('BANK')"
+    >
+      {{ 'accounts.kindBank' | translate }}
+    </button>
+  </div>
+
+  <div class="form-container card-glass" *ngIf="accountKind === 'DEPOSIT'">
+    <form [formGroup]="depositForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="name">{{ 'accounts.accountName' | translate }}</label>
-        <input
-          id="name"
-          type="text"
-          formControlName="name"
-          placeholder="e.g. Main Account, Savings"
-        />
+        <label for="dep-name">{{ 'accounts.accountName' | translate }}</label>
+        <input id="dep-name" type="text" formControlName="name" />
       </div>
       <div class="form-group">
-        <label for="currency">{{ 'accounts.currency' | translate }}</label>
-        <select id="currency" formControlName="currency">
+        <label for="dep-currency">{{ 'accounts.currency' | translate }}</label>
+        <select id="dep-currency" formControlName="currency">
           <option value="EURO">EUR</option>
           <option value="USD">USD</option>
         </select>
       </div>
       <div class="form-group">
-        <label for="balance">{{ 'accounts.currentBalance' | translate }}</label>
-        <input
-          id="balance"
-          type="number"
-          formControlName="balance"
-          placeholder="0.00"
-          step="0.01"
-        />
+        <label for="dep-balance">{{ 'accounts.currentBalance' | translate }}</label>
+        <input id="dep-balance" type="number" formControlName="balance" step="0.01" />
       </div>
       <div class="form-group">
-        <label for="interestRate">{{ 'accounts.interestRate' | translate }}</label>
-        <input
-          id="interestRate"
-          type="number"
-          formControlName="interestRate"
-          placeholder="0"
-          step="0.1"
-        />
+        <label for="dep-rate">{{ 'accounts.interestRate' | translate }}</label>
+        <input id="dep-rate" type="number" formControlName="interestRate" step="0.1" />
       </div>
       <div class="form-group">
-        <label for="term">{{ 'accounts.term' | translate }}</label>
-        <select id="term" formControlName="term">
+        <label for="dep-term">{{ 'accounts.term' | translate }}</label>
+        <select id="dep-term" formControlName="term">
           <option value="Flexible">Flexible</option>
           <option value="1 Month">1 Month</option>
           <option value="3 Months">3 Months</option>
@@ -60,7 +62,55 @@
         <button type="button" class="btn btn-secondary" (click)="cancel()">
           {{ 'accounts.cancel' | translate }}
         </button>
-        <button type="submit" class="btn btn-primary" [disabled]="accountForm.invalid">
+        <button type="submit" class="btn btn-primary" [disabled]="depositForm.invalid">
+          {{ 'accounts.save' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="form-container card-glass" *ngIf="accountKind === 'BANK'">
+    <form [formGroup]="bankForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="bank-name">{{ 'accounts.accountName' | translate }}</label>
+        <input id="bank-name" type="text" formControlName="name" />
+      </div>
+      <div class="form-group">
+        <label for="bank-institution">{{ 'accounts.bankName' | translate }}</label>
+        <input id="bank-institution" type="text" formControlName="bankName" />
+      </div>
+      <div class="form-group">
+        <label for="bank-type">{{ 'accounts.accountType' | translate }}</label>
+        <select id="bank-type" formControlName="accountType">
+          <option *ngFor="let type of bankAccountTypes" [value]="type">
+            {{ 'accounts.types.' + type.toLowerCase() | translate }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="bank-iban">{{ 'accounts.iban' | translate }}</label>
+        <input id="bank-iban" type="text" formControlName="iban" />
+      </div>
+      <div class="form-group">
+        <label for="bank-bic">{{ 'accounts.bic' | translate }}</label>
+        <input id="bank-bic" type="text" formControlName="bic" />
+      </div>
+      <div class="form-group">
+        <label for="bank-currency">{{ 'accounts.currency' | translate }}</label>
+        <select id="bank-currency" formControlName="currency">
+          <option value="EURO">EUR</option>
+          <option value="USD">USD</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="bank-balance">{{ 'accounts.currentBalance' | translate }}</label>
+        <input id="bank-balance" type="number" formControlName="balance" step="0.01" />
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">
+          {{ 'accounts.cancel' | translate }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="bankForm.invalid">
           {{ 'accounts.save' | translate }}
         </button>
       </div>

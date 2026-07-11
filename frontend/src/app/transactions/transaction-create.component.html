@@ -5,16 +5,11 @@
     <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="description">{{ 'transactions.description' | translate }}</label>
-        <input
-          id="description"
-          type="text"
-          formControlName="description"
-          placeholder="e.g. Netflix, Rewe"
-        />
+        <input id="description" type="text" formControlName="description" />
       </div>
       <div class="form-group">
         <label for="amount">{{ 'transactions.amount' | translate }}</label>
-        <input id="amount" type="number" formControlName="amount" placeholder="0.00" step="0.01" />
+        <input id="amount" type="number" formControlName="amount" step="0.01" />
       </div>
       <div class="form-group">
         <label for="date">{{ 'transactions.date' | translate }}</label>
@@ -27,13 +22,48 @@
           <option value="Income">{{ 'transactions.income' | translate }}</option>
         </select>
       </div>
-      <div class="form-group">
-        <label for="category">{{ 'transactions.category' | translate }}</label>
-        <select id="category" formControlName="categoryId">
-          <option [ngValue]="null">{{ 'transactions.selectCategory' | translate }}</option>
-          <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
-        </select>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" [checked]="splitEnabled" (change)="toggleSplit($any($event.target).checked)" />
+          {{ 'transactions.splitEnable' | translate }}
+        </label>
       </div>
+
+      @if (!splitEnabled) {
+        <div class="form-group">
+          <label for="category">{{ 'transactions.category' | translate }}</label>
+          <select id="category" formControlName="categoryId">
+            <option [ngValue]="null">{{ 'transactions.selectCategory' | translate }}</option>
+            <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+      } @else {
+        <div class="split-section" formArrayName="splits">
+          <div class="split-header">
+            <h3>{{ 'transactions.splitLines' | translate }}</h3>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="addSplitLine()">
+              {{ 'transactions.splitAddLine' | translate }}
+            </button>
+          </div>
+          @for (line of splits.controls; track $index) {
+            <div class="split-line" [formGroupName]="$index">
+              <input type="number" formControlName="amount" step="0.01" [placeholder]="'transactions.amount' | translate" />
+              <select formControlName="categoryId">
+                <option [ngValue]="null">{{ 'transactions.selectCategory' | translate }}</option>
+                <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
+              </select>
+              <input type="text" formControlName="note" [placeholder]="'transactions.splitNote' | translate" />
+              <button type="button" class="btn btn-ghost btn-sm" (click)="removeSplitLine($index)">×</button>
+            </div>
+          }
+          <p class="split-total" [class.invalid]="splitTotalMismatch()">
+            {{ 'transactions.splitTotal' | translate }}: {{ splitTotal() | currency: 'EUR' }}
+            / {{ transactionForm.get('amount')?.value | currency: 'EUR' }}
+          </p>
+        </div>
+      }
+
       <div class="form-group">
         <label for="contract">{{ 'transactions.contractOptional' | translate }}</label>
         <select id="contract" formControlName="contractId">

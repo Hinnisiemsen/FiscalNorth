@@ -63,7 +63,11 @@ export class AssistantComponent implements OnInit {
   private pendingQuery: string | null = null;
   private pendingAnalysis = false;
 
-  get showPaywall(): boolean {
+  get showPremiumBanner(): boolean {
+    return this.entitlementService.showPremiumBanner;
+  }
+
+  get premiumBlocked(): boolean {
     return !this.entitlementService.hasFeature('AI_ASSISTANT');
   }
 

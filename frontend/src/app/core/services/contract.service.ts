@@ -29,4 +29,13 @@ export class ContractService {
   analyzeContracts(): Observable<string> {
     return this.apiService.post<string>('/contract/analyze', {});
   }
+
+  analyzeContractDocument(file: File): Observable<{ createdCount: number; summary: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.apiService.postFormData<{ createdCount: number; summary: string }>(
+      '/contract/analyze/document',
+      formData,
+    );
+  }
 }

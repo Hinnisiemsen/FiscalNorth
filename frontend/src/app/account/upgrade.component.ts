@@ -54,6 +54,10 @@ export class UpgradeComponent implements OnInit {
     return this.entitlementService.isPremium;
   }
 
+  get subscription() {
+    return this.entitlementService.subscription;
+  }
+
   startCheckout(): void {
     const plan = this.selectedPlan;
     if (!plan) {

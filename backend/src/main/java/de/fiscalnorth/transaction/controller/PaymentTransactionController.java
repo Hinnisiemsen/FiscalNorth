@@ -3,7 +3,9 @@ package de.fiscalnorth.transaction.controller;
 import de.fiscalnorth.category.model.Category;
 import de.fiscalnorth.category.service.CategoryService;
 import de.fiscalnorth.transaction.dto.CreatePaymentTransactionRequest;
+import de.fiscalnorth.transaction.dto.SplitLineRequest;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
+import de.fiscalnorth.transaction.model.TransactionSplit;
 import de.fiscalnorth.transaction.service.PaymentTransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +38,26 @@ public class PaymentTransactionController {
         return ResponseEntity.ok(paymentTransactionService.getRecentTransactions(safeLimit));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PaymentTransaction> getPaymentTransactionById(@PathVariable Long id) {
+        return ResponseEntity.ok(paymentTransactionService.getPaymentTransactionById(id));
+    }
+
+    @GetMapping("/{id}/splits")
+    public ResponseEntity<List<TransactionSplit>> getPaymentTransactionSplits(@PathVariable Long id) {
+        return ResponseEntity.ok(paymentTransactionService.getSplits(id));
+    }
+
+    @PutMapping("/{id}/splits")
+    public ResponseEntity<List<TransactionSplit>> replacePaymentTransactionSplits(
+            @PathVariable Long id,
+            @RequestBody List<SplitLineRequest> splitLines) {
+        return ResponseEntity.ok(paymentTransactionService.replaceSplits(id, splitLines));
+    }
+
     @PostMapping
     public ResponseEntity<PaymentTransaction> createPaymentTransaction(
-            CreatePaymentTransactionRequest paymentTransactionRequest) {
+            @RequestBody CreatePaymentTransactionRequest paymentTransactionRequest) {
         PaymentTransaction paymentTransaction = paymentTransactionService
                 .createPaymentTransaction(paymentTransactionRequest);
         return new ResponseEntity<>(paymentTransaction, HttpStatus.CREATED);

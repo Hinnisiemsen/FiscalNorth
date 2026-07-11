@@ -3,20 +3,33 @@
     <a routerLink="/accounts/new" class="btn btn-primary">{{ 'accounts.add' | translate }}</a>
   </app-page-header>
 
-  <div class="list-card" *ngFor="let account of accounts">
+  <a
+    class="list-card list-card-link"
+    *ngFor="let account of accounts"
+    [routerLink]="['/accounts', account.id]"
+  >
     <div class="list-card-icon">
-      <span class="material-symbols-outlined">account_balance</span>
+      <span class="material-symbols-outlined">{{ accountIcon(account) }}</span>
     </div>
     <div class="list-card-body">
       <div class="list-card-title">{{ account.name }}</div>
-      <div class="list-card-meta">
+      <div class="list-card-meta" *ngIf="account.kind === 'DEPOSIT'">
         {{ getCurrencyCode(account.currency) }} · {{ account.interestRate }}%
+        · {{ 'accounts.kindDeposit' | translate }}
+      </div>
+      <div class="list-card-meta" *ngIf="account.kind === 'BANK'">
+        {{ getCurrencyCode(account.currency) }}
+        · {{ 'accounts.types.' + (account.accountType || 'other').toLowerCase() | translate }}
+        · {{ 'accounts.kindBank' | translate }}
+      </div>
+      <div class="list-card-meta" *ngIf="account.kind === 'CRYPTO'">
+        {{ getCurrencyCode(account.currency) }} · {{ 'accounts.kindCrypto' | translate }}
       </div>
     </div>
     <div class="list-card-amount">
       {{ account.balance | currency: getCurrencyCode(account.currency) : 'symbol' : '1.2-2' }}
     </div>
-  </div>
+  </a>
 
   <div class="empty-state" *ngIf="accounts.length === 0">
     <p>{{ 'accounts.empty' | translate }}</p>

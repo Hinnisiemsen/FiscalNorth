@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  FormArray,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { TransactionService } from '../core/services/transaction.service';
 import { CategoryService, Category } from '../core/services/category.service';
@@ -19,6 +25,7 @@ export class TransactionCreateComponent implements OnInit {
   transactionForm: FormGroup;
   categories: Category[] = [];
   contracts: Contract[] = [];
+  splitEnabled = false;
 
   constructor(
     private fb: FormBuilder,
@@ -34,7 +41,12 @@ export class TransactionCreateComponent implements OnInit {
       transactionType: ['Expense', Validators.required],
       categoryId: [null],
       contractId: [null],
+      splits: this.fb.array([]),
     });
+  }
+
+  get splits(): FormArray {
+    return this.transactionForm.get('splits') as FormArray;
   }
 
   ngOnInit() {
@@ -42,22 +54,79 @@ export class TransactionCreateComponent implements OnInit {
     this.contractService.getContracts().subscribe((data) => (this.contracts = data));
   }
 
-  onSubmit() {
-    if (this.transactionForm.valid) {
-      const val = this.transactionForm.value;
-      const payload = {
-        description: val.description,
-        amount: val.amount,
-        transactionDate: val.transactionDate,
-        transactionType: val.transactionType,
-        category: val.categoryId ? { id: val.categoryId } : null,
-        contract: val.contractId ? { id: val.contractId } : null,
-      };
-      this.transactionService.createPaymentTransaction(payload).subscribe({
-        next: () => this.router.navigate(['/transactions']),
-        error: (err) => console.error('Failed to create transaction', err),
-      });
+  toggleSplit(enabled: boolean): void {
+    this.splitEnabled = enabled;
+    if (enabled && this.splits.length === 0) {
+      this.addSplitLine();
+      this.addSplitLine();
     }
+    if (!enabled) {
+      this.splits.clear();
+    }
+  }
+
+  addSplitLine(): void {
+    this.splits.push(
+      this.fb.group({
+        amount: ['', [Validators.required, Validators.min(0.01)]],
+        categoryId: [null, Validators.required],
+        note: [''],
+      }),
+    );
+  }
+
+  removeSplitLine(index: number): void {
+    this.splits.removeAt(index);
+  }
+
+  splitTotal(): number {
+    return this.splits.controls.reduce((sum, control) => {
+      const value = Number(control.get('amount')?.value || 0);
+      return sum + value;
+    }, 0);
+  }
+
+  splitTotalMismatch(): boolean {
+    const amount = Number(this.transactionForm.get('amount')?.value || 0);
+    return this.splitEnabled && Math.abs(this.splitTotal() - amount) > 0.009;
+  }
+
+  onSubmit() {
+    if (this.transactionForm.invalid) {
+      return;
+    }
+
+    const val = this.transactionForm.value;
+    const amount = Number(val.amount);
+
+    if (this.splitEnabled) {
+      const splitTotal = this.splitTotal();
+      if (Math.abs(splitTotal - amount) > 0.009) {
+        return;
+      }
+    }
+
+    const payload: Record<string, unknown> = {
+      description: val.description,
+      amount: val.amount,
+      transactionDate: val.transactionDate,
+      transactionType: val.transactionType,
+      category: !this.splitEnabled && val.categoryId ? { id: val.categoryId } : null,
+      contract: val.contractId ? { id: val.contractId } : null,
+    };
+
+    if (this.splitEnabled && this.splits.length > 0) {
+      payload['splits'] = this.splits.controls.map((control) => ({
+        amount: Number(control.get('amount')?.value),
+        categoryId: control.get('categoryId')?.value,
+        note: control.get('note')?.value || null,
+      }));
+    }
+
+    this.transactionService.createPaymentTransaction(payload).subscribe({
+      next: () => this.router.navigate(['/transactions']),
+      error: (err) => console.error('Failed to create transaction', err),
+    });
   }
 
   cancel() {
