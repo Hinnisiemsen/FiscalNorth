@@ -17,6 +17,7 @@ Modern personal finance app built as a **portfolio showcase project**: Spring Bo
 | Live prices | Alpha Vantage + cached fallback + daily cron |
 | Demo seed | Alex + Jamie household, split tx, sample holdings |
 | E2E tests | Cypress — auth, transactions, billing, household, portfolio |
+| iOS app (SwiftUI MVP) | In progress — see [ios/README.md](ios/README.md) |
 
 ## Quick demo
 
@@ -71,6 +72,7 @@ FiscalNorth/
 ├── backend/              # Spring Boot API (Java 21)
 │   └── lib/              # finAPI XS2A client JAR
 ├── frontend/             # Angular 20 SPA
+├── ios/                  # Native SwiftUI iOS app (see ios/README.md)
 ├── docs/                 # AUTH, BILLING, DEPLOY, STAGING, PLATFORM
 ├── ROADMAP.md            # Product roadmap & status
 └── compose.yaml          # Docker Compose stack
