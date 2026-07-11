@@ -3,6 +3,8 @@ package de.fiscalnorth.transaction.service;
 import de.fiscalnorth.auth.CurrentUserService;
 import de.fiscalnorth.category.model.Category;
 import de.fiscalnorth.category.repository.CategoryRepository;
+import de.fiscalnorth.household.model.Household;
+import de.fiscalnorth.household.service.HouseholdScopeService;
 import de.fiscalnorth.transaction.dto.CsvImportResult;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
 import de.fiscalnorth.transaction.model.TransactionType;
@@ -33,6 +35,7 @@ import static org.mockito.Mockito.when;
 class CsvImportServiceTest {
 
     private static final Long OWNER_ID = 1L;
+    private static final Long HOUSEHOLD_ID = 10L;
 
     @Mock
     private PaymentTransactionRepository paymentTransactionRepository;
@@ -43,11 +46,19 @@ class CsvImportServiceTest {
     @Mock
     private CurrentUserService currentUserService;
 
+    @Mock
+    private HouseholdScopeService householdScopeService;
+
     private CsvImportService service;
 
     @BeforeEach
     void setUp() {
-        service = new CsvImportService(paymentTransactionRepository, categoryRepository, TestMessages.create(), currentUserService);
+        service = new CsvImportService(
+                paymentTransactionRepository,
+                categoryRepository,
+                TestMessages.create(),
+                currentUserService,
+                householdScopeService);
         User owner = new User();
         owner.setId(OWNER_ID);
         owner.setEmail("test@example.com");
@@ -55,6 +66,9 @@ class CsvImportServiceTest {
         owner.setUserRole(UserRole.User);
         owner.setAuthProvider(AuthProvider.LOCAL);
         when(currentUserService.getCurrentUser()).thenReturn(owner);
+        Household household = new Household();
+        household.setId(HOUSEHOLD_ID);
+        when(householdScopeService.requireHousehold()).thenReturn(household);
     }
 
     @Test
@@ -68,7 +82,7 @@ class CsvImportServiceTest {
                 "file", "test.csv", "text/csv", csv.getBytes(StandardCharsets.UTF_8));
 
         when(paymentTransactionRepository.existsByOwnerIdAndImportHash(eq(OWNER_ID), anyString())).thenReturn(false);
-        when(categoryRepository.findByOwnerIdAndNameAndTransactionType(anyLong(), anyString(), any()))
+        when(categoryRepository.findByHouseholdIdAndNameAndTransactionType(eq(HOUSEHOLD_ID), anyString(), any()))
                 .thenReturn(Optional.empty());
         when(categoryRepository.save(any(Category.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
@@ -84,6 +98,9 @@ class CsvImportServiceTest {
         assertThat(captor.getAllValues())
                 .extracting(PaymentTransaction::getTransactionType)
                 .containsExactly(TransactionType.Expense, TransactionType.Income);
+        assertThat(captor.getAllValues())
+                .extracting(tx -> tx.getHousehold().getId())
+                .containsOnly(HOUSEHOLD_ID);
     }
 
     @Test
