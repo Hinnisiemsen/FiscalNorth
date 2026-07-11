@@ -32,6 +32,33 @@
 .budget-footer {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.25rem;
   font-size: 0.8125rem;
+  color: var(--color-text-light);
+}
+
+.budget-remaining {
+  font-weight: 500;
+  color: var(--color-accent);
+}
+
+.budget-end-date {
+  font-size: 0.8125rem;
+  color: var(--color-text-light);
+  margin-top: 0.25rem;
+}
+
+.member-breakdown {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.member-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  padding: 0.2rem 0;
   color: var(--color-text-light);
 }

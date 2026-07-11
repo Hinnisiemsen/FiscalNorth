@@ -4,6 +4,8 @@ import de.fiscalnorth.account.dto.CreateBankAccountRequest;
 import de.fiscalnorth.account.model.BankAccount;
 import de.fiscalnorth.account.repository.BankAccountRepository;
 import de.fiscalnorth.auth.CurrentUserService;
+import de.fiscalnorth.household.model.Household;
+import de.fiscalnorth.household.service.HouseholdScopeService;
 import de.fiscalnorth.shared.LocalizedException;
 import de.fiscalnorth.shared.RessourceNotFoundException;
 import de.fiscalnorth.shared.SupportedCurrency;
@@ -23,19 +25,21 @@ import java.util.List;
 public class BankAccountService {
     private final BankAccountRepository bankAccountRepository;
     private final CurrentUserService currentUserService;
+    private final HouseholdScopeService householdScopeService;
 
     public List<BankAccount> getAllBankAccounts() {
-        return bankAccountRepository.findAllByOwnerId(currentUserService.getCurrentUserId());
+        return bankAccountRepository.findAllByHouseholdId(householdScopeService.requireHouseholdId());
     }
 
     public BankAccount getBankAccountById(Long bankAccountId) {
-        return bankAccountRepository.findByIdAndOwnerId(bankAccountId, currentUserService.getCurrentUserId())
+        return bankAccountRepository.findByIdAndHouseholdId(bankAccountId, householdScopeService.requireHouseholdId())
                 .orElseThrow(() -> new RessourceNotFoundException("BankAccount", "id", bankAccountId));
     }
 
     @Transactional
     public BankAccount addNewBankAccount(CreateBankAccountRequest createBankAccountRequest) {
         User owner = currentUserService.getCurrentUser();
+        Household household = householdScopeService.requireHousehold();
         BankAccount newBankAccount = new BankAccount();
 
         newBankAccount.setBankName(createBankAccountRequest.bankName());
@@ -55,6 +59,7 @@ public class BankAccountService {
                         ? createBankAccountRequest.balance()
                         : BigDecimal.ZERO);
         newBankAccount.setOwner(owner);
+        newBankAccount.setHousehold(household);
 
         if (bankAccountRepository.existsByOwnerIdAndIbanIsAndBicIs(
                 owner.getId(), newBankAccount.getIban(), newBankAccount.getBic())) {
@@ -64,4 +69,3 @@ public class BankAccountService {
         return bankAccountRepository.save(newBankAccount);
     }
 }
-

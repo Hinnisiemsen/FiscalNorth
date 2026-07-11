@@ -15,6 +15,8 @@ public interface TransactionSplitRepository extends JpaRepository<TransactionSpl
 
     List<TransactionSplit> findAllByPaymentIdAndPaymentOwnerId(Long paymentId, Long ownerId);
 
+    List<TransactionSplit> findAllByPaymentIdAndPaymentHouseholdId(Long paymentId, Long householdId);
+
     @Query("""
             SELECT COALESCE(SUM(ts.amount), 0) FROM TransactionSplit ts
             JOIN ts.payment p
@@ -40,6 +42,34 @@ public interface TransactionSplitRepository extends JpaRepository<TransactionSpl
             """)
     List<Object[]> sumExpensesByCategoryBetween(
             @Param("ownerId") Long ownerId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    @Query("""
+            SELECT COALESCE(SUM(ts.amount), 0) FROM TransactionSplit ts
+            JOIN ts.payment p
+            WHERE p.household.id = :householdId
+              AND ts.category.id = :categoryId
+              AND p.transactionType = de.fiscalnorth.transaction.model.TransactionType.Expense
+              AND p.transactionDate BETWEEN :startDate AND :endDate
+            """)
+    BigDecimal sumHouseholdExpenseAmountByCategoryIdAndDateRange(
+            @Param("householdId") Long householdId,
+            @Param("categoryId") Long categoryId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    @Query("""
+            SELECT ts.category.name, SUM(ts.amount) FROM TransactionSplit ts
+            JOIN ts.payment p
+            WHERE p.household.id = :householdId
+              AND p.transactionType = de.fiscalnorth.transaction.model.TransactionType.Expense
+              AND p.transactionDate BETWEEN :startDate AND :endDate
+              AND ts.category IS NOT NULL
+            GROUP BY ts.category.name
+            """)
+    List<Object[]> sumHouseholdExpensesByCategoryBetween(
+            @Param("householdId") Long householdId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 }

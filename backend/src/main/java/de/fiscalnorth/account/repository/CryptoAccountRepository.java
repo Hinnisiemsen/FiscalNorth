@@ -11,5 +11,9 @@ import java.util.Optional;
 public interface CryptoAccountRepository extends JpaRepository<CryptoAccount, Long> {
     List<CryptoAccount> findAllByOwnerId(Long ownerId);
 
+    List<CryptoAccount> findAllByHouseholdId(Long householdId);
+
     Optional<CryptoAccount> findByIdAndOwnerId(Long id, Long ownerId);
+
+    Optional<CryptoAccount> findByIdAndHouseholdId(Long id, Long householdId);
 }

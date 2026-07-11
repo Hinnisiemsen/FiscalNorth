@@ -1,0 +1,109 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'portfolio.title' | translate">
+    <button type="button" class="btn btn-primary" (click)="toggleForm()">
+      {{ (showForm ? 'common.cancel' : 'portfolio.addHolding') | translate }}
+    </button>
+  </app-page-header>
+
+  @if (loading) {
+    <p>{{ 'common.loading' | translate }}</p>
+  } @else if (portfolio) {
+    <div class="summary-grid">
+      <div class="summary-card card-glass">
+        <span class="summary-label">{{ 'portfolio.totalValue' | translate }}</span>
+        <span class="summary-value">{{ portfolio.totalValue | currency: 'EUR' }}</span>
+      </div>
+      <div class="summary-card card-glass">
+        <span class="summary-label">{{ 'portfolio.totalCost' | translate }}</span>
+        <span class="summary-value">{{ portfolio.totalCost | currency: 'EUR' }}</span>
+      </div>
+      <div class="summary-card card-glass">
+        <span class="summary-label">{{ 'portfolio.unrealizedGain' | translate }}</span>
+        <span class="summary-value" [class]="gainClass(portfolio.unrealizedGain)">
+          {{ portfolio.unrealizedGain | currency: 'EUR' }}
+        </span>
+      </div>
+    </div>
+
+    @if (showForm) {
+      <section class="card-glass form-card">
+        <h2>{{ 'portfolio.addHolding' | translate }}</h2>
+        <form [formGroup]="holdingForm" (ngSubmit)="addHolding()" class="holding-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="symbol">{{ 'portfolio.symbol' | translate }}</label>
+              <input id="symbol" formControlName="symbol" />
+            </div>
+            <div class="form-group">
+              <label for="name">{{ 'portfolio.name' | translate }}</label>
+              <input id="name" formControlName="name" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="quantity">{{ 'portfolio.quantity' | translate }}</label>
+              <input id="quantity" type="number" step="0.0001" formControlName="quantity" />
+            </div>
+            <div class="form-group">
+              <label for="costBasis">{{ 'portfolio.costBasis' | translate }}</label>
+              <input id="costBasis" type="number" step="0.01" formControlName="costBasis" />
+            </div>
+            <div class="form-group">
+              <label for="assetClass">{{ 'portfolio.assetClass' | translate }}</label>
+              <select id="assetClass" formControlName="assetClass">
+                <option value="STOCK">Stock</option>
+                <option value="ETF">ETF</option>
+                <option value="FUND">Fund</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+          </div>
+          @if (addError) {
+            <p class="error-text">{{ addError | translate }}</p>
+          }
+          <button type="submit" class="btn-primary" [disabled]="holdingForm.invalid">
+            {{ 'portfolio.saveHolding' | translate }}
+          </button>
+        </form>
+      </section>
+    }
+
+    <div class="holdings-list">
+      @for (h of portfolio.holdings; track h.id) {
+        <div class="holding-card card-glass">
+          <div class="holding-head">
+            <div>
+              <h3>{{ h.symbol }}</h3>
+              <p class="holding-name">{{ h.name }}</p>
+            </div>
+            <span class="asset-badge">{{ h.assetClass }}</span>
+          </div>
+          <div class="holding-stats">
+            <div>
+              <span class="stat-label">{{ 'portfolio.marketValue' | translate }}</span>
+              <span>{{ h.marketValue | currency: 'EUR' }}</span>
+            </div>
+            <div>
+              <span class="stat-label">{{ 'portfolio.currentPrice' | translate }}</span>
+              <span>{{ h.currentPrice | currency: 'EUR' }}</span>
+              @if (h.priceStale) {
+                <span class="stale-badge">{{ 'portfolio.priceStale' | translate }}</span>
+              }
+            </div>
+            <div>
+              <span class="stat-label">{{ 'portfolio.unrealizedGain' | translate }}</span>
+              <span [class]="gainClass(h.unrealizedGain)">{{ h.unrealizedGain | currency: 'EUR' }}</span>
+            </div>
+          </div>
+          @if (h.lastUpdatedBy) {
+            <p class="holding-meta">{{ 'portfolio.updatedBy' | translate }}: {{ h.lastUpdatedBy }}</p>
+          }
+        </div>
+      } @empty {
+        <div class="empty-state card-glass">
+          <p>{{ 'portfolio.empty' | translate }}</p>
+        </div>
+      }
+    </div>
+  }
+</div>

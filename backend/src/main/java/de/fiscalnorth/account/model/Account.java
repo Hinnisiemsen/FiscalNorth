@@ -1,5 +1,6 @@
 package de.fiscalnorth.account.model;
 
+import de.fiscalnorth.household.model.Household;
 import de.fiscalnorth.shared.BaseEntity;
 import de.fiscalnorth.shared.SupportedCurrency;
 import de.fiscalnorth.user.model.User;
@@ -22,4 +23,8 @@ public abstract class Account extends BaseEntity {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     protected User owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "household_id")
+    protected Household household;
 }

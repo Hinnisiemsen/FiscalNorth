@@ -1,6 +1,6 @@
 package de.fiscalnorth.transaction.service;
 
-import de.fiscalnorth.auth.CurrentUserService;
+import de.fiscalnorth.household.service.HouseholdScopeService;
 import de.fiscalnorth.transaction.dto.InsightsResponse;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
 import de.fiscalnorth.transaction.repository.TransactionSplitRepository;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class InsightsServiceTest {
 
-    private static final Long OWNER_ID = 42L;
+    private static final Long HOUSEHOLD_ID = 1L;
 
     @Mock
     private PaymentTransactionRepository paymentTransactionRepository;
@@ -31,14 +31,14 @@ class InsightsServiceTest {
     private TransactionSplitRepository transactionSplitRepository;
 
     @Mock
-    private CurrentUserService currentUserService;
+    private HouseholdScopeService householdScopeService;
 
     @InjectMocks
     private InsightsService insightsService;
 
     @BeforeEach
     void setUp() {
-        when(currentUserService.getCurrentUserId()).thenReturn(OWNER_ID);
+        when(householdScopeService.requireHouseholdId()).thenReturn(HOUSEHOLD_ID);
     }
 
     @Test
@@ -46,12 +46,12 @@ class InsightsServiceTest {
         LocalDate start = LocalDate.of(2026, 6, 1);
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
 
-        when(paymentTransactionRepository.sumExpensesByCategoryBetweenExcludingSplitParents(
-                        eq(OWNER_ID), eq(start), eq(end)))
+        when(paymentTransactionRepository.sumHouseholdExpensesByCategoryBetweenExcludingSplitParents(
+                        eq(HOUSEHOLD_ID), eq(start), eq(end)))
                 .thenReturn(List.<Object[]>of(new Object[]{"Groceries", new BigDecimal("100.00")}));
-        when(transactionSplitRepository.sumExpensesByCategoryBetween(eq(OWNER_ID), eq(start), eq(end)))
+        when(transactionSplitRepository.sumHouseholdExpensesByCategoryBetween(eq(HOUSEHOLD_ID), eq(start), eq(end)))
                 .thenReturn(List.<Object[]>of(new Object[]{"Groceries", new BigDecimal("20.50")}));
-        when(paymentTransactionRepository.sumByMonthAndTypeBetween(eq(OWNER_ID), eq(start), eq(end)))
+        when(paymentTransactionRepository.sumHouseholdByMonthAndTypeBetween(eq(HOUSEHOLD_ID), eq(start), eq(end)))
                 .thenReturn(List.<Object[]>of(new Object[]{2026, 6, "Expense", new BigDecimal("200.00")}));
 
         InsightsResponse response = insightsService.getInsights(2026, 6);

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.fiscalnorth.account.repository.DepositAccountRepository;
 import de.fiscalnorth.auth.CurrentUserService;
+import de.fiscalnorth.household.model.Household;
+import de.fiscalnorth.household.service.HouseholdScopeService;
 import de.fiscalnorth.goal.dto.ApplyPlanRequest;
 import de.fiscalnorth.goal.dto.CreateGoalRequest;
 import de.fiscalnorth.goal.dto.GoalOverview;
@@ -41,18 +43,17 @@ public class GoalService {
     private final GoalProgressService progressService;
     private final GoalPlanningService planningService;
     private final CurrentUserService currentUserService;
+    private final HouseholdScopeService householdScopeService;
     private final ObjectMapper objectMapper;
 
     public List<GoalWithProgress> getAllGoalsWithProgress() {
-        return goalRepository.findAllByOwnerId(currentUserService.getCurrentUserId()).stream()
+        return goalRepository.findAllByHouseholdId(householdScopeService.requireHouseholdId()).stream()
                 .map(progressService::toGoalWithProgress)
                 .toList();
     }
 
     public List<GoalWithProgress> getAllGoalsWithProgressForOwner(Long ownerId) {
-        return goalRepository.findAllByOwnerId(ownerId).stream()
-                .map(progressService::toGoalWithProgress)
-                .toList();
+        return getAllGoalsWithProgress();
     }
 
     public GoalOverview getOverview() {
@@ -81,7 +82,7 @@ public class GoalService {
     }
 
     public GoalWithProgress getGoalById(Long id) {
-        FinancialGoal goal = goalRepository.findByIdAndOwnerId(id, currentUserService.getCurrentUserId())
+        FinancialGoal goal = goalRepository.findByIdAndHouseholdId(id, householdScopeService.requireHouseholdId())
                 .orElseThrow(() -> new RessourceNotFoundException("FinancialGoal", "id", id));
         return progressService.toGoalWithProgress(goal);
     }
@@ -89,7 +90,8 @@ public class GoalService {
     @Transactional
     public GoalWithProgress createGoal(CreateGoalRequest request) {
         User owner = currentUserService.getCurrentUser();
-        validateLinkedAccount(request.linkedAccountId(), owner.getId());
+        Household household = householdScopeService.requireHousehold();
+        validateLinkedAccount(request.linkedAccountId(), household.getId());
 
         FinancialGoal goal = new FinancialGoal();
         goal.setName(request.name());
@@ -101,13 +103,14 @@ public class GoalService {
         goal.setMonthlyContribution(request.monthlyContribution());
         goal.setStatus(GoalStatus.ACTIVE);
         goal.setOwner(owner);
+        goal.setHousehold(household);
 
         return progressService.toGoalWithProgress(goalRepository.save(goal));
     }
 
     @Transactional
     public GoalWithProgress updateGoal(Long id, UpdateGoalRequest request) {
-        FinancialGoal goal = goalRepository.findByIdAndOwnerId(id, currentUserService.getCurrentUserId())
+        FinancialGoal goal = goalRepository.findByIdAndHouseholdId(id, householdScopeService.requireHouseholdId())
                 .orElseThrow(() -> new RessourceNotFoundException("FinancialGoal", "id", id));
 
         if (request.name() != null) {
@@ -126,7 +129,7 @@ public class GoalService {
             goal.setTargetDate(request.targetDate());
         }
         if (request.linkedAccountId() != null) {
-            validateLinkedAccount(request.linkedAccountId(), goal.getOwner().getId());
+            validateLinkedAccount(request.linkedAccountId(), householdScopeService.requireHouseholdId());
             goal.setLinkedAccountId(request.linkedAccountId());
         }
         if (request.monthlyContribution() != null) {
@@ -141,7 +144,7 @@ public class GoalService {
 
     @Transactional
     public void deleteGoal(Long id) {
-        FinancialGoal goal = goalRepository.findByIdAndOwnerId(id, currentUserService.getCurrentUserId())
+        FinancialGoal goal = goalRepository.findByIdAndHouseholdId(id, householdScopeService.requireHouseholdId())
                 .orElseThrow(() -> new RessourceNotFoundException("FinancialGoal", "id", id));
         goalRepository.delete(goal);
     }
@@ -187,10 +190,11 @@ public class GoalService {
     public List<GoalWithProgress> applyPlan(Long sessionId, ApplyPlanRequest request) {
         GoalInterviewSession session = getSessionForCurrentUser(sessionId);
         User owner = session.getOwner();
+        Household household = householdScopeService.requireHouseholdForUser(owner);
 
         List<GoalWithProgress> created = request.goals().stream()
                 .map(dto -> {
-                    validateLinkedAccount(dto.linkedAccountId(), owner.getId());
+                    validateLinkedAccount(dto.linkedAccountId(), household.getId());
                     FinancialGoal goal = new FinancialGoal();
                     goal.setName(dto.name());
                     goal.setGoalType(dto.goalType());
@@ -201,6 +205,7 @@ public class GoalService {
                     goal.setMonthlyContribution(dto.monthlyContribution());
                     goal.setStatus(GoalStatus.ACTIVE);
                     goal.setOwner(owner);
+                    goal.setHousehold(household);
                     return progressService.toGoalWithProgress(goalRepository.save(goal));
                 })
                 .toList();
@@ -243,9 +248,9 @@ public class GoalService {
         }
     }
 
-    private void validateLinkedAccount(Long linkedAccountId, Long ownerId) {
+    private void validateLinkedAccount(Long linkedAccountId, Long householdId) {
         if (linkedAccountId != null) {
-            depositAccountRepository.findByIdAndOwnerId(linkedAccountId, ownerId)
+            depositAccountRepository.findByIdAndHouseholdId(linkedAccountId, householdId)
                     .orElseThrow(() -> new RessourceNotFoundException("DepositAccount", "id", linkedAccountId));
         }
     }

@@ -2,6 +2,8 @@ package de.fiscalnorth.user.service;
 
 import de.fiscalnorth.category.model.Category;
 import de.fiscalnorth.category.repository.CategoryRepository;
+import de.fiscalnorth.household.model.Household;
+import de.fiscalnorth.household.service.HouseholdService;
 import de.fiscalnorth.transaction.model.TransactionType;
 import de.fiscalnorth.user.model.User;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +32,11 @@ public class UserOnboardingService {
     );
 
     private final CategoryRepository categoryRepository;
+    private final HouseholdService householdService;
 
     @Transactional
     public void seedDefaultCategories(User owner) {
+        Household household = householdService.createHouseholdForUser(owner, null);
         if (categoryRepository.existsByOwnerId(owner.getId())) {
             return;
         }
@@ -41,6 +45,7 @@ public class UserOnboardingService {
             category.setName(seed.name());
             category.setTransactionType(seed.type());
             category.setOwner(owner);
+            category.setHousehold(household);
             categoryRepository.save(category);
         }
     }

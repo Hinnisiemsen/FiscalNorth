@@ -10,7 +10,8 @@
     "accounts": "Accounts",
     "bankSync": "Connect bank",
     "categories": "Categories",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "portfolio": "Portfolio"
   },
   "routes": {
     "home": "Home",
@@ -34,7 +35,9 @@
     "categories": "Categories",
     "newCategory": "New category",
     "accountSettings": "Account",
-    "upgrade": "Upgrade to Premium"
+    "upgrade": "Upgrade to Premium",
+    "household": "Household",
+    "portfolio": "Portfolio"
   },
   "billing": {
     "subscriptionSection": "Subscription",
@@ -333,7 +336,8 @@
     "splitAddLine": "Add line",
     "splitNote": "Note (optional)",
     "splitTotal": "Split total",
-    "splitBadge": "Split"
+    "splitBadge": "Split",
+    "noFilterResults": "No transactions match this filter."
   },
   "import": {
     "back": "Back to transactions",
@@ -393,7 +397,42 @@
     "endDate": "End date",
     "categoryOptional": "Category (optional)",
     "cancel": "Cancel",
-    "save": "Save budget"
+    "save": "Save budget",
+    "remaining": "remaining"
+  },
+  "household": {
+    "title": "Household",
+    "members": "Members",
+    "pendingInvite": "Pending invite",
+    "invitePartner": "Invite partner",
+    "partnerEmail": "Partner email",
+    "sendInvite": "Send invite",
+    "inviteSent": "Invite sent successfully",
+    "inviteFailed": "Could not send invite",
+    "inviteExpires": "Expires",
+    "role": {
+      "OWNER": "Owner",
+      "MEMBER": "Member"
+    }
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "totalValue": "Total value",
+    "totalCost": "Total cost",
+    "unrealizedGain": "Unrealized gain",
+    "addHolding": "Add holding",
+    "saveHolding": "Save holding",
+    "symbol": "Symbol",
+    "name": "Name",
+    "quantity": "Quantity",
+    "costBasis": "Cost basis",
+    "assetClass": "Asset class",
+    "marketValue": "Market value",
+    "currentPrice": "Current price",
+    "priceStale": "Cached price",
+    "updatedBy": "Updated by",
+    "empty": "No holdings yet. Add your first investment.",
+    "addFailed": "Could not add holding"
   },
   "goals": {
     "title": "Financial goals",

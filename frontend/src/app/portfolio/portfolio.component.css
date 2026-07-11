@@ -1,0 +1,94 @@
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem;
+}
+
+.summary-label {
+  font-size: 0.8125rem;
+  color: var(--color-text-light);
+}
+
+.summary-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.holdings-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.holding-card {
+  padding: 1rem;
+}
+
+.holding-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.holding-head h3 {
+  margin: 0;
+}
+
+.holding-name {
+  margin: 0.25rem 0 0;
+  color: var(--color-text-light);
+  font-size: 0.875rem;
+}
+
+.asset-badge,
+.stale-badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.holding-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+}
+
+.holding-meta {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-light);
+}
+
+.gain-positive {
+  color: #4ade80;
+}
+
+.gain-negative {
+  color: #f87171;
+}
+
+.form-card {
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.holding-form .form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}

@@ -2,13 +2,13 @@ package de.fiscalnorth.ai.service;
 
 import de.fiscalnorth.account.model.DepositAccount;
 import de.fiscalnorth.account.repository.DepositAccountRepository;
-import de.fiscalnorth.auth.CurrentUserService;
 import de.fiscalnorth.budget.dto.BudgetWithUsage;
 import de.fiscalnorth.budget.service.BudgetService;
 import de.fiscalnorth.contract.model.Contract;
 import de.fiscalnorth.contract.repository.ContractRepository;
 import de.fiscalnorth.goal.repository.FinancialGoalRepository;
 import de.fiscalnorth.goal.service.GoalProgressService;
+import de.fiscalnorth.household.service.HouseholdScopeService;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
 import de.fiscalnorth.transaction.repository.PaymentTransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,29 +27,33 @@ public class FinancialContextService {
     private final PaymentTransactionRepository paymentTransactionRepository;
     private final BudgetService budgetService;
     private final ContractRepository contractRepository;
-    private final CurrentUserService currentUserService;
+    private final HouseholdScopeService householdScopeService;
     private final FinancialGoalRepository financialGoalRepository;
     private final GoalProgressService goalProgressService;
 
     public String buildContextSnapshot() {
-        return buildContextSnapshotForOwner(currentUserService.getCurrentUserId());
+        return buildContextSnapshotForHousehold(householdScopeService.requireHouseholdId());
     }
 
     public String buildContextSnapshotForOwner(Long ownerId) {
-        List<DepositAccount> accounts = depositAccountRepository.findAllByOwnerId(ownerId);
+        return buildContextSnapshot();
+    }
+
+    private String buildContextSnapshotForHousehold(Long householdId) {
+        List<DepositAccount> accounts = depositAccountRepository.findAllByHouseholdId(householdId);
         BigDecimal totalBalance = accounts.stream()
                 .map(DepositAccount::getBalance)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        List<Contract> contracts = contractRepository.findAllByOwnerId(ownerId);
+        List<Contract> contracts = contractRepository.findAllByHouseholdId(householdId);
         BigDecimal monthlyFixed = contracts.stream()
                 .map(Contract::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         List<PaymentTransaction> recent = paymentTransactionRepository
-                .findAllByOwnerIdOrderByTransactionDateDesc(ownerId, PageRequest.of(0, 15));
+                .findAllByHouseholdIdOrderByTransactionDateDesc(householdId, PageRequest.of(0, 15));
 
-        List<BudgetWithUsage> budgets = budgetService.getBudgetsWithUsageForOwner(ownerId).stream()
+        List<BudgetWithUsage> budgets = budgetService.getBudgetsWithUsage().stream()
                 .filter(b -> !b.endDate().isBefore(LocalDate.now().withDayOfMonth(1))
                         && !b.startDate().isAfter(LocalDate.now()))
                 .limit(8)
@@ -82,7 +86,7 @@ public class FinancialContextService {
         }
 
         sb.append("\nFinanzziele:\n");
-        financialGoalRepository.findAllByOwnerId(ownerId).stream()
+        financialGoalRepository.findAllByHouseholdId(householdId).stream()
                 .map(goalProgressService::toGoalWithProgress)
                 .limit(8)
                 .forEach(g -> sb.append("- ")

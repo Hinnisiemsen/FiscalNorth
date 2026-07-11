@@ -9,5 +9,9 @@ import java.util.Optional;
 public interface ContractRepository extends JpaRepository<Contract, Long> {
     List<Contract> findAllByOwnerId(Long ownerId);
 
+    List<Contract> findAllByHouseholdId(Long householdId);
+
     Optional<Contract> findByIdAndOwnerId(Long id, Long ownerId);
+
+    Optional<Contract> findByIdAndHouseholdId(Long id, Long householdId);
 }

@@ -10,10 +10,17 @@ export interface Budget {
   endDate: string;
 }
 
+export interface MemberSpending {
+  memberName: string;
+  spent: number;
+}
+
 export interface BudgetWithUsage extends Budget {
   spent: number;
+  remaining: number;
   categoryId?: number;
   categoryName?: string;
+  memberBreakdown?: MemberSpending[];
 }
 
 @Injectable({

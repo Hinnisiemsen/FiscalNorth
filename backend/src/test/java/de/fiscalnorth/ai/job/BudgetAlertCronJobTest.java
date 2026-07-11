@@ -82,8 +82,10 @@ class BudgetAlertCronJobTest {
                         start,
                         end,
                         new BigDecimal("85.00"),
+                        new BigDecimal("15.00"),
                         1L,
-                        "Food")));
+                        "Food",
+                        List.of())));
         when(notificationService.createIfAbsent(
                         eq(1L),
                         anyString(),

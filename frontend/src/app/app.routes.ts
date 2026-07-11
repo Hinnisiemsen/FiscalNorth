@@ -23,6 +23,8 @@ import { GoalDetailComponent } from './goals/goal-detail.component';
 import { LoginComponent } from './auth/login.component';
 import { AccountSettingsComponent } from './account/account-settings.component';
 import { UpgradeComponent } from './account/upgrade.component';
+import { HouseholdSettingsComponent } from './household/household-settings.component';
+import { PortfolioComponent } from './portfolio/portfolio.component';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -43,6 +45,11 @@ export const routes: Routes = [
         path: 'account',
         component: AccountSettingsComponent,
         data: { titleKey: 'routes.account' },
+      },
+      {
+        path: 'household',
+        component: HouseholdSettingsComponent,
+        data: { titleKey: 'routes.household' },
       },
       {
         path: 'account/upgrade',
@@ -92,6 +99,7 @@ export const routes: Routes = [
         data: { titleKey: 'routes.newBudget' },
       },
       { path: 'goals', component: GoalListComponent, data: { titleKey: 'routes.goals' } },
+      { path: 'portfolio', component: PortfolioComponent, data: { titleKey: 'routes.portfolio' } },
       {
         path: 'goals/new',
         component: GoalInterviewComponent,

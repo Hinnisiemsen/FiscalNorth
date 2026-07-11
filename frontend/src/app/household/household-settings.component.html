@@ -1,0 +1,58 @@
+<div class="page-content-inner">
+  <app-page-header [heading]="'household.title' | translate" />
+
+  @if (loading) {
+    <p>{{ 'common.loading' | translate }}</p>
+  } @else if (household) {
+    <div class="settings-grid">
+      <section class="card-glass settings-card">
+        <h2>{{ household.name }}</h2>
+        <p class="readonly-field">
+          <strong>{{ 'household.members' | translate }}:</strong>
+          {{ household.members.length }} / 2
+        </p>
+
+        <ul class="member-list">
+          @for (member of household.members; track member.userId) {
+            <li class="member-row">
+              <div>
+                <strong>{{ member.userName }}</strong>
+                <span class="member-email">{{ member.email }}</span>
+              </div>
+              <span class="role-badge">{{ 'household.role.' + member.role | translate }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      @if (household.pendingInvite) {
+        <section class="card-glass settings-card">
+          <h2>{{ 'household.pendingInvite' | translate }}</h2>
+          <p>{{ household.pendingInvite.email }}</p>
+          <p class="notice-text">{{ 'household.inviteExpires' | translate }}: {{ household.pendingInvite.expiresAt | date: 'medium' }}</p>
+        </section>
+      }
+
+      @if (canInvite) {
+        <section class="card-glass settings-card">
+          <h2>{{ 'household.invitePartner' | translate }}</h2>
+          <form [formGroup]="inviteForm" (ngSubmit)="sendInvite()" class="settings-form">
+            <div class="form-group">
+              <label for="email">{{ 'household.partnerEmail' | translate }}</label>
+              <input id="email" type="email" formControlName="email" />
+            </div>
+            @if (inviteMessage) {
+              <p class="success-text">{{ inviteMessage | translate }}</p>
+            }
+            @if (inviteError) {
+              <p class="error-text">{{ inviteError | translate }}</p>
+            }
+            <button type="submit" class="btn-primary" [disabled]="inviteForm.invalid">
+              {{ 'household.sendInvite' | translate }}
+            </button>
+          </form>
+        </section>
+      }
+    </div>
+  }
+</div>
