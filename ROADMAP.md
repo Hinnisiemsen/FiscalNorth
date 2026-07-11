@@ -78,6 +78,24 @@ flowchart TD
 | 3 — Household budgets | **Done** | Member breakdown, household cron alerts |
 | 4 — Shared portfolio | **Done** | Allocation chart, net-worth KPI, price cron |
 | 5 — Showcase polish | **Done** | Demo seed, E2E, docs |
+| 6 — iOS showcase MVP | **In progress** | SwiftUI app: auth, dashboard, accounts, transactions, budgets, portfolio |
+
+---
+
+## Phase 6 — iOS app (in progress)
+
+Native SwiftUI client in [`ios/`](../ios/) integrating with the existing REST API.
+
+| Screen | Status |
+|--------|--------|
+| Login / register | Done |
+| Dashboard (net worth, budget KPIs) | Done |
+| Accounts (read-only list) | Done |
+| Transactions (read-only list) | Done |
+| Budgets (usage + member breakdown) | Done |
+| Portfolio (holdings) | Done |
+| Google OAuth | Deferred |
+| AI assistant, billing, bank sync | Deferred |
 
 ---
 
@@ -93,6 +111,7 @@ flowchart TD
 | 6 | Shared portfolio + price API | 4 | Done |
 | 7 | Demo seed + E2E tests | 5 | Done |
 | 8 | README / docs sync | 5 | Done |
+| 9 | iOS SwiftUI showcase MVP | 6 | In progress |
 
 ---
 
@@ -103,8 +122,9 @@ flowchart TD
 - Viewer/child roles, households with 3+ members
 - Email delivery for household invites (token shown in UI for demo)
 - Tax reporting, multi-currency conversion
-- Mobile native apps
 - Production XS2A bank connections
+- iOS Google OAuth, push notifications, offline cache
+- Android app
 
 ---
 

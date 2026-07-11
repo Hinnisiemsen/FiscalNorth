@@ -108,6 +108,26 @@ Proxy entries in `frontend/proxy.conf.json` forward `/api`, `/oauth2`, and `/log
 - CSRF uses a cookie repository; the frontend reads `XSRF-TOKEN` and sends `X-XSRF-TOKEN`.
 - OAuth users are provisioned on first login; linking by email upgrades `authProvider` to `BOTH` when applicable.
 
+## Mobile clients (iOS)
+
+The native iOS app in [`ios/`](../ios/) uses the same session-cookie + CSRF model as the Angular SPA, but calls the Spring Boot API **directly** (e.g. `http://localhost:8080/api/...` in Simulator). Browser CORS rules do not apply to native URLSession clients.
+
+| Step | Endpoint / behavior |
+|------|---------------------|
+| CSRF bootstrap | `GET /api/auth/csrf` before the first mutating request |
+| Login | `POST /api/auth/login` with JSON body + CSRF header |
+| Session | `JSESSIONID` cookie stored in `HTTPCookieStorage` |
+| Mutations | Include CSRF header on POST/PUT/DELETE |
+| Status check | `GET /api/auth/status` on app launch |
+
+**Simulator:** point the iOS client at `http://localhost:8080`.
+
+**Physical device:** use your Mac's LAN IP (e.g. `http://192.168.1.10:8080`) because `localhost` on the device refers to the phone itself.
+
+Google OAuth is not implemented in the iOS MVP; use email/password or register a new account.
+
+See [ios/README.md](../ios/README.md) for setup and verification steps.
+
 ## Testing
 
 Backend tests use dummy OAuth client credentials via `application-test.properties`. Run:
