@@ -100,6 +100,7 @@
             <app-paywall-banner
               feature="AI_GOAL_PLANNER"
               messageKey="billing.paywall.goalPlanner"
+              (dismissed)="onPaywallDismissed()"
             />
           } @else if (planLoading) {
             <p class="plan-loading">{{ 'goals.interview.generatingPlan' | translate }}</p>

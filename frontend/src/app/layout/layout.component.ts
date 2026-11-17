@@ -12,8 +12,24 @@ import { filter, interval, Subscription, switchMap, startWith } from 'rxjs';
 import { NotificationService } from '../core/services/notification.service';
 import { LanguageSwitcherComponent } from '../shared/language-switcher.component';
 import { UserMenuComponent } from './user-menu.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
+import { LanguageService } from '../core/i18n/language.service';
+import { SeasonService } from '../core/theme/season.service';
+
+const SIDEBAR_STORAGE_KEY = 'fn-sidebar-collapsed';
+
+export interface NavItem {
+  labelKey: string;
+  path: string;
+  icon: string;
+  premium: boolean;
+}
+
+export interface NavGroup {
+  labelKey: string;
+  items: NavItem[];
+}
 
 @Component({
   selector: 'app-layout',
@@ -34,30 +50,57 @@ export class LayoutComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly translate = inject(TranslateService);
+  readonly season = inject(SeasonService);
   private navSub?: Subscription;
 
   drawerOpen = false;
+  sidebarCollapsed = false;
+  isHome = true;
   pageTitle = 'Fiscal North';
   unreadNotifications = 0;
   private countSub?: Subscription;
 
-  menuItems = [
-    { labelKey: 'nav.dashboard', path: '/', icon: 'dashboard', premium: false },
-    { labelKey: 'nav.assistant', path: '/assistant', icon: 'auto_awesome', premium: true },
-    { labelKey: 'nav.transactions', path: '/transactions', icon: 'receipt_long', premium: false },
-    { labelKey: 'nav.import', path: '/transactions/import', icon: 'upload', premium: false },
-    { labelKey: 'nav.contracts', path: '/contracts', icon: 'description', premium: false },
-    { labelKey: 'nav.budgets', path: '/budgets', icon: 'pie_chart', premium: false },
-    { labelKey: 'nav.goals', path: '/goals', icon: 'savings', premium: false },
-    { labelKey: 'nav.portfolio', path: '/portfolio', icon: 'trending_up', premium: false },
-    { labelKey: 'nav.accounts', path: '/accounts', icon: 'account_balance', premium: false },
-    { labelKey: 'nav.bankSync', path: '/bank-sync', icon: 'link', premium: true },
-    { labelKey: 'nav.categories', path: '/categories', icon: 'category', premium: false },
+  readonly navGroups: NavGroup[] = [
+    {
+      labelKey: 'nav.groupAsk',
+      items: [
+        { labelKey: 'nav.dashboard', path: '/', icon: 'home', premium: false },
+        { labelKey: 'nav.assistant', path: '/assistant', icon: 'auto_awesome', premium: true },
+      ],
+    },
+    {
+      labelKey: 'nav.groupMoney',
+      items: [
+        {
+          labelKey: 'nav.transactions',
+          path: '/transactions',
+          icon: 'receipt_long',
+          premium: false,
+        },
+        { labelKey: 'nav.budgets', path: '/budgets', icon: 'pie_chart', premium: false },
+        { labelKey: 'nav.goals', path: '/goals', icon: 'savings', premium: false },
+        { labelKey: 'nav.portfolio', path: '/portfolio', icon: 'trending_up', premium: false },
+        { labelKey: 'nav.accounts', path: '/accounts', icon: 'account_balance', premium: false },
+      ],
+    },
+    {
+      labelKey: 'nav.groupTools',
+      items: [
+        { labelKey: 'nav.import', path: '/transactions/import', icon: 'upload', premium: false },
+        { labelKey: 'nav.contracts', path: '/contracts', icon: 'description', premium: false },
+        { labelKey: 'nav.bankSync', path: '/bank-sync', icon: 'link', premium: true },
+        { labelKey: 'nav.categories', path: '/categories', icon: 'category', premium: false },
+        { labelKey: 'nav.household', path: '/household', icon: 'groups', premium: false },
+      ],
+    },
   ];
 
-  constructor(private notificationService: NotificationService) {}
+  constructor(private notificationService: NotificationService) {
+    inject(LanguageService);
+  }
 
   ngOnInit(): void {
+    this.sidebarCollapsed = localStorage.getItem(SIDEBAR_STORAGE_KEY) === '1';
     this.updateTitle();
     this.navSub = this.router.events
       .pipe(filter((e) => e instanceof NavigationEnd))
@@ -108,6 +151,11 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.syncBodyScroll();
   }
 
+  toggleSidebar(): void {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
+    localStorage.setItem(SIDEBAR_STORAGE_KEY, this.sidebarCollapsed ? '1' : '0');
+  }
+
   private syncBodyScroll(): void {
     document.body.style.overflow = this.drawerOpen ? 'hidden' : '';
   }
@@ -117,6 +165,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
   }
 
   private updateTitle(): void {
+    const url = this.router.url.split('?')[0];
+    this.isHome = url === '/';
     let child = this.route.firstChild;
     while (child?.firstChild) {
       child = child.firstChild;

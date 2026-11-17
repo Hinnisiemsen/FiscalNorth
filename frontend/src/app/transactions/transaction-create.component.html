@@ -25,7 +25,11 @@
 
       <div class="form-group checkbox-group">
         <label>
-          <input type="checkbox" [checked]="splitEnabled" (change)="toggleSplit($any($event.target).checked)" />
+          <input
+            type="checkbox"
+            [checked]="splitEnabled"
+            (change)="toggleSplit($any($event.target).checked)"
+          />
           {{ 'transactions.splitEnable' | translate }}
         </label>
       </div>
@@ -48,18 +52,29 @@
           </div>
           @for (line of splits.controls; track $index) {
             <div class="split-line" [formGroupName]="$index">
-              <input type="number" formControlName="amount" step="0.01" [placeholder]="'transactions.amount' | translate" />
+              <input
+                type="number"
+                formControlName="amount"
+                step="0.01"
+                [placeholder]="'transactions.amount' | translate"
+              />
               <select formControlName="categoryId">
                 <option [ngValue]="null">{{ 'transactions.selectCategory' | translate }}</option>
                 <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
               </select>
-              <input type="text" formControlName="note" [placeholder]="'transactions.splitNote' | translate" />
-              <button type="button" class="btn btn-ghost btn-sm" (click)="removeSplitLine($index)">×</button>
+              <input
+                type="text"
+                formControlName="note"
+                [placeholder]="'transactions.splitNote' | translate"
+              />
+              <button type="button" class="btn btn-ghost btn-sm" (click)="removeSplitLine($index)">
+                ×
+              </button>
             </div>
           }
           <p class="split-total" [class.invalid]="splitTotalMismatch()">
-            {{ 'transactions.splitTotal' | translate }}: {{ splitTotal() | currency: 'EUR' }}
-            / {{ transactionForm.get('amount')?.value | currency: 'EUR' }}
+            {{ 'transactions.splitTotal' | translate }}: {{ splitTotal() | currency: 'EUR' }} /
+            {{ transactionForm.get('amount')?.value | currency: 'EUR' }}
           </p>
         </div>
       }

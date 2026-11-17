@@ -22,7 +22,11 @@
 
 .login-header h1 {
   margin: 0.75rem 0 0.25rem;
-  font-size: 1.5rem;
+  font-size: clamp(1.75rem, 4vw, 2.4rem);
+}
+
+.login-kicker {
+  margin: 0.85rem auto 0;
 }
 
 .login-header p {

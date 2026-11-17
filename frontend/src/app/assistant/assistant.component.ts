@@ -10,7 +10,6 @@ import { TransactionService } from '../core/services/transaction.service';
 import { GoalService, GoalType } from '../core/services/goal.service';
 import { ActionCardComponent } from './action-card.component';
 import { PaywallBannerComponent } from '../shared/paywall-banner.component';
-import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
 import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 import { LanguageService } from '../core/i18n/language.service';
 
@@ -35,7 +34,6 @@ interface MessageBlock {
     FormsModule,
     ActionCardComponent,
     PaywallBannerComponent,
-    ...PAGE_HEADER_IMPORTS,
     ...TRANSLATE_IMPORTS,
   ],
   templateUrl: './assistant.component.html',

@@ -1,10 +1,15 @@
 /// <reference types="cypress" />
 
+const seedClientPrefs = (win: Window) => {
+  win.localStorage.setItem('fn-season', 'default');
+  win.localStorage.setItem('fn.locale', 'en');
+};
+
 Cypress.Commands.add('login', (email = 'alex@fiscalnorth.local', password = 'demo1234') => {
   cy.session(
     [email, password],
     () => {
-      cy.visit('/login');
+      cy.visit('/login', { onBeforeLoad: seedClientPrefs });
       cy.window().then(async (win) => {
         const csrfResponse = await win.fetch('/api/auth/csrf', { credentials: 'include' });
         expect(csrfResponse.status).to.eq(200);
@@ -24,7 +29,7 @@ Cypress.Commands.add('login', (email = 'alex@fiscalnorth.local', password = 'dem
     },
     {
       validate() {
-        cy.visit('/');
+        cy.visit('/', { onBeforeLoad: seedClientPrefs });
         cy.url({ timeout: 10000 }).should('not.include', '/login');
       },
     },

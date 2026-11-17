@@ -7,7 +7,7 @@
   --color-accent-hover: #1d4ed8;
   --color-accent-soft: rgba(37, 99, 235, 0.1);
   --color-accent-border: rgba(37, 99, 235, 0.2);
-  --color-background: #eef2f6;
+  --color-background: #f0f4f8;
   --color-surface: #ffffff;
   --color-surface-glass: rgba(255, 255, 255, 0.68);
   --color-surface-muted: rgba(255, 255, 255, 0.5);
@@ -44,13 +44,16 @@
     var(--gradient-violet) 100%
   );
   --gradient-hero: linear-gradient(135deg, var(--color-accent), var(--gradient-violet));
+  --gradient-greeting: linear-gradient(105deg, #1a73e8 0%, #9334e6 48%, #e37400 100%);
   --gradient-danger: linear-gradient(135deg, var(--color-danger), #991b1b);
   --gradient-success: linear-gradient(90deg, var(--color-success), #4ade80);
   --gradient-warning: linear-gradient(90deg, var(--color-warning), #facc15);
   --gradient-danger-bar: linear-gradient(90deg, var(--color-danger), #f87171);
 
   --font-family: 'Roboto Flex', system-ui, -apple-system, sans-serif;
-  --font-family-heading: 'IBM Plex Sans', var(--font-family);
+  --font-family-heading: 'Outfit', 'IBM Plex Sans', var(--font-family);
+  --font-family-display: 'Outfit', var(--font-family-heading);
+  --shadow-elevated: 0 12px 40px rgba(26, 35, 50, 0.12);
   --spacing-unit: 1rem;
   --radius-pill: 9999px;
   --radius-card: 20px;
@@ -67,6 +70,7 @@
   --transition-normal: 250ms var(--ease-spring);
 
   --rail-width: 72px;
+  --sidebar-width: 268px;
   --topbar-height: 56px;
   --content-max-width: 960px;
   --blur-glass: 16px;
@@ -115,19 +119,40 @@ button {
 }
 
 .spark {
+  position: relative;
   display: block;
   width: 28px;
   height: 28px;
-  border-radius: 50%;
+  flex-shrink: 0;
+  background: transparent;
+}
+
+.spark::before,
+.spark::after {
+  content: '';
+  position: absolute;
   background: linear-gradient(
     135deg,
     var(--gradient-blue) 0%,
     var(--gradient-teal) 45%,
     var(--gradient-violet) 100%
   );
+  clip-path: polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0% 50%, 38% 38%);
+}
+
+.spark::before {
+  inset: 0;
   box-shadow:
     0 2px 12px rgba(37, 99, 235, 0.22),
     0 0 20px rgba(94, 234, 212, 0.15);
+}
+
+.spark::after {
+  top: -5px;
+  right: -7px;
+  width: 10px;
+  height: 10px;
+  opacity: 0.85;
 }
 
 .spark-sm {

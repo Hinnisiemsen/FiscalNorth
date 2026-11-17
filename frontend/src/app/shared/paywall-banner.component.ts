@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 import { PremiumFeature } from '../core/models/billing.model';
@@ -14,6 +14,7 @@ import { EntitlementService } from '../core/services/entitlement.service';
 export class PaywallBannerComponent {
   @Input({ required: true }) feature!: PremiumFeature;
   @Input() messageKey = 'billing.paywall.default';
+  @Output() dismissed = new EventEmitter<void>();
 
   private readonly entitlementService = inject(EntitlementService);
 
@@ -23,5 +24,6 @@ export class PaywallBannerComponent {
 
   tryDemo(): void {
     this.entitlementService.dismissPremiumBanner();
+    this.dismissed.emit();
   }
 }

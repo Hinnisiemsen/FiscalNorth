@@ -38,6 +38,9 @@ export class HouseholdService {
   }
 
   acceptInvite(token: string): Observable<Household> {
-    return this.api.post<Household>(`/household/invites/accept?token=${encodeURIComponent(token)}`, {});
+    return this.api.post<Household>(
+      `/household/invites/accept?token=${encodeURIComponent(token)}`,
+      {},
+    );
   }
 }

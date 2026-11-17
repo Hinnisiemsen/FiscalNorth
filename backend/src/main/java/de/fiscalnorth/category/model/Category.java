@@ -1,5 +1,6 @@
 package de.fiscalnorth.category.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.fiscalnorth.household.model.Household;
 import de.fiscalnorth.shared.BaseEntity;
 import de.fiscalnorth.transaction.model.TransactionType;
@@ -21,10 +22,12 @@ public class Category extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
 
+    @JsonIgnore
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "household_id")
     private Household household;

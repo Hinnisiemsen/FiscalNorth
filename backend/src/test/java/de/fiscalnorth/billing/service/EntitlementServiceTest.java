@@ -40,7 +40,7 @@ class EntitlementServiceTest {
         demoProperties = new DemoProperties();
         demoProperties.setPremiumPreviewEnabled(false);
         SubscriptionService subscriptionService = new SubscriptionService(userSubscriptionRepository, stripeProperties);
-        entitlementService = new EntitlementService(subscriptionService, demoProperties);
+        entitlementService = new EntitlementService(subscriptionService, demoProperties, stripeProperties);
     }
 
     @Test

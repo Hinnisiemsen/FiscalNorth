@@ -4,13 +4,11 @@
   [class.compact]="variant() === 'compact'"
   [class.inline]="variant() === 'inline'"
 >
-  @if (variant() === 'hero') {
+  @if (variant() === 'hero' && showBrand()) {
     <div class="ask-brand">
       <span class="spark spark-sm" aria-hidden="true"></span>
-
       <div>
         <span class="ask-brand-title">{{ 'askBar.brandTitle' | translate }}</span>
-
         <span class="ask-brand-sub">{{ 'askBar.brandSub' | translate }}</span>
       </div>
     </div>
@@ -18,7 +16,6 @@
 
   <div class="ask-input-row">
     <span class="material-symbols-outlined ask-input-icon">auto_awesome</span>
-
     <input
       type="text"
       class="ask-input"
@@ -28,7 +25,6 @@
       (keydown)="onKeydown($event)"
       [attr.aria-label]="'askBar.inputAriaLabel' | translate"
     />
-
     <button
       type="button"
       class="ask-send"
@@ -44,11 +40,9 @@
     @if (showAnalysisChip() && variant() === 'hero') {
       <button type="button" class="ask-chip ask-chip-primary" (click)="startGeneralAnalysis()">
         <span class="material-symbols-outlined">analytics</span>
-
         {{ 'askBar.analysisStart' | translate }}
       </button>
     }
-
     @for (s of suggestions(); track s) {
       <button type="button" class="ask-chip" (click)="ask(s)">{{ s }}</button>
     }

@@ -48,9 +48,7 @@ export class HouseholdSettingsComponent implements OnInit {
 
   get canInvite(): boolean {
     return (
-      this.isOwner &&
-      (this.household?.members.length ?? 0) < 2 &&
-      !this.household?.pendingInvite
+      this.isOwner && (this.household?.members.length ?? 0) < 2 && !this.household?.pendingInvite
     );
   }
 

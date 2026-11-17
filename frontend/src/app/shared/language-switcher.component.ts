@@ -26,11 +26,11 @@ import { TranslateModule } from '@ngx-translate/core';
     `
       .lang-switcher select {
         font-size: 0.8125rem;
-        padding: 0.35rem 0.5rem;
-        border-radius: 8px;
-        border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
-        background: var(--surface-glass, rgba(20, 24, 32, 0.6));
-        color: inherit;
+        padding: 0.4rem 0.6rem;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--color-border);
+        background: var(--color-surface-glass);
+        color: var(--color-primary);
         max-width: 7.5rem;
       }
       .sr-only {

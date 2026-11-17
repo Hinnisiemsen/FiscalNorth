@@ -19,6 +19,14 @@
         <span class="material-symbols-outlined">settings</span>
         {{ 'auth.accountSettings' | translate }}
       </a>
+      <a routerLink="/household" class="dropdown-item" role="menuitem" (click)="close()">
+        <span class="material-symbols-outlined">groups</span>
+        {{ 'nav.household' | translate }}
+      </a>
+      <a routerLink="/account/upgrade" class="dropdown-item" role="menuitem" (click)="close()">
+        <span class="material-symbols-outlined">workspace_premium</span>
+        {{ 'billing.upgradeCta' | translate }}
+      </a>
       <button type="button" class="dropdown-item" role="menuitem" (click)="signOut()">
         <span class="material-symbols-outlined">logout</span>
         {{ 'auth.signOut' | translate }}

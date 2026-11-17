@@ -16,7 +16,7 @@ describe('Transactions', () => {
     cy.get('#description').type('E2E Test Coffee');
     cy.get('#amount').clear().type('4.50');
     cy.get('button[type="submit"]').click();
-    cy.url({ timeout: 15000 }).should('include', '/transactions');
-    cy.contains('E2E Test Coffee');
+    cy.url({ timeout: 15000 }).should('match', /\/transactions\/?$/);
+    cy.contains('.list-card-title', 'E2E Test Coffee').scrollIntoView().should('be.visible');
   });
 });

@@ -3,6 +3,8 @@ package de.fiscalnorth.transaction.service;
 import de.fiscalnorth.auth.CurrentUserService;
 import de.fiscalnorth.category.model.Category;
 import de.fiscalnorth.category.repository.CategoryRepository;
+import de.fiscalnorth.household.model.Household;
+import de.fiscalnorth.household.service.HouseholdScopeService;
 import de.fiscalnorth.transaction.dto.CsvImportResult;
 import de.fiscalnorth.transaction.model.PaymentTransaction;
 import de.fiscalnorth.transaction.model.TransactionType;
@@ -43,11 +45,19 @@ class CsvImportServiceTest {
     @Mock
     private CurrentUserService currentUserService;
 
+    @Mock
+    private HouseholdScopeService householdScopeService;
+
     private CsvImportService service;
 
     @BeforeEach
     void setUp() {
-        service = new CsvImportService(paymentTransactionRepository, categoryRepository, TestMessages.create(), currentUserService);
+        service = new CsvImportService(
+                paymentTransactionRepository,
+                categoryRepository,
+                TestMessages.create(),
+                currentUserService,
+                householdScopeService);
         User owner = new User();
         owner.setId(OWNER_ID);
         owner.setEmail("test@example.com");
@@ -55,6 +65,10 @@ class CsvImportServiceTest {
         owner.setUserRole(UserRole.User);
         owner.setAuthProvider(AuthProvider.LOCAL);
         when(currentUserService.getCurrentUser()).thenReturn(owner);
+        Household household = new Household();
+        household.setId(9L);
+        household.setName("Test household");
+        when(householdScopeService.requireHousehold()).thenReturn(household);
     }
 
     @Test
@@ -84,6 +98,9 @@ class CsvImportServiceTest {
         assertThat(captor.getAllValues())
                 .extracting(PaymentTransaction::getTransactionType)
                 .containsExactly(TransactionType.Expense, TransactionType.Income);
+        assertThat(captor.getAllValues())
+                .extracting(tx -> tx.getHousehold().getId())
+                .containsOnly(9L);
     }
 
     @Test

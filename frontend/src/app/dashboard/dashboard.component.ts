@@ -1,16 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 import { AccountService } from '../core/services/account.service';
 import { ContractService } from '../core/services/contract.service';
 import { InsightsService, MonthlyTrend } from '../core/services/insights.service';
 import { BudgetService, BudgetWithUsage } from '../core/services/budget.service';
 import { GoalOverview, GoalService, GoalWithProgress } from '../core/services/goal.service';
-import { PortfolioOverview, PortfolioService } from '../core/services/portfolio.service';
+import { PortfolioService } from '../core/services/portfolio.service';
 import { UserService } from '../core/services/user.service';
+import { AuthService } from '../core/services/auth.service';
 import { AiService } from '../core/services/ai.service';
 import { forkJoin } from 'rxjs';
 import { AppNotification, NotificationService } from '../core/services/notification.service';
-import { RouterLink } from '@angular/router';
+import { SeasonService, greetingKind } from '../core/theme/season.service';
 import {
   buildConclusions,
   buildKpis,
@@ -34,6 +36,14 @@ export interface PanelAiState {
   text: string;
 }
 
+export interface HomePromptCard {
+  id: string;
+  icon: string;
+  titleKey: string;
+  queryKey?: string;
+  analysis?: boolean;
+}
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -42,6 +52,10 @@ export interface PanelAiState {
   styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent implements OnInit {
+  private readonly router = inject(Router);
+  private readonly season = inject(SeasonService);
+  private readonly auth = inject(AuthService);
+
   totalBalance = 0;
   portfolioValue = 0;
   netWorth = 0;
@@ -50,7 +64,6 @@ export class DashboardComponent implements OnInit {
   fixedCosts = 0;
   disposableIncome = 0;
   userName = '';
-  greeting = '';
   loading = true;
   aiAvailable = false;
 
@@ -73,8 +86,6 @@ export class DashboardComponent implements OnInit {
 
   heroConclusion = '';
   expenseTrendLabel = '';
-
-  readonly generalAsk = ASK_CONTEXTS.general;
 
   private expandedPanels = new Set<DashboardPanel>();
   private panelAiState: Partial<Record<DashboardPanel, PanelAiState>> = {};
@@ -128,7 +139,6 @@ export class DashboardComponent implements OnInit {
         notifications,
       }) => {
         this.userName = user.userName?.trim() || this.language.instant('dashboard.defaultUser');
-        this.greeting = this.buildGreeting(this.userName);
 
         this.recentNotifications = notifications.slice(0, 5);
         this.totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
@@ -192,8 +202,8 @@ export class DashboardComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.userName = this.language.instant('dashboard.defaultUser');
-        this.greeting = this.buildGreeting(this.userName);
+        this.userName =
+          this.auth.currentUser?.userName?.trim() || this.language.instant('dashboard.defaultUser');
         this.loading = false;
       },
     });
@@ -419,9 +429,96 @@ export class DashboardComponent implements OnInit {
       .filter(Boolean);
   }
 
+  get greeting(): string {
+    const name = this.userName || this.language.instant('dashboard.defaultUser');
+    return this.buildGreeting(name);
+  }
+
+  get isYule(): boolean {
+    return this.season.isYule();
+  }
+
+  get promptCards(): HomePromptCard[] {
+    if (this.isYule) {
+      return [
+        {
+          id: 'holiday',
+          icon: 'featured_seasonal_and_gifts',
+          titleKey: 'dashboard.cardHolidaySpend',
+          queryKey: 'dashboard.cardHolidaySpendQuery',
+        },
+        {
+          id: 'recap',
+          icon: 'menu_book',
+          titleKey: 'dashboard.cardYearRecap',
+          queryKey: 'dashboard.cardYearRecapQuery',
+        },
+        {
+          id: 'gift',
+          icon: 'redeem',
+          titleKey: 'dashboard.cardGiftBudget',
+          queryKey: 'dashboard.cardGiftBudgetQuery',
+        },
+        {
+          id: 'analysis',
+          icon: 'auto_awesome',
+          titleKey: 'dashboard.cardFullAnalysis',
+          analysis: true,
+        },
+      ];
+    }
+    return [
+      {
+        id: 'save',
+        icon: 'savings',
+        titleKey: 'dashboard.cardSave',
+        queryKey: 'dashboard.cardSaveQuery',
+      },
+      {
+        id: 'month',
+        icon: 'calendar_month',
+        titleKey: 'dashboard.cardMonth',
+        queryKey: 'dashboard.cardMonthQuery',
+      },
+      {
+        id: 'budget',
+        icon: 'pie_chart',
+        titleKey: 'dashboard.cardBudget',
+        queryKey: 'dashboard.cardBudgetQuery',
+      },
+      {
+        id: 'analysis',
+        icon: 'auto_awesome',
+        titleKey: 'dashboard.cardFullAnalysis',
+        analysis: true,
+      },
+    ];
+  }
+
+  openPrompt(card: HomePromptCard): void {
+    if (card.analysis) {
+      this.router.navigate(['/assistant'], { queryParams: { mode: 'analysis' } });
+      return;
+    }
+    if (!card.queryKey) return;
+    this.router.navigate(['/assistant'], {
+      queryParams: { q: this.language.instant(card.queryKey) },
+    });
+  }
+
   private buildGreeting(name: string): string {
-    const h = new Date().getHours();
     const first = name.split(/\s+/)[0];
+    const kind = greetingKind(new Date(), this.season.isYule());
+    if (kind === 'christmas') {
+      return this.language.instant('dashboard.greetingChristmas', { name: first });
+    }
+    if (kind === 'newYear') {
+      return this.language.instant('dashboard.greetingNewYear', { name: first });
+    }
+    if (kind === 'holidays') {
+      return this.language.instant('dashboard.greetingHolidays', { name: first });
+    }
+    const h = new Date().getHours();
     if (h < 12) {
       return this.language.instant('dashboard.greetingMorning', { name: first });
     }

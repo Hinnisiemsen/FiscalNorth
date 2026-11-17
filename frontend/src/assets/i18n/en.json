@@ -1,6 +1,6 @@
 {
   "nav": {
-    "dashboard": "Dashboard",
+    "dashboard": "Home",
     "assistant": "Fiscal North",
     "transactions": "Transactions",
     "import": "Import",
@@ -11,7 +11,12 @@
     "bankSync": "Connect bank",
     "categories": "Categories",
     "notifications": "Notifications",
-    "portfolio": "Portfolio"
+    "portfolio": "Portfolio",
+    "household": "Household",
+    "newChat": "New chat",
+    "groupAsk": "Ask",
+    "groupMoney": "Your money",
+    "groupTools": "Tools"
   },
   "routes": {
     "home": "Home",
@@ -91,6 +96,7 @@
   "auth": {
     "title": "Welcome to Fiscal North",
     "subtitle": "Sign in to manage your finances",
+    "seasonKicker": "Warm wishes from the North",
     "signIn": "Sign in",
     "createAccount": "Create account",
     "email": "Email",
@@ -116,7 +122,11 @@
     "mainNav": "Main navigation",
     "navMenu": "Navigation menu",
     "openMenu": "Open navigation menu",
-    "notificationsTitle": "Notifications from Fiscal North"
+    "notificationsTitle": "Notifications from Fiscal North",
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar",
+    "yuleOn": "Turn on holiday theme",
+    "yuleOff": "Turn off holiday theme"
   },
   "dashboard": {
     "overviewPeriod": "Overview · {{period}}",
@@ -146,6 +156,24 @@
     "greetingMorning": "Good morning, {{name}}",
     "greetingAfternoon": "Good afternoon, {{name}}",
     "greetingEvening": "Good evening, {{name}}",
+    "greetingHolidays": "Happy holidays, {{name}}",
+    "greetingChristmas": "Merry Christmas, {{name}}",
+    "greetingNewYear": "Happy New Year, {{name}}",
+    "seasonKicker": "Holiday season",
+    "heroSub": "Ask Fiscal North anything about {{period}} — or pick a starting point.",
+    "cardHolidaySpend": "Help me plan holiday spending without blowing the budget",
+    "cardHolidaySpendQuery": "Help me plan holiday spending for this season without blowing my budgets. Use my current numbers.",
+    "cardYearRecap": "Give me a year-end recap of our household finances",
+    "cardYearRecapQuery": "Give me a year-end recap of our household finances: spending, savings, and what to watch.",
+    "cardGiftBudget": "How much room is left for gifts this month?",
+    "cardGiftBudgetQuery": "How much room is left for gifts this month after budgets, fixed costs, and recent spending?",
+    "cardFullAnalysis": "Start a full analysis of my finances",
+    "cardSave": "Where can I save the most this month?",
+    "cardSaveQuery": "Where can I save the most this month based on my spending and budgets?",
+    "cardMonth": "How is my monthly balance looking?",
+    "cardMonthQuery": "How is my monthly balance looking compared with last month?",
+    "cardBudget": "Which budget needs attention?",
+    "cardBudgetQuery": "Which budget needs attention right now, and what should I do?",
     "defaultUser": "User",
     "teaserNoIssues": "No issues",
     "teaserMonth": "{{net}} balance · {{expenses}} spent",
@@ -219,6 +247,7 @@
     "unavailable": "Fiscal North is temporarily unavailable.",
     "welcomeTitle": "Hello, I'm Fiscal North",
     "welcomeText": "Ask me about accounts, spending, and budgets — I answer based on your data in the app.",
+    "welcomeYule": "Ask me to plan holiday spending, recap the year, or keep December on budget.",
     "examplesLabel": "Tap an example:",
     "senderName": "Fiscal North",
     "followUpLabel": "Ask next:",

@@ -44,8 +44,7 @@ export class TransactionListComponent implements OnInit {
         !this.categoryFilter ||
         tx.category?.name === this.categoryFilter ||
         tx.splits?.some((s) => s.category?.name === this.categoryFilter);
-      const matchesMonth =
-        !this.monthFilter || tx.transactionDate?.startsWith(this.monthFilter);
+      const matchesMonth = !this.monthFilter || tx.transactionDate?.startsWith(this.monthFilter);
       return matchesCategory && matchesMonth;
     });
   }

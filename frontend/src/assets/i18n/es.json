@@ -1,6 +1,6 @@
 {
   "nav": {
-    "dashboard": "Panel",
+    "dashboard": "Inicio",
     "assistant": "Fiscal North",
     "transactions": "Transacciones",
     "import": "Importar",
@@ -10,7 +10,13 @@
     "accounts": "Cuentas",
     "bankSync": "Conectar banco",
     "categories": "Categorías",
-    "notifications": "Notificaciones"
+    "notifications": "Notificaciones",
+    "portfolio": "Cartera",
+    "household": "Hogar",
+    "newChat": "Nuevo chat",
+    "groupAsk": "Preguntar",
+    "groupMoney": "Tu dinero",
+    "groupTools": "Herramientas"
   },
   "routes": {
     "home": "Inicio",
@@ -34,7 +40,10 @@
     "categories": "Categorías",
     "newCategory": "Nueva categoría",
     "accountSettings": "Cuenta",
-    "upgrade": "Mejorar a Premium"
+    "upgrade": "Mejorar a Premium",
+    "household": "Hogar",
+    "portfolio": "Cartera",
+    "householdJoin": "Unirse al hogar"
   },
   "billing": {
     "subscriptionSection": "Suscripción",
@@ -85,6 +94,7 @@
   "auth": {
     "title": "Bienvenido a Fiscal North",
     "subtitle": "Inicia sesión para gestionar tus finanzas",
+    "seasonKicker": "Saludos cálidos desde el Norte",
     "signIn": "Iniciar sesión",
     "createAccount": "Crear cuenta",
     "email": "Correo electrónico",
@@ -110,7 +120,11 @@
     "mainNav": "Navegación principal",
     "navMenu": "Menú de navegación",
     "openMenu": "Abrir menú de navegación",
-    "notificationsTitle": "Notificaciones de Fiscal North"
+    "notificationsTitle": "Notificaciones de Fiscal North",
+    "collapseSidebar": "Contraer barra lateral",
+    "expandSidebar": "Expandir barra lateral",
+    "yuleOn": "Activar tema navideño",
+    "yuleOff": "Desactivar tema navideño"
   },
   "dashboard": {
     "overviewPeriod": "Resumen · {{period}}",
@@ -137,6 +151,24 @@
     "greetingMorning": "Buenos días, {{name}}",
     "greetingAfternoon": "Buenas tardes, {{name}}",
     "greetingEvening": "Buenas noches, {{name}}",
+    "greetingHolidays": "Felices fiestas, {{name}}",
+    "greetingChristmas": "Feliz Navidad, {{name}}",
+    "greetingNewYear": "Feliz Año Nuevo, {{name}}",
+    "seasonKicker": "Temporada navideña",
+    "heroSub": "Pregunta a Fiscal North lo que quieras sobre {{period}} — o elige un punto de partida.",
+    "cardHolidaySpend": "Ayúdame a planificar el gasto navideño sin pasarme del presupuesto",
+    "cardHolidaySpendQuery": "Ayúdame a planificar el gasto de estas fiestas sin romper mis presupuestos. Usa mis cifras actuales.",
+    "cardYearRecap": "Hazme un resumen de fin de año de las finanzas del hogar",
+    "cardYearRecapQuery": "Hazme un resumen de fin de año de las finanzas del hogar: gastos, ahorro y a qué prestar atención.",
+    "cardGiftBudget": "¿Cuánto margen queda este mes para regalos?",
+    "cardGiftBudgetQuery": "¿Cuánto margen queda este mes para regalos después de presupuestos, costes fijos y gastos recientes?",
+    "cardFullAnalysis": "Empieza un análisis completo de mis finanzas",
+    "cardSave": "¿Dónde puedo ahorrar más este mes?",
+    "cardSaveQuery": "¿Dónde puedo ahorrar más este mes según mis gastos y presupuestos?",
+    "cardMonth": "¿Cómo va el saldo de este mes?",
+    "cardMonthQuery": "¿Cómo va el saldo de este mes comparado con el anterior?",
+    "cardBudget": "¿Qué presupuesto necesita atención?",
+    "cardBudgetQuery": "¿Qué presupuesto necesita atención ahora y qué debería hacer?",
     "defaultUser": "Usuario",
     "teaserNoIssues": "Sin problemas",
     "teaserMonth": "Saldo {{net}} · {{expenses}} gastados",
@@ -202,7 +234,9 @@
     "brandSub": "Su asistente financiero — haga una pregunta o inicie un análisis",
     "analysisChip": "Análisis",
     "placeholder": "Pregunte a Fiscal North…",
-    "send": "Enviar"
+    "send": "Enviar",
+    "analysisStart": "Iniciar análisis completo",
+    "inputAriaLabel": "Preguntar a Fiscal North"
   },
   "assistant": {
     "unavailable": "Fiscal North no está disponible temporalmente.",

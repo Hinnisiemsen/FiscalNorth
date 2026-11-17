@@ -39,7 +39,7 @@ services:
       SPRING_SQL_INIT_MODE: always
       # Hibernate import.sql only runs with ddl-auto=create/create-drop; load demo seed via Spring SQL init.
       SPRING_SQL_INIT_SCHEMA_LOCATIONS: classpath:org/springframework/session/jdbc/schema-postgresql.sql
-      SPRING_SQL_INIT_DATA_LOCATIONS: classpath:import.sql
+      SPRING_SQL_INIT_DATA_LOCATIONS: classpath:import.sql,classpath:import-postgres-sequences.sql
       SPRING_DOCKER_COMPOSE_ENABLED: 'false'
       SPRING_H2_CONSOLE_ENABLED: 'false'
       SPRING_RABBITMQ_HOST: rabbitmq

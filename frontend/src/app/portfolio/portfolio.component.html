@@ -32,7 +32,9 @@
           <div class="allocation-row">
             <div class="allocation-head">
               <span>{{ slice.label }}</span>
-              <span>{{ slice.share | number: '1.0-1' }} % · {{ slice.value | currency: 'EUR' }}</span>
+              <span
+                >{{ slice.share | number: '1.0-1' }} % · {{ slice.value | currency: 'EUR' }}</span
+              >
             </div>
             <div class="bar-track">
               <div class="bar-fill" [style.width.%]="slice.share"></div>
@@ -109,11 +111,15 @@
             </div>
             <div>
               <span class="stat-label">{{ 'portfolio.unrealizedGain' | translate }}</span>
-              <span [class]="gainClass(h.unrealizedGain)">{{ h.unrealizedGain | currency: 'EUR' }}</span>
+              <span [class]="gainClass(h.unrealizedGain)">{{
+                h.unrealizedGain | currency: 'EUR'
+              }}</span>
             </div>
           </div>
           @if (h.lastUpdatedBy) {
-            <p class="holding-meta">{{ 'portfolio.updatedBy' | translate }}: {{ h.lastUpdatedBy }}</p>
+            <p class="holding-meta">
+              {{ 'portfolio.updatedBy' | translate }}: {{ h.lastUpdatedBy }}
+            </p>
           }
         </div>
       } @empty {

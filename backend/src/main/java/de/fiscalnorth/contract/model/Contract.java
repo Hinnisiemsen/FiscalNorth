@@ -1,5 +1,6 @@
 package de.fiscalnorth.contract.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.fiscalnorth.household.model.Household;
 import de.fiscalnorth.shared.BaseEntity;
 import de.fiscalnorth.user.model.User;
@@ -24,10 +25,12 @@ public class Contract extends BaseEntity {
     private ContractInterval contractInterval;
     private boolean autoDetected;
 
+    @JsonIgnore
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "household_id")
     private Household household;

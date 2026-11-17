@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../core/services/auth.service';
 import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
+import { SeasonService } from '../core/theme/season.service';
 
 @Component({
   selector: 'app-login',
@@ -17,6 +18,7 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  readonly season = inject(SeasonService);
 
   mode: 'login' | 'register' = 'login';
   errorMessage = '';

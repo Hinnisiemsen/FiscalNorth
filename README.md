@@ -17,6 +17,8 @@ Modern personal finance app built as a **portfolio showcase project**: Spring Bo
 | Live prices | Alpha Vantage + cached fallback + daily cron |
 | Demo seed | Alex + Jamie household, split tx, sample holdings |
 | E2E tests | Cypress — auth, transactions, billing, household, portfolio |
+| Gemini-inspired shell | In progress — collapsible sidebar, home greeting, prompt cards |
+| Holiday season theme | In progress — auto from 15 Nov–6 Jan, toggle in the top bar |
 
 ## Quick demo
 
@@ -33,7 +35,7 @@ Partner account **Jamie**: `jamie@fiscalnorth.local` / `demo1234` (same househol
 
 | Route | What you'll see |
 |-------|-----------------|
-| `/` | Dashboard — net worth, household budgets, category drill-down |
+| `/` | Home — Gemini-style greeting, prompt cards, net worth, household budgets |
 | `/budgets` | Remaining amounts + Alex/Jamie spend breakdown |
 | `/portfolio` | AAPL + VWCE.DE holdings, asset allocation |
 | `/household` | Members, invite partner, join link |
