@@ -17,14 +17,14 @@
       </div>
       @if (account.kind === 'DEPOSIT') {
         <p class="meta">
-          {{ getCurrencyCode(account.currency) }} · {{ account.interestRate }}% · {{ account.term }}
-          · {{ 'accounts.kindDeposit' | translate }}
+          {{ getCurrencyCode(account.currency) }} · {{ account.interestRate }}% ·
+          {{ account.term }} · {{ 'accounts.kindDeposit' | translate }}
         </p>
       } @else {
         <p class="meta">
           {{ getCurrencyCode(account.currency) }}
-          · {{ 'accounts.types.' + (account.accountType || 'other').toLowerCase() | translate }}
-          · {{ account.bankName }}
+          · {{ 'accounts.types.' + (account.accountType || 'other').toLowerCase() | translate }} ·
+          {{ account.bankName }}
         </p>
         <p class="meta meta-secondary">{{ account.iban }} · {{ account.bic }}</p>
       }

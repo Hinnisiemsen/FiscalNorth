@@ -29,7 +29,7 @@ describe('Financial goals', () => {
     cy.get('input[name="monthly"]').should('be.visible').clear().type('250').blur();
     cy.get('.wizard-actions .btn-primary').should('not.be.disabled').click();
     cy.get('.wizard-actions .btn-primary').click();
-    cy.get('app-paywall-banner', { timeout: 15000 }).should('be.visible');
-    cy.contains('app-paywall-banner', /Premium/i);
+    cy.get('[data-cy=paywall-banner]', { timeout: 15000 }).should('be.visible');
+    cy.contains('[data-cy=paywall-banner]', /Premium/i);
   });
 });

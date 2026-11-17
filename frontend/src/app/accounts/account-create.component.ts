@@ -2,10 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import {
-  AccountService,
-  BankAccountType,
-} from '../core/services/account.service';
+import { AccountService, BankAccountType } from '../core/services/account.service';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
 import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 

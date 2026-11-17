@@ -3,7 +3,9 @@
 
   <section class="card-glass settings-card join-card">
     @if (household) {
-      <p class="success-text">{{ 'household.join.success' | translate: { name: household.name } }}</p>
+      <p class="success-text">
+        {{ 'household.join.success' | translate: { name: household.name } }}
+      </p>
       <ul class="member-list">
         @for (member of household.members; track member.userId) {
           <li>{{ member.userName }} ({{ 'household.role.' + member.role | translate }})</li>
@@ -20,7 +22,12 @@
       @if (errorKey) {
         <p class="error-text">{{ errorKey | translate }}</p>
       }
-      <button type="button" class="btn-primary" [disabled]="loading || !token" (click)="acceptInvite()">
+      <button
+        type="button"
+        class="btn-primary"
+        [disabled]="loading || !token"
+        (click)="acceptInvite()"
+      >
         {{ loading ? ('common.loading' | translate) : ('household.join.accept' | translate) }}
       </button>
     }

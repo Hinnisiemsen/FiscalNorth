@@ -14,6 +14,7 @@ import { LanguageSwitcherComponent } from '../shared/language-switcher.component
 import { UserMenuComponent } from './user-menu.component';
 import { TranslateService } from '@ngx-translate/core';
 import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
+import { LanguageService } from '../core/i18n/language.service';
 import { SeasonService } from '../core/theme/season.service';
 
 const SIDEBAR_STORAGE_KEY = 'fn-sidebar-collapsed';
@@ -94,7 +95,9 @@ export class LayoutComponent implements OnInit, OnDestroy {
     },
   ];
 
-  constructor(private notificationService: NotificationService) {}
+  constructor(private notificationService: NotificationService) {
+    inject(LanguageService);
+  }
 
   ngOnInit(): void {
     this.sidebarCollapsed = localStorage.getItem(SIDEBAR_STORAGE_KEY) === '1';

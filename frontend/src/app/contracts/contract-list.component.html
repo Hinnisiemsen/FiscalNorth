@@ -1,8 +1,17 @@
 <div class="page-content-inner">
   <app-page-header [heading]="'contracts.title' | translate">
     <label class="btn btn-secondary file-btn">
-      {{ isAnalyzingDocument ? ('contracts.analyzingDocument' | translate) : ('contracts.analyzeDocument' | translate) }}
-      <input type="file" accept=".pdf,.txt,.text/plain" (change)="onDocumentSelected($event)" hidden />
+      {{
+        isAnalyzingDocument
+          ? ('contracts.analyzingDocument' | translate)
+          : ('contracts.analyzeDocument' | translate)
+      }}
+      <input
+        type="file"
+        accept=".pdf,.txt,.text/plain"
+        (change)="onDocumentSelected($event)"
+        hidden
+      />
     </label>
     <button class="btn btn-secondary" (click)="analyzeContracts()" [disabled]="isAnalyzing">
       {{ isAnalyzing ? ('contracts.analyzing' | translate) : ('contracts.analyze' | translate) }}

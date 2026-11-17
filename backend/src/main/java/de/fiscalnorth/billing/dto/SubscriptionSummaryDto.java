@@ -13,6 +13,9 @@ public record SubscriptionSummaryDto(
         Instant currentPeriodEnd,
         Instant trialEnd,
         boolean cancelAtPeriodEnd,
-        boolean premiumActive
+        boolean premiumActive,
+        boolean billingEnabled,
+        boolean premiumPreviewEnabled,
+        boolean paidSubscriptionActive
 ) {
 }

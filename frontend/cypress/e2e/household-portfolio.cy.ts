@@ -26,14 +26,14 @@ describe('Household, portfolio, splits, and demo paywall', () => {
 
   it('shows split transaction in list', () => {
     cy.visit('/transactions');
-    cy.contains('Kaufland Wocheneinkauf');
+    cy.contains('.list-card-title', 'Kaufland Wocheneinkauf').scrollIntoView().should('be.visible');
     cy.contains(/split/i);
   });
 
   it('unlocks premium assistant via try in demo', () => {
     cy.visit('/assistant');
-    cy.contains(/try in demo|in demo testen/i).click();
-    cy.get('app-paywall-banner').should('not.exist');
+    cy.get('[data-cy=try-demo]', { timeout: 15000 }).should('be.visible').click();
+    cy.get('[data-cy=paywall-banner]').should('not.exist');
   });
 
   it('loads household join page with token query', () => {

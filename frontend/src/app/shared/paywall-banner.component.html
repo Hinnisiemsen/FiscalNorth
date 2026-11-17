@@ -1,4 +1,4 @@
-<div class="paywall-banner">
+<div class="paywall-banner" data-cy="paywall-banner">
   <div class="paywall-content">
     <span class="material-symbols-outlined paywall-icon" aria-hidden="true">workspace_premium</span>
     <div>
@@ -8,7 +8,12 @@
   </div>
   <div class="paywall-actions">
     @if (showTryDemo) {
-      <button type="button" class="btn-secondary paywall-cta" (click)="tryDemo()">
+      <button
+        type="button"
+        class="btn-secondary paywall-cta"
+        data-cy="try-demo"
+        (click)="tryDemo()"
+      >
         {{ 'billing.tryInDemo' | translate }}
       </button>
     }

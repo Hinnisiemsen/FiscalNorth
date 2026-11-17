@@ -31,7 +31,10 @@
           <p>{{ household.pendingInvite.email }}</p>
           <p class="invite-link-label">{{ 'household.joinLink' | translate }}</p>
           <code class="invite-link">/household/join?token={{ household.pendingInvite.token }}</code>
-          <p class="notice-text">{{ 'household.inviteExpires' | translate }}: {{ household.pendingInvite.expiresAt | date: 'medium' }}</p>
+          <p class="notice-text">
+            {{ 'household.inviteExpires' | translate }}:
+            {{ household.pendingInvite.expiresAt | date: 'medium' }}
+          </p>
         </section>
       }
 

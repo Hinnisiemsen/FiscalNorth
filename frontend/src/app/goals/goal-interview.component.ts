@@ -120,7 +120,12 @@ export class GoalInterviewComponent implements OnInit {
     if (this.step < 4) {
       this.saveAnswersAndAdvance();
     } else if (this.step === 4) {
-      this.saveAnswersAndAdvance();
+      this.saveAnswers(() => {
+        this.step = 5;
+        if (!this.showPremiumBanner) {
+          this.generatePlan();
+        }
+      });
     } else if (this.step === 5) {
       this.step = 6;
     }
@@ -129,6 +134,12 @@ export class GoalInterviewComponent implements OnInit {
   back(): void {
     if (this.step > 1) {
       this.step--;
+    }
+  }
+
+  onPaywallDismissed(): void {
+    if (!this.premiumBlocked) {
+      this.generatePlan();
     }
   }
 

@@ -1,7 +1,7 @@
 .assistant {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - var(--topbar-height) - 4rem);
+  min-height: calc(100% - 0.5rem);
   max-width: 760px;
   margin: 0 auto;
 }

@@ -1,6 +1,7 @@
 package de.fiscalnorth.billing.service;
 
 import de.fiscalnorth.billing.PremiumRequiredException;
+import de.fiscalnorth.billing.config.StripeProperties;
 import de.fiscalnorth.billing.dto.SubscriptionSummaryDto;
 import de.fiscalnorth.billing.model.PremiumFeature;
 import de.fiscalnorth.billing.model.SubscriptionPlan;
@@ -25,6 +26,7 @@ public class EntitlementService {
 
     private final SubscriptionService subscriptionService;
     private final DemoProperties demoProperties;
+    private final StripeProperties stripeProperties;
 
     public boolean isPremiumPreviewEnabled() {
         return demoProperties.isPremiumPreviewEnabled();
@@ -76,6 +78,8 @@ public class EntitlementService {
     public SubscriptionSummaryDto toSummary(User user) {
         boolean premiumActive = hasFeature(user, PremiumFeature.AI_ASSISTANT);
         boolean paidSubscriptionActive = isPaidSubscriber(user);
+        boolean billingEnabled = stripeProperties.isEnabled();
+        boolean premiumPreviewEnabled = isPremiumPreviewEnabled();
         SubscriptionPlan plan = premiumActive ? SubscriptionPlan.PREMIUM : SubscriptionPlan.FREE;
         List<String> entitlements = getEntitlements(user).stream()
                 .map(PremiumFeature::name)
@@ -90,7 +94,10 @@ public class EntitlementService {
                         subscription.getCurrentPeriodEnd(),
                         subscription.getTrialEnd(),
                         subscription.isCancelAtPeriodEnd(),
-                        premiumActive))
+                        premiumActive,
+                        billingEnabled,
+                        premiumPreviewEnabled,
+                        paidSubscriptionActive))
                 .orElseGet(() -> new SubscriptionSummaryDto(
                         SubscriptionPlan.FREE,
                         SubscriptionStatus.NONE,
@@ -98,6 +105,9 @@ public class EntitlementService {
                         null,
                         null,
                         false,
-                        premiumActive));
+                        premiumActive,
+                        billingEnabled,
+                        premiumPreviewEnabled,
+                        paidSubscriptionActive));
     }
 }
