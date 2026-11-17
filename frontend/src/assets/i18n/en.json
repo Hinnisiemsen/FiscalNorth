@@ -245,6 +245,8 @@
   },
   "assistant": {
     "unavailable": "Fiscal North is temporarily unavailable.",
+    "statusChrome": "Replies use the on-device model in Chrome.",
+    "statusChromeDownload": "Replies use the on-device model in Chrome. The first reply may wait while Chrome downloads it.",
     "welcomeTitle": "Hello, I'm Fiscal North",
     "welcomeText": "Ask me about accounts, spending, and budgets — I answer based on your data in the app.",
     "welcomeYule": "Ask me to plan holiday spending, recap the year, or keep December on budget.",
@@ -425,6 +427,7 @@
     "empty": "No budgets found.",
     "newTitle": "New budget",
     "name": "Name",
+    "namePlaceholder": "e.g. Groceries, Entertainment",
     "limit": "Limit (€)",
     "startDate": "Start date",
     "endDate": "End date",
@@ -470,6 +473,12 @@
     "quantity": "Quantity",
     "costBasis": "Cost basis",
     "assetClass": "Asset class",
+    "assetClasses": {
+      "STOCK": "Stock",
+      "ETF": "ETF",
+      "FUND": "Fund",
+      "OTHER": "Other"
+    },
     "marketValue": "Market value",
     "currentPrice": "Current price",
     "priceStale": "Cached price",

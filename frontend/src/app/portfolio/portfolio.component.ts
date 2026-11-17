@@ -1,7 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { PortfolioOverview, PortfolioService } from '../core/services/portfolio.service';
+import {
+  AssetClass,
+  PortfolioOverview,
+  PortfolioService,
+} from '../core/services/portfolio.service';
 import { PAGE_HEADER_IMPORTS } from '../shared/shared-ui';
 import { TRANSLATE_IMPORTS } from '../core/i18n/translate-imports';
 
@@ -21,12 +25,14 @@ export class PortfolioComponent implements OnInit {
   showForm = false;
   addError = '';
 
+  readonly assetClasses: AssetClass[] = ['STOCK', 'ETF', 'FUND', 'OTHER'];
+
   holdingForm = this.fb.group({
     symbol: ['', Validators.required],
     name: ['', Validators.required],
-    quantity: [0, [Validators.required, Validators.min(0.0001)]],
-    costBasis: [0, [Validators.required, Validators.min(0)]],
-    assetClass: ['STOCK', Validators.required],
+    quantity: [null as number | null, [Validators.required, Validators.min(0.0001)]],
+    costBasis: [null as number | null, [Validators.required, Validators.min(0)]],
+    assetClass: ['STOCK' as AssetClass, Validators.required],
   });
 
   ngOnInit(): void {
@@ -60,13 +66,13 @@ export class PortfolioComponent implements OnInit {
         name: value.name!,
         quantity: Number(value.quantity),
         costBasis: Number(value.costBasis),
-        assetClass: value.assetClass as 'STOCK' | 'ETF' | 'FUND' | 'OTHER',
+        assetClass: value.assetClass as AssetClass,
       })
       .subscribe({
         next: (portfolio) => {
           this.portfolio = portfolio;
           this.showForm = false;
-          this.holdingForm.reset({ assetClass: 'STOCK', quantity: 0, costBasis: 0 });
+          this.holdingForm.reset({ assetClass: 'STOCK', quantity: null, costBasis: null });
         },
         error: (err) => {
           this.addError = err.error?.messageKey ?? 'portfolio.addFailed';

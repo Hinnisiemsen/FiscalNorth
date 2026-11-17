@@ -245,6 +245,8 @@
   },
   "assistant": {
     "unavailable": "Fiscal North ist vorübergehend nicht verfügbar.",
+    "statusChrome": "Antworten kommen vom Modell in Chrome.",
+    "statusChromeDownload": "Antworten kommen vom Modell in Chrome. Beim ersten Mal kann der Download einen Moment dauern.",
     "welcomeTitle": "Hallo, ich bin Fiscal North",
     "welcomeText": "Stell mir Fragen zu Konten, Ausgaben und Budgets — ich antworte auf Basis deiner Daten in der App.",
     "welcomeYule": "Frag mich nach Weihnachtsausgaben, einem Jahresrückblick oder einem ruhigen Dezember-Budget.",
@@ -424,6 +426,7 @@
     "empty": "Keine Budgets gefunden.",
     "newTitle": "Neues Budget",
     "name": "Name",
+    "namePlaceholder": "z. B. Lebensmittel, Unterhaltung",
     "limit": "Limit (€)",
     "startDate": "Startdatum",
     "endDate": "Enddatum",
@@ -469,6 +472,12 @@
     "quantity": "Stückzahl",
     "costBasis": "Kostenbasis",
     "assetClass": "Anlageklasse",
+    "assetClasses": {
+      "STOCK": "Aktie",
+      "ETF": "ETF",
+      "FUND": "Fonds",
+      "OTHER": "Sonstige"
+    },
     "marketValue": "Marktwert",
     "currentPrice": "Aktueller Kurs",
     "priceStale": "Gecachter Kurs",

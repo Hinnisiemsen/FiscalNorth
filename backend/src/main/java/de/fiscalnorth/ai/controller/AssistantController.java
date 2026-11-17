@@ -1,5 +1,6 @@
 package de.fiscalnorth.ai.controller;
 
+import de.fiscalnorth.ai.dto.AssistantContextDto;
 import de.fiscalnorth.ai.dto.AssistantStatusDto;
 import de.fiscalnorth.ai.dto.ChatRequest;
 import de.fiscalnorth.ai.dto.ChatResponse;
@@ -31,15 +32,24 @@ public class AssistantController {
     public ResponseEntity<AssistantStatusDto> status() {
         if (!assistantService.isAvailable()) {
             return ResponseEntity.ok(new AssistantStatusDto(
-                    false, messages.get("assistant.status.unavailable")));
+                    false, messages.get("assistant.status.unavailable"), false));
         }
         if (!entitlementService.hasFeature(
                 currentUserService.getCurrentUser(), PremiumFeature.AI_ASSISTANT)) {
             return ResponseEntity.ok(new AssistantStatusDto(
-                    false, messages.get("assistant.status.premiumRequired")));
+                    false, messages.get("assistant.status.premiumRequired"), false));
+        }
+        if (assistantService.isDemo()) {
+            return ResponseEntity.ok(new AssistantStatusDto(
+                    true, messages.get("assistant.status.demo"), true));
         }
         return ResponseEntity.ok(new AssistantStatusDto(
-                true, messages.get("assistant.status.ready")));
+                true, messages.get("assistant.status.ready"), false));
+    }
+
+    @GetMapping("/context")
+    public ResponseEntity<AssistantContextDto> context() {
+        return ResponseEntity.ok(new AssistantContextDto(assistantService.contextSnapshot()));
     }
 
     @PostMapping("/chat")

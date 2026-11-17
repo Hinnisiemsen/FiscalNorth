@@ -33,6 +33,7 @@ public class AssistantService {
     private final FinancialContextService financialContextService;
     private final ActionPayloadValidator actionPayloadValidator;
     private final FollowUpRecommendationService followUpRecommendationService;
+    private final DemoAssistantResponder demoAssistantResponder;
     private final AiProperties aiProperties;
     private final ObjectMapper objectMapper;
     private final Messages messages;
@@ -43,15 +44,35 @@ public class AssistantService {
     private String apiKey;
 
     public boolean isAvailable() {
-        return aiProperties.enabled() && apiKey != null && !apiKey.isBlank();
+        return aiProperties.enabled() && (hasLiveKey() || aiProperties.demoFallback());
+    }
+
+    public boolean isDemo() {
+        return aiProperties.enabled() && aiProperties.demoFallback() && !hasLiveKey();
+    }
+
+    public String contextSnapshot() {
+        entitlementService.requireFeature(
+                currentUserService.getCurrentUser(), PremiumFeature.AI_ASSISTANT);
+        return financialContextService.buildContextSnapshot();
+    }
+
+    private boolean hasLiveKey() {
+        return apiKey != null && !apiKey.isBlank();
     }
 
     public ChatResponse chat(String message, String conversationId) {
-        if (!isAvailable()) {
+        if (!aiProperties.enabled()) {
             throw new AiDisabledException();
         }
         entitlementService.requireFeature(
                 currentUserService.getCurrentUser(), PremiumFeature.AI_ASSISTANT);
+        if (!hasLiveKey()) {
+            if (!aiProperties.demoFallback()) {
+                throw new AiDisabledException();
+            }
+            return demoAssistantResponder.respond(message, conversationId);
+        }
 
         String context = financialContextService.buildContextSnapshot();
         String systemPrompt = """

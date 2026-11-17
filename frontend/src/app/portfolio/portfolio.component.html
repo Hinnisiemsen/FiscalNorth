@@ -1,6 +1,6 @@
 <div class="page-content-inner">
   <app-page-header [heading]="'portfolio.title' | translate">
-    <button type="button" class="btn btn-primary" (click)="toggleForm()">
+    <button type="button" class="btn btn-primary" data-cy="add-holding" (click)="toggleForm()">
       {{ (showForm ? 'common.cancel' : 'portfolio.addHolding') | translate }}
     </button>
   </app-page-header>
@@ -51,36 +51,52 @@
           <div class="form-row">
             <div class="form-group">
               <label for="symbol">{{ 'portfolio.symbol' | translate }}</label>
-              <input id="symbol" formControlName="symbol" />
+              <input id="symbol" formControlName="symbol" data-cy="holding-symbol" />
             </div>
             <div class="form-group">
               <label for="name">{{ 'portfolio.name' | translate }}</label>
-              <input id="name" formControlName="name" />
+              <input id="name" formControlName="name" data-cy="holding-name" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label for="quantity">{{ 'portfolio.quantity' | translate }}</label>
-              <input id="quantity" type="number" step="0.0001" formControlName="quantity" />
+              <input
+                id="quantity"
+                type="number"
+                step="0.0001"
+                formControlName="quantity"
+                data-cy="holding-quantity"
+              />
             </div>
             <div class="form-group">
               <label for="costBasis">{{ 'portfolio.costBasis' | translate }}</label>
-              <input id="costBasis" type="number" step="0.01" formControlName="costBasis" />
+              <input
+                id="costBasis"
+                type="number"
+                step="0.01"
+                formControlName="costBasis"
+                data-cy="holding-cost"
+              />
             </div>
             <div class="form-group">
               <label for="assetClass">{{ 'portfolio.assetClass' | translate }}</label>
-              <select id="assetClass" formControlName="assetClass">
-                <option value="STOCK">Stock</option>
-                <option value="ETF">ETF</option>
-                <option value="FUND">Fund</option>
-                <option value="OTHER">Other</option>
+              <select id="assetClass" formControlName="assetClass" data-cy="holding-asset-class">
+                @for (cls of assetClasses; track cls) {
+                  <option [value]="cls">{{ 'portfolio.assetClasses.' + cls | translate }}</option>
+                }
               </select>
             </div>
           </div>
           @if (addError) {
             <p class="error-text">{{ addError | translate }}</p>
           }
-          <button type="submit" class="btn-primary" [disabled]="holdingForm.invalid">
+          <button
+            type="submit"
+            class="btn-primary"
+            data-cy="save-holding"
+            [disabled]="holdingForm.invalid"
+          >
             {{ 'portfolio.saveHolding' | translate }}
           </button>
         </form>
@@ -95,7 +111,9 @@
               <h3>{{ h.symbol }}</h3>
               <p class="holding-name">{{ h.name }}</p>
             </div>
-            <span class="asset-badge">{{ h.assetClass }}</span>
+            <span class="asset-badge">{{
+              'portfolio.assetClasses.' + h.assetClass | translate
+            }}</span>
           </div>
           <div class="holding-stats">
             <div>

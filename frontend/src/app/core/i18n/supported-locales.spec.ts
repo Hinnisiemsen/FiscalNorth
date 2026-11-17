@@ -1,3 +1,5 @@
+import { CurrencyPipe } from '@angular/common';
+import { registerAppLocales } from './register-locales';
 import {
   DEFAULT_LOCALE,
   intlLocaleTag,
@@ -5,6 +7,8 @@ import {
   LOCALE_STORAGE_KEY,
   resolveInitialLocale,
 } from './supported-locales';
+
+registerAppLocales();
 
 describe('supported-locales', () => {
   beforeEach(() => {
@@ -33,5 +37,10 @@ describe('supported-locales', () => {
 
   it('resolveInitialLocale falls back to default', () => {
     expect(resolveInitialLocale()).toBe(DEFAULT_LOCALE);
+  });
+
+  it('formats currency for de-DE without missing locale data', () => {
+    const pipe = new CurrencyPipe('de-DE');
+    expect(pipe.transform(195.5, 'EUR')).toContain('195');
   });
 });

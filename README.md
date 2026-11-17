@@ -42,7 +42,7 @@ Partner account **Jamie**: `jamie@fiscalnorth.local` / `demo1234` (same househol
 | `/transactions` | Split transaction "Kaufland Wocheneinkauf" |
 | `/assistant` | Premium paywall → click **Try in demo** to unlock AI |
 
-Premium features work locally via `DEMO_PREMIUM_PREVIEW=true` (default). Set `GEMINI_API_KEY` for the AI assistant.
+Premium features work locally via `DEMO_PREMIUM_PREVIEW=true` (default). The assistant uses Chrome’s on-device Prompt API (Gemini Nano) when the browser model is ready; otherwise it falls back to a local demo reply unless `GEMINI_API_KEY` is set.
 
 ## Features
 
@@ -151,7 +151,8 @@ Open http://localhost:4200 and sign in with the demo credentials above.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `GEMINI_API_KEY` | — | Google Gemini API key (AI assistant, goal planner, contract analysis) |
+| `GEMINI_API_KEY` | — | Cloud Gemini for assistant, goal planner, and contract analysis when Chrome Nano is not ready |
+| `AI_DEMO_FALLBACK` | `true` | Local canned assistant replies when no live Gemini key is set |
 | `DEMO_PREMIUM_PREVIEW` | `true` | Unlock premium features without Stripe |
 | `PORTFOLIO_PRICE_PROVIDER` | `manual-fallback` | `alphavantage` for live quotes |
 | `PORTFOLIO_PRICE_API_KEY` | — | Alpha Vantage API key |

@@ -1,7 +1,8 @@
 <div class="assistant page-content-inner">
   @if (showPremiumBanner) {
     <app-paywall-banner feature="AI_ASSISTANT" messageKey="billing.paywall.assistant" />
-  } @else if (setupHint && !aiAvailable) {
+  }
+  @if (setupHint) {
     <div class="setup-hint card-glass">
       <span class="material-symbols-outlined">info</span>
       <p>{{ setupHint }}</p>
@@ -17,7 +18,12 @@
         <p class="welcome-follow-label">{{ 'assistant.examplesLabel' | translate }}</p>
         <div class="prompt-grid welcome-prompts">
           @for (key of welcomeFollowUpKeys; track key) {
-            <button type="button" class="prompt-card" (click)="askWelcomeExample(key)">
+            <button
+              type="button"
+              class="prompt-card"
+              (click)="askWelcomeExample(key)"
+              [disabled]="chatBlocked"
+            >
               <span class="prompt-card-icon">
                 <span class="material-symbols-outlined">auto_awesome</span>
               </span>
@@ -100,14 +106,14 @@
       [(ngModel)]="inputText"
       (keydown)="onKeydown($event)"
       [placeholder]="'assistant.inputPlaceholder' | translate"
-      [disabled]="loading || premiumBlocked"
+      [disabled]="loading || chatBlocked"
       [attr.aria-label]="'assistant.inputPlaceholder' | translate"
     />
     <button
       type="button"
       class="send-btn"
       (click)="send()"
-      [disabled]="loading || !inputText.trim() || premiumBlocked"
+      [disabled]="loading || !inputText.trim() || chatBlocked"
       [attr.aria-label]="'askBar.send' | translate"
     >
       <span class="material-symbols-outlined">arrow_upward</span>
