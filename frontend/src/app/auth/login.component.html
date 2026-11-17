@@ -3,8 +3,11 @@
   <div class="login-card card-glass">
     <div class="login-header">
       <span class="spark spark-lg" aria-hidden="true"></span>
-      <h1>{{ 'auth.title' | translate }}</h1>
+      <h1 class="dash-greeting login-greeting">{{ 'auth.title' | translate }}</h1>
       <p>{{ 'auth.subtitle' | translate }}</p>
+      @if (season.isYule()) {
+        <p class="season-kicker login-kicker">{{ 'auth.seasonKicker' | translate }}</p>
+      }
     </div>
 
     <div class="mode-tabs">

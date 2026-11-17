@@ -31,7 +31,9 @@
             ],
             "styles": [
               "src/styles.css",
-              "src/styles/components.css"
+              "src/styles/components.css",
+              "src/styles/gemini-shell.css",
+              "src/styles/season-yule.css"
             ]
           },
           "configurations": {
@@ -102,7 +104,9 @@
             ],
             "styles": [
               "src/styles.css",
-              "src/styles/components.css"
+              "src/styles/components.css",
+              "src/styles/gemini-shell.css",
+              "src/styles/season-yule.css"
             ]
           }
         }

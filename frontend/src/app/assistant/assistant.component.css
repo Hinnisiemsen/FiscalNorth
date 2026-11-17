@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - var(--topbar-height) - 4rem);
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
 }
 
@@ -26,21 +26,25 @@
 
 .chat-welcome {
   text-align: center;
-  padding: 2rem 1rem 3rem;
+  padding: 2.5rem 1rem 2rem;
   color: var(--color-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .chat-welcome .spark-lg {
   margin: 0 auto 1rem;
 }
 
-.chat-welcome h2 {
-  font-family: var(--font-family-heading);
-  font-size: 1.35rem;
-  font-weight: 500;
-  color: var(--color-primary);
+.assistant-greeting {
+  font-size: clamp(2rem, 5vw, 3.25rem);
   margin-bottom: 0.5rem;
-  letter-spacing: -0.02em;
+}
+
+.welcome-prompts {
+  margin-top: 0.5rem;
+  text-align: left;
 }
 
 .welcome-follow-label,
@@ -245,16 +249,19 @@
 
 .chat-input-bar {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: var(--color-surface-glass);
-  backdrop-filter: blur(var(--blur-glass));
-  -webkit-backdrop-filter: blur(var(--blur-glass));
+  padding: 0.65rem 0.65rem 0.65rem 1.1rem;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
   margin-top: auto;
-  box-shadow: var(--shadow-glass);
+  box-shadow: var(--shadow-md);
   transition: box-shadow var(--transition-fast);
+}
+
+.chat-input-bar .ask-input-icon {
+  color: var(--color-accent);
 }
 
 .chat-input-bar:focus-within {

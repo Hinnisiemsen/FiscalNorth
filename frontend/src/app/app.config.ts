@@ -20,15 +20,15 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor, localeInterceptor])),
+    importProvidersFrom(
+      TranslateModule.forRoot({
+        fallbackLang: 'en',
+      }),
+    ),
     provideTranslateHttpLoader({
       prefix: '/assets/i18n/',
       suffix: '.json',
     }),
-    importProvidersFrom(
-      TranslateModule.forRoot({
-        defaultLanguage: 'en',
-      }),
-    ),
     {
       provide: LOCALE_ID,
       useFactory: () => intlLocaleTag(resolveInitialLocale()),

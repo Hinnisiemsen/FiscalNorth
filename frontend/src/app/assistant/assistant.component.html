@@ -1,6 +1,4 @@
 <div class="assistant page-content-inner">
-  <app-page-header [heading]="'routes.assistant' | translate" />
-
   @if (showPremiumBanner) {
     <app-paywall-banner feature="AI_ASSISTANT" messageKey="billing.paywall.assistant" />
   } @else if (setupHint && !aiAvailable) {
@@ -14,13 +12,16 @@
     @if (messages.length === 0 && !loading) {
       <div class="chat-welcome">
         <span class="spark spark-lg" aria-hidden="true"></span>
-        <h2>{{ 'assistant.welcomeTitle' | translate }}</h2>
+        <h2 class="dash-greeting assistant-greeting">{{ 'assistant.welcomeTitle' | translate }}</h2>
         <p>{{ 'assistant.welcomeText' | translate }}</p>
         <p class="welcome-follow-label">{{ 'assistant.examplesLabel' | translate }}</p>
-        <div class="follow-up-chips">
+        <div class="prompt-grid welcome-prompts">
           @for (key of welcomeFollowUpKeys; track key) {
-            <button type="button" class="follow-up-chip" (click)="askWelcomeExample(key)">
-              {{ key | translate }}
+            <button type="button" class="prompt-card" (click)="askWelcomeExample(key)">
+              <span class="prompt-card-icon">
+                <span class="material-symbols-outlined">auto_awesome</span>
+              </span>
+              <span class="prompt-card-title">{{ key | translate }}</span>
             </button>
           }
         </div>
@@ -92,6 +93,7 @@
   </div>
 
   <div class="chat-input-bar">
+    <span class="material-symbols-outlined ask-input-icon">auto_awesome</span>
     <input
       type="text"
       class="chat-input"
@@ -108,7 +110,7 @@
       [disabled]="loading || !inputText.trim() || premiumBlocked"
       [attr.aria-label]="'askBar.send' | translate"
     >
-      <span class="material-symbols-outlined">send</span>
+      <span class="material-symbols-outlined">arrow_upward</span>
     </button>
   </div>
 </div>

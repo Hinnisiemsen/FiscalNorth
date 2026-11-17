@@ -1,57 +1,63 @@
-<div class="layout-container" [class.drawer-open]="drawerOpen">
+<div
+  class="layout-container"
+  [class.drawer-open]="drawerOpen"
+  [class.sidebar-collapsed]="sidebarCollapsed"
+>
   <div class="ambient-gradient" aria-hidden="true"></div>
 
-  <!-- Desktop icon rail -->
-  <aside class="icon-rail" [attr.aria-label]="'layout.mainNav' | translate">
-    <a routerLink="/" class="rail-logo" [title]="'layout.brand' | translate">
-      <span class="spark" aria-hidden="true"></span>
-    </a>
-    <nav class="rail-nav">
-      <a
-        *ngFor="let item of menuItems"
-        [routerLink]="item.path"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: item.path === '/' }"
-        [title]="item.labelKey | translate"
-        class="rail-link"
-      >
-        <span class="material-symbols-outlined">{{ item.icon }}</span>
-        @if (item.premium) {
-          <span class="premium-dot" [title]="'billing.premiumBadge' | translate"></span>
-        }
-      </a>
-    </nav>
-  </aside>
-
-  <!-- Mobile drawer -->
   <div class="drawer-backdrop" *ngIf="drawerOpen" (click)="closeDrawer()" aria-hidden="true"></div>
-  <aside
-    class="nav-drawer"
-    [class.open]="drawerOpen"
-    [attr.aria-label]="'layout.navMenu' | translate"
-    [attr.aria-hidden]="!drawerOpen"
-  >
-    <div class="drawer-header">
-      <span class="spark spark-lg" aria-hidden="true"></span>
-      <h2>{{ 'layout.brand' | translate }}</h2>
-    </div>
-    <nav class="drawer-nav">
-      <a
-        *ngFor="let item of menuItems"
-        [routerLink]="item.path"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: item.path === '/' }"
-        class="drawer-link"
-        (click)="onNavClick()"
+
+  <aside class="app-sidebar" [attr.aria-label]="'layout.mainNav' | translate">
+    <div class="sidebar-top">
+      <button
+        type="button"
+        class="sidebar-toggle"
+        (click)="toggleSidebar()"
+        [attr.aria-label]="
+          (sidebarCollapsed ? 'layout.expandSidebar' : 'layout.collapseSidebar') | translate
+        "
       >
-        <span class="material-symbols-outlined">{{ item.icon }}</span>
-        {{ item.labelKey | translate }}
-        @if (item.premium) {
-          <span class="premium-tag">{{ 'billing.premiumBadge' | translate }}</span>
-        }
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+      <a routerLink="/" class="brand" [title]="'layout.brand' | translate" (click)="onNavClick()">
+        <span class="spark" aria-hidden="true"></span>
+        <span class="brand-name">{{ 'layout.brand' | translate }}</span>
       </a>
+    </div>
+
+    <a
+      routerLink="/assistant"
+      class="new-chat-btn"
+      [title]="'nav.newChat' | translate"
+      (click)="onNavClick()"
+    >
+      <span class="material-symbols-outlined">edit_square</span>
+      <span class="new-chat-label">{{ 'nav.newChat' | translate }}</span>
+    </a>
+
+    <nav class="sidebar-nav" [attr.aria-label]="'layout.navMenu' | translate">
+      @for (group of navGroups; track group.labelKey) {
+        <p class="nav-group-label">{{ group.labelKey | translate }}</p>
+        @for (item of group.items; track item.path) {
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+            [title]="item.labelKey | translate"
+            class="nav-link"
+            (click)="onNavClick()"
+          >
+            <span class="material-symbols-outlined">{{ item.icon }}</span>
+            <span class="nav-label">{{ item.labelKey | translate }}</span>
+            @if (item.premium) {
+              <span class="premium-tag">{{ 'billing.premiumBadge' | translate }}</span>
+            }
+          </a>
+        }
+      }
     </nav>
-    <div class="drawer-account">
+
+    <div class="sidebar-footer">
       <app-user-menu />
     </div>
   </aside>
@@ -67,21 +73,36 @@
       >
         <span class="material-symbols-outlined">menu</span>
       </button>
-      <h1 class="topbar-title">{{ pageTitle }}</h1>
-      <app-language-switcher />
-      <a
-        routerLink="/notifications"
-        class="notification-bell"
-        [title]="'layout.notificationsTitle' | translate"
-      >
-        <span class="material-symbols-outlined">notifications</span>
-        @if (unreadNotifications > 0) {
-          <span class="notification-badge">{{
-            unreadNotifications > 9 ? '9+' : unreadNotifications
-          }}</span>
-        }
-      </a>
-      <app-user-menu />
+      <h1 class="topbar-title" [class.is-home]="isHome">{{ pageTitle }}</h1>
+      <div class="topbar-tools">
+        <button
+          type="button"
+          class="icon-btn"
+          [class.active]="season.isYule()"
+          (click)="season.toggle()"
+          [attr.aria-pressed]="season.isYule()"
+          [attr.aria-label]="(season.isYule() ? 'layout.yuleOff' : 'layout.yuleOn') | translate"
+          [title]="(season.isYule() ? 'layout.yuleOff' : 'layout.yuleOn') | translate"
+        >
+          <span class="material-symbols-outlined">{{ season.isYule() ? 'ac_unit' : 'sunny' }}</span>
+        </button>
+        <app-language-switcher />
+        <a
+          routerLink="/notifications"
+          class="icon-btn notification-bell"
+          [title]="'layout.notificationsTitle' | translate"
+        >
+          <span class="material-symbols-outlined">notifications</span>
+          @if (unreadNotifications > 0) {
+            <span class="notification-badge">{{
+              unreadNotifications > 9 ? '9+' : unreadNotifications
+            }}</span>
+          }
+        </a>
+        <div class="topbar-user-desktop">
+          <app-user-menu />
+        </div>
+      </div>
     </header>
 
     <div class="page-content">

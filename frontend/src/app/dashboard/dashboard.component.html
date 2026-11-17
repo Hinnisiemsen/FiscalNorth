@@ -1,23 +1,42 @@
 <div class="dashboard page-content-inner">
-  <header class="dash-header">
-    <div>
-      <h1>{{ greeting }}</h1>
-
-      <p class="dash-period">
-        {{ 'dashboard.overviewPeriod' | translate: { period: periodLabel } }}
+  <section class="home-hero">
+    @if (isYule) {
+      <p class="season-kicker">
+        <span class="material-symbols-outlined">ac_unit</span>
+        {{ 'dashboard.seasonKicker' | translate }}
       </p>
+    }
+
+    <h1 class="dash-greeting">{{ greeting }}</h1>
+    <p class="dash-sub">{{ 'dashboard.heroSub' | translate: { period: periodLabel } }}</p>
+
+    <div class="prompt-grid">
+      @for (card of promptCards; track card.id) {
+        <button type="button" class="prompt-card" (click)="openPrompt(card)">
+          <span class="prompt-card-icon">
+            <span class="material-symbols-outlined">{{ card.icon }}</span>
+          </span>
+          <span class="prompt-card-title">{{ card.titleKey | translate }}</span>
+        </button>
+      }
     </div>
 
-    <a routerLink="/assistant" class="header-assistant-link">
-      <span class="material-symbols-outlined">auto_awesome</span>
-
-      <span class="hide-mobile">{{ 'dashboard.openChat' | translate }}</span>
-    </a>
-  </header>
+    <div class="home-composer">
+      <app-fiscal-north-ask-bar
+        variant="hero"
+        [suggestions]="[]"
+        [showAnalysisChip]="false"
+        [showBrand]="false"
+      />
+    </div>
+  </section>
 
   @if (loading) {
     <p class="loading-hint">{{ 'dashboard.loading' | translate }}</p>
   } @else {
+    <p class="kpi-section-label">
+      {{ 'dashboard.overviewPeriod' | translate: { period: periodLabel } }}
+    </p>
     <section class="overview-strip card-glass" aria-label="KPIs">
       <div class="overview-item" [class.highlight-negative]="currentTotals.net < 0">
         <span class="overview-label">{{ 'dashboard.balanceMonth' | translate }}</span>
@@ -54,7 +73,10 @@
       <div class="overview-item">
         <span class="overview-label">{{ 'dashboard.householdBudgets' | translate }}</span>
         <span class="overview-value">{{ householdBudgetSpent | currency: 'EUR' }}</span>
-        <span class="overview-hint">{{ householdBudgetSpent | currency: 'EUR' }} / {{ householdBudgetLimit | currency: 'EUR' }}</span>
+        <span class="overview-hint"
+          >{{ householdBudgetSpent | currency: 'EUR' }} /
+          {{ householdBudgetLimit | currency: 'EUR' }}</span
+        >
       </div>
 
       <div class="overview-item">
@@ -68,13 +90,6 @@
 
     <div class="dash-layout">
       <div class="dash-primary">
-        <app-fiscal-north-ask-bar
-          variant="hero"
-          [placeholder]="generalAsk.placeholder"
-          [suggestions]="generalAsk.suggestions"
-          [showAnalysisChip]="true"
-        />
-
         <section class="hero-compact card-glass">
           <span class="hero-label">{{ 'dashboard.availableAfterFixed' | translate }}</span>
 
@@ -218,7 +233,11 @@
                       class="category-bar"
                       style="text-decoration: none; color: inherit"
                       [routerLink]="['/transactions']"
-                      [queryParams]="{ category: c.categoryName, year: currentYear, month: currentMonth }"
+                      [queryParams]="{
+                        category: c.categoryName,
+                        year: currentYear,
+                        month: currentMonth,
+                      }"
                     >
                       <span class="cat-name">{{ c.categoryName }}</span>
 
@@ -305,9 +324,17 @@
                   <ng-container *ngTemplateOutlet="panelAiBlock; context: { panel: 'budgets' }" />
 
                   @for (b of activeBudgets(); track b.id) {
-                    <a class="budget-row" [class]="budgetStatusClass(b)" style="text-decoration: none; color: inherit" [routerLink]="['/budgets']">
+                    <a
+                      class="budget-row"
+                      [class]="budgetStatusClass(b)"
+                      style="text-decoration: none; color: inherit"
+                      [routerLink]="['/budgets']"
+                    >
                       <div class="budget-row-head">
-                        <span>{{ b.name }} · {{ b.remaining | currency: 'EUR' }} {{ 'budgets.remaining' | translate }}</span>
+                        <span
+                          >{{ b.name }} · {{ b.remaining | currency: 'EUR' }}
+                          {{ 'budgets.remaining' | translate }}</span
+                        >
                         <span>{{ budgetUsagePercent(b) | number: '1.0-0' }} %</span>
                       </div>
                       <div class="bar-track">
