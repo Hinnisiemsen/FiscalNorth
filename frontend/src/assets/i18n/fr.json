@@ -240,6 +240,8 @@
   },
   "assistant": {
     "unavailable": "Fiscal North est temporairement indisponible.",
+    "statusChrome": "Les réponses utilisent le modèle dans Chrome.",
+    "statusChromeDownload": "Les réponses utilisent le modèle dans Chrome. Le premier téléchargement peut prendre un moment.",
     "welcomeTitle": "Bonjour, je suis Fiscal North",
     "welcomeText": "Posez-moi des questions sur vos comptes, dépenses et budgets — je réponds à partir de vos données dans l'application.",
     "examplesLabel": "Appuyez sur un exemple :",
@@ -325,6 +327,7 @@
     "empty": "Aucun budget trouvé.",
     "newTitle": "Nouveau budget",
     "name": "Nom",
+    "namePlaceholder": "p. ex. Courses, loisirs",
     "limit": "Plafond (€)",
     "startDate": "Date de début",
     "endDate": "Date de fin",

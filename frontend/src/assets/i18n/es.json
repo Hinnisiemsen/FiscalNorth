@@ -240,6 +240,8 @@
   },
   "assistant": {
     "unavailable": "Fiscal North no está disponible temporalmente.",
+    "statusChrome": "Las respuestas usan el modelo en Chrome.",
+    "statusChromeDownload": "Las respuestas usan el modelo en Chrome. La primera descarga puede tardar un momento.",
     "welcomeTitle": "Hola, soy Fiscal North",
     "welcomeText": "Pregúnteme sobre cuentas, gastos y presupuestos — respondo según sus datos en la aplicación.",
     "examplesLabel": "Pulse un ejemplo:",
@@ -325,6 +327,7 @@
     "empty": "No se encontraron presupuestos.",
     "newTitle": "Nuevo presupuesto",
     "name": "Nombre",
+    "namePlaceholder": "p. ej. Comida, ocio",
     "limit": "Límite (€)",
     "startDate": "Fecha de inicio",
     "endDate": "Fecha de fin",

@@ -69,6 +69,10 @@ export class AssistantComponent implements OnInit {
     return !this.entitlementService.hasFeature('AI_ASSISTANT');
   }
 
+  get chatBlocked(): boolean {
+    return this.premiumBlocked || !this.aiAvailable;
+  }
+
   constructor(
     private ai: AiService,
     private budgetService: BudgetService,
@@ -99,7 +103,15 @@ export class AssistantComponent implements OnInit {
     this.ai.getStatus().subscribe({
       next: (s) => {
         this.aiAvailable = s.available;
-        this.setupHint = s.available ? '' : s.message;
+        if (s.source === 'chrome') {
+          this.setupHint = this.lang.instant(
+            s.chromeState === 'available'
+              ? 'assistant.statusChrome'
+              : 'assistant.statusChromeDownload',
+          );
+        } else {
+          this.setupHint = !s.available || s.demo ? s.message : '';
+        }
         this.tryConsumePendingQuery();
       },
       error: () => {
@@ -128,13 +140,13 @@ export class AssistantComponent implements OnInit {
 
   send(): void {
     const text = this.inputText.trim();
-    if (!text || this.loading) return;
+    if (!text || this.loading || this.chatBlocked) return;
     this.sendMessage(text);
   }
 
   askFollowUp(question: string): void {
     const text = question.trim();
-    if (!text || this.loading) return;
+    if (!text || this.loading || this.chatBlocked) return;
     this.sendMessage(text);
   }
 

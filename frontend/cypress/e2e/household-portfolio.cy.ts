@@ -14,7 +14,20 @@ describe('Household, portfolio, splits, and demo paywall', () => {
     cy.contains('AAPL');
     cy.contains('VWCE.DE');
     cy.contains(/total value|gesamtwert/i);
-    cy.contains(/asset allocation|asset allocation/i);
+    cy.contains(/asset allocation|asset-allokation/i);
+  });
+
+  it('adds an ETF holding from the portfolio form', () => {
+    cy.visit('/portfolio');
+    cy.get('[data-cy=add-holding]').click();
+    cy.get('[data-cy=holding-symbol]').type('IWDA');
+    cy.get('[data-cy=holding-name]').type('MSCI World');
+    cy.get('[data-cy=holding-quantity]').type('3');
+    cy.get('[data-cy=holding-cost]').type('250');
+    cy.get('[data-cy=holding-asset-class]').select('ETF');
+    cy.get('[data-cy=save-holding]').click();
+    cy.contains('IWDA');
+    cy.contains(/MSCI World/);
   });
 
   it('shows budget remaining and member breakdown', () => {
